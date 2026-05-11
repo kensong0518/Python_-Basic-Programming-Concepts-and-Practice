@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐍 Python 互動參考書</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0b0d14;
+    --bg2:       #111320;
+    --bg3:       #181b2a;
+    --bg4:       #1e2235;
+    --border:    rgba(100,120,255,0.15);
+    --border2:   rgba(100,120,255,0.3);
+    --green:     #00e5a0;
+    --green2:    #00c484;
+    --blue:      #5b8fff;
+    --purple:    #b07fff;
+    --yellow:    #ffd166;
+    --red:       #ff6b6b;
+    --orange:    #ff9f43;
+    --text:      #c8d0e8;
+    --text2:     #7b89b0;
+    --text3:     #4a5474;
+    --white:     #e8eeff;
+    --glow:      0 0 20px rgba(0,229,160,0.25);
+    --glow-b:    0 0 20px rgba(91,143,255,0.25);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── GRID NOISE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(100,120,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(100,120,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(11,13,20,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+
+  .logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem; font-weight: 700;
+    color: var(--green);
+    letter-spacing: 0.05em;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .logo-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .header-nav {
+    display: flex; gap: 0.5rem;
+  }
+
+  .header-nav button {
+    background: none; border: 1px solid var(--border);
+    color: var(--text2); padding: 0.3rem 0.8rem;
+    border-radius: 6px; cursor: pointer;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.8rem; transition: all 0.2s;
+  }
+
+  .header-nav button:hover, .header-nav button.active {
+    background: var(--bg4); color: var(--white);
+    border-color: var(--border2);
+  }
+
+  /* ─── LAYOUT ─── */
+  .layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    max-width: 1400px; margin: 0 auto;
+    min-height: calc(100vh - 60px);
+    position: relative; z-index: 1;
+  }
+
+  /* ─── SIDEBAR ─── */
+  aside {
+    position: sticky; top: 60px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 1rem;
+    background: rgba(17,19,32,0.5);
+  }
+
+  aside::-webkit-scrollbar { width: 4px; }
+  aside::-webkit-scrollbar-track { background: transparent; }
+  aside::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+
+  .sidebar-title {
+    font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text3); padding: 0 0.5rem; margin-bottom: 0.8rem;
+  }
+
+  .nav-chapter {
+    margin-bottom: 0.25rem;
+  }
+
+  .nav-chapter-btn {
+    width: 100%; text-align: left;
+    background: none; border: none; cursor: pointer;
+    color: var(--text2); padding: 0.45rem 0.7rem;
+    border-radius: 8px; font-size: 0.85rem;
+    font-family: 'Noto Sans TC', sans-serif;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: all 0.2s; gap: 8px;
+  }
+
+  .nav-chapter-btn:hover { background: var(--bg4); color: var(--white); }
+  .nav-chapter-btn.active {
+    background: rgba(0,229,160,0.08);
+    color: var(--green);
+    border-left: 2px solid var(--green);
+  }
+
+  .nav-chapter-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; color: var(--text3);
+    background: var(--bg4); padding: 2px 6px; border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .nav-chapter-btn.active .nav-chapter-num { color: var(--green); background: rgba(0,229,160,0.15); }
+
+  .nav-sub { padding-left: 1rem; display: none; }
+  .nav-sub.open { display: block; }
+
+  .nav-sub a {
+    display: block; color: var(--text3);
+    padding: 0.3rem 0.7rem; border-radius: 6px;
+    text-decoration: none; font-size: 0.78rem;
+    transition: all 0.2s;
+  }
+
+  .nav-sub a:hover { color: var(--text); background: var(--bg3); }
+  .nav-sub a.active { color: var(--blue); }
+
+  /* ─── MAIN ─── */
+  main {
+    padding: 3rem 3rem 5rem;
+    max-width: 960px;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    margin-bottom: 4rem;
+    padding: 3rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    position: relative; overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute; top: -60px; right: -60px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(0,229,160,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute; bottom: -80px; left: 30%;
+    width: 300px; height: 200px;
+    background: radial-gradient(circle, rgba(91,143,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(0,229,160,0.1); border: 1px solid rgba(0,229,160,0.3);
+    color: var(--green); font-size: 0.75rem; font-weight: 600;
+    padding: 4px 12px; border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em; margin-bottom: 1.2rem;
+  }
+
+  .hero h1 {
+    font-size: 2.8rem; font-weight: 900;
+    color: var(--white);
+    line-height: 1.2; margin-bottom: 1rem;
+  }
+
+  .hero h1 span { color: var(--green); }
+
+  .hero p { color: var(--text2); font-size: 1rem; max-width: 500px; }
+
+  .hero-stats {
+    display: flex; gap: 2rem; margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex; flex-direction: column;
+  }
+
+  .stat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.8rem; font-weight: 700;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.75rem; color: var(--text3); margin-top: 4px;
+  }
+
+  /* ─── CHAPTER ─── */
+  .chapter {
+    margin-bottom: 5rem;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .chapter-header {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 2rem; padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .chapter-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; font-weight: 700;
+    color: var(--green); background: rgba(0,229,160,0.1);
+    border: 1px solid rgba(0,229,160,0.2);
+    padding: 4px 10px; border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  .chapter h2 {
+    font-size: 1.7rem; font-weight: 800; color: var(--white);
+  }
+
+  /* ─── SECTION ─── */
+  .section { margin-bottom: 2.5rem; }
+
+  .section h3 {
+    font-size: 1.15rem; font-weight: 700;
+    color: var(--white); margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+
+  .section h3::before {
+    content: '';
+    width: 4px; height: 20px;
+    background: linear-gradient(180deg, var(--green), var(--blue));
+    border-radius: 2px; flex-shrink: 0;
+  }
+
+  .section h4 {
+    font-size: 0.95rem; font-weight: 700;
+    color: var(--blue); margin: 1.2rem 0 0.6rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  p { margin-bottom: 0.8rem; color: var(--text); }
+
+  /* ─── CODE BLOCK ─── */
+  .code-block {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    margin: 1rem 0;
+    transition: border-color 0.2s;
+  }
+
+  .code-block:hover { border-color: var(--border2); }
+
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.6rem 1rem;
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .code-dots span:nth-child(1) { background: #ff5f56; }
+  .code-dots span:nth-child(2) { background: #ffbd2e; }
+  .code-dots span:nth-child(3) { background: #27c93f; }
+
+  .code-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; color: var(--text3);
+    letter-spacing: 0.08em;
+  }
+
+  .copy-btn {
+    background: none; border: 1px solid var(--border);
+    color: var(--text3); padding: 3px 10px;
+    border-radius: 5px; cursor: pointer;
+    font-size: 0.72rem; transition: all 0.2s;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+
+  .copy-btn:hover { background: var(--bg4); color: var(--white); border-color: var(--border2); }
+  .copy-btn.copied { color: var(--green); border-color: rgba(0,229,160,0.4); }
+
+  pre {
+    padding: 1.2rem 1.4rem;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.65;
+  }
+
+  pre::-webkit-scrollbar { height: 4px; }
+  pre::-webkit-scrollbar-track { background: transparent; }
+  pre::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+
+  /* syntax */
+  .kw  { color: #c792ea; font-weight: 600; }
+  .fn  { color: var(--blue); }
+  .str { color: var(--green); }
+  .num { color: var(--orange); }
+  .cmt { color: var(--text3); font-style: italic; }
+  .var { color: #82aaff; }
+  .op  { color: var(--yellow); }
+  .pun { color: var(--text2); }
+
+  /* output block */
+  .output-block {
+    background: rgba(0,229,160,0.04);
+    border: 1px solid rgba(0,229,160,0.15);
+    border-left: 3px solid var(--green);
+    border-radius: 0 10px 10px 0;
+    padding: 0.9rem 1.2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--green);
+    margin: 0.5rem 0 1rem;
+  }
+
+  .output-block::before {
+    content: '▶ 執行結果';
+    display: block; font-size: 0.68rem;
+    color: var(--green2); opacity: 0.7;
+    margin-bottom: 0.4rem; letter-spacing: 0.08em;
+  }
+
+  /* ─── INFO BOXES ─── */
+  .tip, .warn, .note {
+    border-radius: 10px; padding: 1rem 1.2rem;
+    margin: 1rem 0; font-size: 0.9rem;
+    display: flex; gap: 0.8rem; align-items: flex-start;
+  }
+
+  .tip {
+    background: rgba(0,229,160,0.06);
+    border: 1px solid rgba(0,229,160,0.2);
+    color: var(--text);
+  }
+
+  .warn {
+    background: rgba(255,107,107,0.06);
+    border: 1px solid rgba(255,107,107,0.2);
+    color: var(--text);
+  }
+
+  .note {
+    background: rgba(91,143,255,0.06);
+    border: 1px solid rgba(91,143,255,0.2);
+    color: var(--text);
+  }
+
+  .tip-icon, .warn-icon, .note-icon {
+    font-size: 1.1rem; flex-shrink: 0; margin-top: 1px;
+  }
+
+  /* ─── TABLE ─── */
+  .table-wrap { overflow-x: auto; margin: 1rem 0; border-radius: 10px; }
+
+  table {
+    width: 100%; border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  th {
+    background: var(--bg3);
+    color: var(--white); font-weight: 700;
+    padding: 0.75rem 1rem; text-align: left;
+    font-size: 0.8rem; letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border2);
+  }
+
+  td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  td code, th code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg4); color: var(--yellow);
+    padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;
+  }
+
+  /* ─── PRACTICE CARDS ─── */
+  .practice {
+    border-radius: 14px; overflow: hidden;
+    margin: 2rem 0;
+    border: 1px solid var(--border);
+  }
+
+  .practice-easy .practice-header { background: rgba(0,229,160,0.08); border-bottom-color: rgba(0,229,160,0.2); }
+  .practice-hard .practice-header { background: rgba(255,107,107,0.08); border-bottom-color: rgba(255,107,107,0.2); }
+
+  .practice-header {
+    padding: 1rem 1.2rem;
+    display: flex; align-items: center; gap: 0.8rem;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  .practice-badge {
+    font-size: 0.7rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em; white-space: nowrap;
+  }
+
+  .practice-easy .practice-badge {
+    background: rgba(0,229,160,0.15); color: var(--green);
+    border: 1px solid rgba(0,229,160,0.3);
+  }
+
+  .practice-hard .practice-badge {
+    background: rgba(255,107,107,0.15); color: var(--red);
+    border: 1px solid rgba(255,107,107,0.3);
+  }
+
+  .practice-title {
+    font-weight: 700; color: var(--white); font-size: 0.95rem;
+    flex: 1;
+  }
+
+  .practice-body {
+    padding: 1.2rem; background: var(--bg2);
+  }
+
+  .practice-q { color: var(--text); margin-bottom: 1rem; }
+
+  .toggle-answer {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text2); padding: 0.5rem 1rem;
+    border-radius: 8px; cursor: pointer;
+    font-size: 0.82rem; transition: all 0.25s;
+    font-family: 'Noto Sans TC', sans-serif;
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 0.5rem;
+  }
+
+  .toggle-answer:hover { background: var(--bg4); color: var(--white); border-color: var(--border2); }
+  .toggle-answer.open { color: var(--yellow); border-color: rgba(255,209,102,0.3); }
+
+  .answer-box {
+    display: none; margin-top: 1rem;
+    animation: slideDown 0.3s ease;
+  }
+
+  .answer-box.open { display: block; }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── OPERATOR GRID ─── */
+  .op-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.6rem; margin: 1rem 0;
+  }
+
+  .op-card {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.8rem;
+    text-align: center; transition: all 0.2s;
+  }
+
+  .op-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+
+  .op-symbol {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.3rem; font-weight: 700; color: var(--yellow);
+    line-height: 1;
+  }
+
+  .op-name { font-size: 0.72rem; color: var(--text3); margin-top: 4px; }
+  .op-example { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text2); margin-top: 2px; }
+
+  /* ─── CHAPTER NAV PILLS ─── */
+  .chapter-pills {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 3rem;
+  }
+
+  .pill {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text2); padding: 0.5rem 1rem;
+    border-radius: 30px; font-size: 0.8rem;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+
+  .pill:hover { background: var(--bg4); color: var(--white); border-color: var(--border2); }
+
+  /* ─── PROGRESS BAR ─── */
+  .progress-track {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.2rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .progress-label {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 0.7rem;
+  }
+
+  .progress-text { font-size: 0.82rem; color: var(--text2); }
+  .progress-pct { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: 700; color: var(--green); }
+
+  .progress-bar {
+    height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--green), var(--blue));
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  /* ─── INLINE CODE ─── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg4); color: var(--yellow);
+    padding: 2px 6px; border-radius: 4px; font-size: 0.85em;
+  }
+
+  /* ─── SEARCH ─── */
+  .search-box {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.4rem 0.8rem;
+    transition: border-color 0.2s;
+  }
+
+  .search-box:focus-within { border-color: var(--border2); }
+  .search-icon { color: var(--text3); font-size: 0.9rem; }
+
+  .search-input {
+    background: none; border: none; outline: none;
+    color: var(--text); font-size: 0.82rem;
+    font-family: 'Noto Sans TC', sans-serif;
+    width: 160px;
+  }
+
+  .search-input::placeholder { color: var(--text3); }
+
+  /* ─── FLOW CHART / CONCEPT VIZ ─── */
+  .concept-flow {
+    display: flex; align-items: center; gap: 0;
+    flex-wrap: wrap; margin: 1rem 0;
+  }
+
+  .flow-box {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.6rem 1rem;
+    font-size: 0.82rem; color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .flow-arrow { color: var(--text3); padding: 0 0.5rem; font-size: 1.1rem; }
+
+  /* ─── SCROLL INDICATOR ─── */
+  .scroll-top {
+    position: fixed; bottom: 2rem; right: 2rem;
+    width: 40px; height: 40px;
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 10px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text2); font-size: 1rem;
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s; z-index: 50;
+  }
+
+  .scroll-top.visible { opacity: 1; pointer-events: all; }
+  .scroll-top:hover { background: var(--bg4); color: var(--white); }
+
+  /* ─── CHAPTER DIVIDER ─── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 3rem 0;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { display: none; }
+    main { padding: 2rem 1.5rem 4rem; }
+    .hero h1 { font-size: 2rem; }
+    .hero { padding: 2rem; }
+  }
+
+  /* ─── ANIMATIONS ─── */
+  .chapter { opacity: 0; transform: translateY(24px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .chapter.visible { opacity: 1; transform: translateY(0); }
+
+  /* ─── SEARCH HIGHLIGHT ─── */
+  .highlight { background: rgba(255,209,102,0.25); border-radius: 2px; }
+
+  /* ─── TOOLTIP ─── */
+  [data-tip] { position: relative; cursor: help; }
+  [data-tip]::after {
+    content: attr(data-tip);
+    position: absolute; bottom: 120%; left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg4); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 4px 10px; font-size: 0.75rem;
+    white-space: nowrap; pointer-events: none;
+    opacity: 0; transition: opacity 0.2s;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+  [data-tip]:hover::after { opacity: 1; }
+
+</style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    Python 互動參考書
+  </div>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="text" id="searchInput" placeholder="搜尋關鍵字...">
+    </div>
+    <div class="header-nav">
+      <button onclick="expandAll()">展開全部</button>
+      <button onclick="collapseAll()">收合全部</button>
+    </div>
+  </div>
+</header>
+
+<!-- ─── LAYOUT ─── -->
+<div class="layout">
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside>
+    <div class="sidebar-title">章節目錄</div>
+
+    <div id="navTree"></div>
+
+    <div style="margin-top:2rem; padding:0 0.5rem;">
+      <div class="sidebar-title" style="margin-bottom:0.6rem;">學習進度</div>
+      <div class="progress-track" style="padding:0.8rem;">
+        <div class="progress-label">
+          <span class="progress-text">解鎖題目</span>
+          <span class="progress-pct" id="progressPct">0%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN ─── -->
+  <main id="mainContent">
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-badge">
+        <span>●</span> Python 3 互動參考書
+      </div>
+      <h1>從零開始學<br><span>Python</span> 程式設計</h1>
+      <p>涵蓋 7 大章節、完整範例、詳細說明與互動練習題，適合零基礎初學者。</p>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-num">7</div><div class="stat-label">章節</div></div>
+        <div class="stat"><div class="stat-num">40+</div><div class="stat-label">程式範例</div></div>
+        <div class="stat"><div class="stat-num">14</div><div class="stat-label">互動練習</div></div>
+      </div>
+    </div>
+
+    <!-- chapter pills -->
+    <div class="chapter-pills" id="chapterPills"></div>
+
+    <!-- ══════════════════════════════════════════
+         CH1: 認識程式設計
+    ══════════════════════════════════════════ -->
+    <div class="chapter" id="ch1">
+      <div class="chapter-header">
+        <span class="chapter-num">CH 01</span>
+        <h2>認識程式設計</h2>
+      </div>
+
+      <div class="section" id="ch1-1">
+        <h3>1-1 什麼是程式？</h3>
+        <p><strong style="color:var(--white)">程式（Program）</strong>是由一連串指令所組成，用來告訴電腦如何執行特定的工作。</p>
+        <div class="table-wrap"><table>
+          <tr><th>名詞</th><th>說明</th><th>比喻</th></tr>
+          <tr><td><strong style="color:var(--yellow)">演算法</strong>（Algorithm）</td><td>解決問題的步驟與方法</td><td>食譜</td></tr>
+          <tr><td><strong style="color:var(--yellow)">程式</strong>（Program）</td><td>用程式語言撰寫的演算法</td><td>依照食譜寫下的步驟</td></tr>
+          <tr><td><strong style="color:var(--yellow)">軟體</strong>（Software）</td><td>由一個或多個程式組成的系統</td><td>整本食譜書</td></tr>
+        </table></div>
+        <div class="tip"><span class="tip-icon">💡</span><div><strong>程式設計師（Programmer）</strong> 負責撰寫程式，讓使用者（User）能透過程式完成任務，例如：計算成績、傳送訊息、播放音樂。</div></div>
+      </div>
+
+      <div class="section" id="ch1-2">
+        <h3>1-2 程式語言種類</h3>
+        <div class="table-wrap"><table>
+          <tr><th>類型</th><th>說明</th><th>範例</th></tr>
+          <tr><td>機器語言</td><td>由 0 和 1 組成，電腦直接執行</td><td><code>10110000 01100001</code></td></tr>
+          <tr><td>高階語言</td><td>接近人類語言，需翻譯才能執行</td><td>Python、C/C++、Java</td></tr>
+        </table></div>
+        <p><strong style="color:var(--green)">Python 的特色：</strong>語法簡潔、功能強大（AI/網頁/資料分析）、跨平台、免費開源。</p>
+      </div>
+
+      <div class="section" id="ch1-3">
+        <h3>1-3 開發環境：Google Colab</h3>
+        <p>Google Colab 是免費線上 Python 執行環境，不需安裝任何軟體。</p>
+        <p>第一個 Python 程式範例：</p>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="fn">print</span><span class="pun">(</span><span class="str">"Hello, World!"</span><span class="pun">)</span></pre>
+        </div>
+        <div class="output-block">Hello, World!</div>
+      </div>
+
+      <div class="section" id="ch1-4">
+        <h3>1-4 錯誤與除錯</h3>
+        <div class="table-wrap"><table>
+          <tr><th>錯誤類型</th><th>說明</th><th>範例</th></tr>
+          <tr><td>語法錯誤（Syntax Error）</td><td>程式碼格式寫錯</td><td><code>prnt("Hello")</code> 拼字錯誤</td></tr>
+          <tr><td>邏輯錯誤（Logic Error）</td><td>程式能執行，但結果不正確</td><td>加法寫成減法</td></tr>
+          <tr><td>執行時錯誤（Runtime Error）</td><td>執行過程中發生錯誤</td><td>除以 0</td></tr>
+        </table></div>
+        <div class="warn"><span class="warn-icon">⚠️</span><div>Python 是<strong>大小寫敏感</strong>的語言，<code>Print</code> 和 <code>print</code> 是不同的！</div></div>
+      </div>
+
+      <!-- Practice 1 -->
+      <div class="practice practice-easy">
+        <div class="practice-header" onclick="togglePractice(this)">
+          <span class="practice-badge">⭐ 簡單</span>
+          <span class="practice-title">練習 1-1｜第一個程式</span>
+          <span style="color:var(--text3)">▼</span>
+        </div>
+        <div class="practice-body">
+          <div class="practice-q">撰寫程式，在螢幕上分三行印出：<br><code>我是Python初學者</code>、<code>我喜歡寫程式</code>、<code>加油！</code></div>
+          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
+          <div class="answer-box">
+            <div class="code-block">
+              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+              <pre><span class="fn">print</span><span class="pun">(</span><span class="str">"我是Python初學者"</span><span class="pun">)</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">"我喜歡寫程式"</span><span class="pun">)</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">"加油！"</span><span class="pun">)</span></pre>
+            </div>
+            <div class="output-block">我是Python初學者
+我喜歡寫程式
+加油！</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="practice practice-hard">
+        <div class="practice-header" onclick="togglePractice(this)">
+          <span class="practice-badge">🔥 困難</span>
+          <span class="practice-title">練習 1-2｜sep 與 end 應用</span>
+          <span style="color:var(--text3)">▼</span>
+        </div>
+        <div class="practice-body">
+          <div class="practice-q">用<strong>一行 print()</strong>，利用 <code>sep</code> 和 <code>end</code> 印出：<br><code>P-Y-T-H-O-N!</code>（每字母間用 <code>-</code> 分隔，結尾為 <code>!</code>）</div>
+          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
+          <div class="answer-box">
+            <div class="code-block">
+              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+              <pre><span class="fn">print</span><span class="pun">(</span><span class="str">'P'</span><span class="pun">,</span><span class="str">'Y'</span><span class="pun">,</span><span class="str">'T'</span><span class="pun">,</span><span class="str">'H'</span><span class="pun">,</span><span class="str">'O'</span><span class="pun">,</span><span class="str">'N'</span><span class="pun">,</span> sep<span class="op">=</span><span class="str">'-'</span><span class="pun">,</span> end<span class="op">=</span><span class="str">'!\n'</span><span class="pun">)</span></pre>
+            </div>
+            <div class="output-block">P-Y-T-H-O-N!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         CH2: 變數與資料型態
+    ══════════════════════════════════════════ -->
+    <div class="chapter" id="ch2">
+      <div class="chapter-header">
+        <span class="chapter-num">CH 02</span>
+        <h2>變數與資料型態</h2>
+      </div>
+
+      <div class="section" id="ch2-1">
+        <h3>2-1 變數（Variable）</h3>
+        <p><strong style="color:var(--white)">變數</strong>是用來儲存資料的容器，可以想像成一個有名字的盒子。語法：<code>變數名稱 = 值</code></p>
+        <div class="warn"><span class="warn-icon">⚠️</span><div><code>=</code> 是「指定」，不是數學上的「等於」！等於判斷在 Python 中是 <code>==</code></div></div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="var">name</span>       <span class="op">=</span> <span class="str">'Alice'</span>    <span class="cmt"># 字串型態</span>
+<span class="var">age</span>        <span class="op">=</span> <span class="num">16</span>         <span class="cmt"># 整數型態</span>
+<span class="var">height</span>     <span class="op">=</span> <span class="num">160.5</span>      <span class="cmt"># 浮點數型態</span>
+<span class="var">is_student</span> <span class="op">=</span> <span class="kw">True</span>       <span class="cmt"># 布林型態</span></pre>
+        </div>
+      </div>
+
+      <div class="section" id="ch2-2">
+        <h3>2-2 四種資料型態</h3>
+        <div class="table-wrap"><table>
+          <tr><th>型態</th><th>英文</th><th>範例值</th><th>說明</th></tr>
+          <tr><td>整數</td><td><code>int</code></td><td><code>10, -5, 0</code></td><td>沒有小數點的數字</td></tr>
+          <tr><td>浮點數</td><td><code>float</code></td><td><code>3.14, 98.5</code></td><td>有小數點的數字</td></tr>
+          <tr><td>字串</td><td><code>str</code></td><td><code>'Hello', "台北"</code></td><td>用引號包起的文字</td></tr>
+          <tr><td>布林</td><td><code>bool</code></td><td><code>True, False</code></td><td>真或假，只有兩個值</td></tr>
+        </table></div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="fn">print</span><span class="pun">(</span><span class="fn">type</span><span class="pun">(</span><span class="num">10</span><span class="pun">))</span>       <span class="cmt"># &lt;class 'int'&gt;</span>
+<span class="fn">print</span><span class="pun">(</span><span class="fn">type</span><span class="pun">(</span><span class="num">3.14</span><span class="pun">))</span>     <span class="cmt"># &lt;class 'float'&gt;</span>
+<span class="fn">print</span><span class="pun">(</span><span class="fn">type</span><span class="pun">(</span><span class="str">'hello'</span><span class="pun">))</span>  <span class="cmt"># &lt;class 'str'&gt;</span>
+<span class="fn">print</span><span class="pun">(</span><span class="fn">type</span><span class="pun">(</span><span class="kw">True</span><span class="pun">))</span>      <span class="cmt"># &lt;class 'bool'&gt;</span></pre>
+        </div>
+      </div>
+
+      <div class="section" id="ch2-3">
+        <h3>2-3 命名規則</h3>
+        <p>✅ 只能用英文字母、數字、底線 <code>_</code>，且<strong>不能以數字開頭</strong>。</p>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="cmt"># ✅ 合法命名</span>
+<span class="var">_pay</span>         <span class="op">=</span> <span class="num">14</span>
+<span class="var">sum_total</span>    <span class="op">=</span> <span class="num">100</span>
+<span class="var">studentName</span>  <span class="op">=</span> <span class="str">"Bob"</span>
+
+<span class="cmt"># ❌ 不合法（會發生錯誤）</span>
+<span class="cmt"># 7lucky = 11     ← 以數字開頭</span>
+<span class="cmt"># w-e-6-K = 2.5   ← 含有連字號</span></pre>
+        </div>
+      </div>
+
+      <div class="section" id="ch2-4">
+        <h3>2-4 變數互換</h3>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="cmt"># 方法一：暫存變數</span>
+<span class="var">x</span>, <span class="var">y</span> <span class="op">=</span> <span class="num">3</span>, <span class="num">5</span>
+<span class="var">temp</span> <span class="op">=</span> <span class="var">x</span>
+<span class="var">x</span> <span class="op">=</span> <span class="var">y</span>
+<span class="var">y</span> <span class="op">=</span> <span class="var">temp</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">x</span>, <span class="var">y</span><span class="pun">)</span>  <span class="cmt"># 5 3</span>
+
+<span class="cmt"># 方法二：Python 一行互換（更簡潔！）</span>
+<span class="var">x</span>, <span class="var">y</span> <span class="op">=</span> <span class="num">3</span>, <span class="num">5</span>
+<span class="var">x</span>, <span class="var">y</span> <span class="op">=</span> <span class="var">y</span>, <span class="var">x</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">x</span>, <span class="var">y</span><span class="pun">)</span>  <span class="cmt"># 5 3</span></pre>
+        </div>
+      </div>
+
+      <div class="practice practice-easy">
+        <div class="practice-header" onclick="togglePractice(this)">
+          <span class="practice-badge">⭐ 簡單</span>
+          <span class="practice-title">練習 2-1｜自我介紹輸出</span>
+          <span style="color:var(--text3)">▼</span>
+        </div>
+        <div class="practice-body">
+          <div class="practice-q">定義三個變數 <code>name</code>、<code>age</code>、<code>city</code>，分別儲存姓名、年齡、城市，然後印出：<br><code>我叫 Alice，今年 16 歲，住在 台北。</code></div>
+          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
+          <div class="answer-box">
+            <div class="code-block">
+              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+              <pre><span class="var">name</span> <span class="op">=</span> <span class="str">'Alice'</span>
+<span class="var">age</span>  <span class="op">=</span> <span class="num">16</span>
+<span class="var">city</span> <span class="op">=</span> <span class="str">'台北'</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'我叫'</span><span class="pun">,</span> <span class="var">name</span><span class="pun">,</span> <span class="str">'，今年'</span><span class="pun">,</span> <span class="var">age</span><span class="pun">,</span> <span class="str">'歲，住在'</span><span class="pun">,</span> <span class="var">city</span><span class="pun">,</span> <span class="str">'。'</span><span class="pun">,</span> sep<span class="op">=</span><span class="str">''</span><span class="pun">)</span></pre>
+            </div>
+            <div class="output-block">我叫Alice，今年16歲，住在台北。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="practice practice-hard">
+        <div class="practice-header" onclick="togglePractice(this)">
+          <span class="practice-badge">🔥 困難</span>
+          <span class="practice-title">練習 2-2｜三變數循環位移</span>
+          <span style="color:var(--text3)">▼</span>
+        </div>
+        <div class="practice-body">
+          <div class="practice-q"><code>a=1, b=2, c=3</code>，不新增額外變數，讓值循環位移：<code>a→2, b→3, c→1</code></div>
+          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
+          <div class="answer-box">
+            <div class="code-block">
+              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+              <pre><span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span> <span class="op">=</span> <span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>
+<span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span> <span class="op">=</span> <span class="var">b</span>, <span class="var">c</span>, <span class="var">a</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span><span class="pun">)</span>  <span class="cmt"># 2 3 1</span></pre>
+            </div>
+            <div class="output-block">2 3 1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         CH3: 輸入與輸出
+    ══════════════════════════════════════════ -->
+    <div class="chapter" id="ch3">
+      <div class="chapter-header">
+        <span class="chapter-num">CH 03</span>
+        <h2>輸入與輸出</h2>
+      </div>
+
+      <div class="section" id="ch3-1">
+        <h3>3-1 輸出：print()</h3>
+        <div class="table-wrap"><table>
+          <tr><th>參數</th><th>預設值</th><th>功能</th><th>範例</th></tr>
+          <tr><td><code>sep</code></td><td>空格</td><td>多個值之間的分隔符</td><td><code>sep='-'</code> → <code>A-B-C</code></td></tr>
+          <tr><td><code>end</code></td><td>換行 <code>\n</code></td><td>輸出結尾符號</td><td><code>end=''</code> → 不換行</td></tr>
+        </table></div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="fn">print</span><span class="pun">(</span><span class="str">'A'</span><span class="pun">,</span> <span class="str">'B'</span><span class="pun">,</span> <span class="str">'C'</span><span class="pun">)</span>              <span class="cmt"># A B C</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'A'</span><span class="pun">,</span> <span class="str">'B'</span><span class="pun">,</span> <span class="str">'C'</span><span class="pun">,</span> sep<span class="op">=</span><span class="str">'-'</span><span class="pun">)</span>    <span class="cmt"># A-B-C</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'Hello!'</span><span class="pun">,</span> end<span class="op">=</span><span class="str">' '</span><span class="pun">)</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'World!'</span><span class="pun">)</span>                   <span class="cmt"># Hello! World!</span></pre>
+        </div>
+      </div>
+
+      <div class="section" id="ch3-2">
+        <h3>3-2 輸入：input() 與型態轉換</h3>
+        <div class="warn"><span class="warn-icon">⚠️</span><div><code>input()</code> 回傳的值<strong>永遠是字串（str）</strong>！若要做數學運算，必須先用 <code>int()</code> 或 <code>float()</code> 轉換。</div></div>
+        <div class="table-wrap"><table>
+          <tr><th>函式</th><th>功能</th><th>範例</th></tr>
+          <tr><td><code>int(x)</code></td><td>轉換為整數</td><td><code>int("10")</code> → <code>10</code></td></tr>
+          <tr><td><code>float(x)</code></td><td>轉換為浮點數</td><td><code>float("3.14")</code> → <code>3.14</code></td></tr>
+          <tr><td><code>str(x)</code></td><td>轉換為字串</td><td><code>str(100)</code> → <code>"100"</code></td></tr>
+        </table></div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="cmt"># ❌ 錯誤：字串相加不是數字相加</span>
+<span class="var">a</span> <span class="op">=</span> <span class="fn">input</span><span class="pun">(</span><span class="str">'輸入數字：'</span><span class="pun">)</span>   <span class="cmt"># 輸入 5</span>
+<span class="var">b</span> <span class="op">=</span> <span class="fn">input</span><span class="pun">(</span><span class="str">'輸入數字：'</span><span class="pun">)</span>   <span class="cmt"># 輸入 3</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">+</span> <span class="var">b</span><span class="pun">)</span>              <span class="cmt"># 輸出：53（字串串接！）</span>
+
+<span class="cmt"># ✅ 正確：先轉換為整數</span>
+<span class="var">a</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'輸入數字：'</span><span class="pun">))</span>
+<span class="var">b</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'輸入數字：'</span><span class="pun">))</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">+</span> <span class="var">b</span><span class="pun">)</span>              <span class="cmt"># 輸出：8</span></pre>
+        </div>
+
+        <h4>📌 綜合範例：輸入三科成績計算總分</h4>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="var">name</span> <span class="op">=</span> <span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入姓名：'</span><span class="pun">)</span>
+<span class="var">s1</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入國文成績：'</span><span class="pun">))</span>
+<span class="var">s2</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入英文成績：'</span><span class="pun">))</span>
+<span class="var">s3</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入數學成績：'</span><span class="pun">))</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">name</span><span class="pun">,</span> <span class="str">'的總分：'</span><span class="pun">,</span> <span class="var">s1</span> <span class="op">+</span> <span class="var">s2</span> <span class="op">+</span> <span class="var">s3</span><span class="pun">)</span></pre>
+        </div>
+        <div class="output-block">請輸入姓名：Cathy
+請輸入國文成績：9
+請輸入英文成績：8
+請輸入數學成績：7
+Cathy 的總分：24</div>
+      </div>
+
+      <div class="practice practice-easy">
+        <div class="practice-header" onclick="togglePractice(this)">
+          <span class="practice-badge">⭐ 簡單</span>
+          <span class="practice-title">練習 3-1｜畢氏定理計算斜邊</span>
+          <span style="color:var(--text3)">▼</span>
+        </div>
+        <div class="practice-body">
+          <div class="practice-q">輸入直角三角形兩邊 <code>a</code> 和 <code>b</code>，計算斜邊 <code>c = √(a²+b²)</code> 並輸出。</div>
+          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
+          <div class="answer-box">
+            <div class="code-block">
+              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+              <pre><span class="var">a</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入直角邊 a：'</span><span class="pun">))</span>
+<span class="var">b</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入直角邊 b：'</span><span class="pun">))</span>
+<span class="var">c</span> <span class="op">=</span> <span class="pun">(</span><span class="var">a</span><span class="op">**</span><span class="num">2</span> <span class="op">+</span> <span class="var">b</span><span class="op">**</span><span class="num">2</span><span class="pun">)</span> <span class="op">**</span> <span class="num">0.5</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'斜邊長 c ='</span><span class="pun">,</span> <span class="var">c</span><span class="pun">)</span></pre>
+            </div>
+            <div class="output-block">請輸入直角邊 a：3
+請輸入直角邊 b：4
+斜邊長 c = 5.0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="practice practice-hard">
+        <div class="practice-header" onclick="togglePractice(this)">
+          <span class="practice-badge">🔥 困難</span>
+          <span class="practice-title">練習 3-2｜BMI 計算器</span>
+          <span style="color:var(--text3)">▼</span>
+        </div>
+        <div class="practice-body">
+          <div class="practice-q">輸入姓名、身高（cm）、體重（kg），計算 BMI = 體重 ÷ 身高(m)²，並輸出 BMI 值（取小數點一位）。</div>
+          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
+          <div class="answer-box">
+            <div class="code-block">
+              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+              <pre><span class="var">name</span>   <span class="op">=</span> <span class="fn">input</span><span class="pun">(</span><span class="str">'姓名：'</span><span class="pun">)</span>
+<span class="var">height</span> <span class="op">=</span> <span class="fn">float</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'身高(cm)：'</span><span class="pun">))</span> <span class="op">/</span> <span class="num">100</span>
+<span class="var">weight</span> <span class="op">=</span> <span class="fn">float</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'體重(kg)：'</span><span class="pun">))</span>
+<span class="var">bmi</span>    <span class="op">=</span> <span class="var">weight</span> <span class="op">/</span> <span class="pun">(</span><span class="var">height</span> <span class="op">**</span> <span class="num">2</span><span class="pun">)</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">name</span><span class="pun">,</span> <span class="str">'的 BMI ='</span><span class="pun">,</span> <span class="fn">round</span><span class="pun">(</span><span class="var">bmi</span><span class="pun">,</span> <span class="num">1</span><span class="pun">))</span></pre>
+            </div>
+            <div class="output-block">姓名：Jack
+身高(cm)：175
+體重(kg)：63
+Jack 的 BMI = 20.6</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         CH4: 運算子
+    ══════════════════════════════════════════ -->
+    <div class="chapter" id="ch4">
+      <div class="chapter-header">
+        <span class="chapter-num">CH 04</span>
+        <h2>運算子</h2>
+      </div>
+
+      <div class="section" id="ch4-1">
+        <h3>4-1 算術運算子</h3>
+        <div class="op-grid">
+          <div class="op-card"><div class="op-symbol">+</div><div class="op-name">加法</div><div class="op-example">5+3 = 8</div></div>
+          <div class="op-card"><div class="op-symbol">-</div><div class="op-name">減法</div><div class="op-example">5-3 = 2</div></div>
+          <div class="op-card"><div class="op-symbol">*</div><div class="op-name">乘法</div><div class="op-example">5*3 = 15</div></div>
+          <div class="op-card"><div class="op-symbol">/</div><div class="op-name">除法</div><div class="op-example">5/2 = 2.5</div></div>
+          <div class="op-card"><div class="op-symbol">//</div><div class="op-name">整除</div><div class="op-example">5//2 = 2</div></div>
+          <div class="op-card"><div class="op-symbol">%</div><div class="op-name">取餘數</div><div class="op-example">5%2 = 1</div></div>
+          <div class="op-card"><div class="op-symbol">**</div><div class="op-name">次方</div><div class="op-example">5**3 = 125</div></div>
+        </div>
+        <div class="tip"><span class="tip-icon">💡</span><div><strong>優先順序（高→低）：</strong> <code>()</code> &gt; <code>**</code> &gt; <code>* / // %</code> &gt; <code>+ -</code></div></div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="var">a</span> <span class="op">=</span> <span class="num">9</span><span class="pun">;</span>  <span class="var">b</span> <span class="op">=</span> <span class="num">4</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">+</span>  <span class="var">b</span><span class="pun">)</span>   <span class="cmt"># 13</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">-</span>  <span class="var">b</span><span class="pun">)</span>   <span class="cmt"># 5</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">*</span>  <span class="var">b</span><span class="pun">)</span>   <span class="cmt"># 36</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">/</span>  <span class="var">b</span><span class="pun">)</span>   <span class="cmt"># 2.25</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">//</span> <span class="var">b</span><span class="pun">)</span>   <span class="cmt"># 2  ← 商</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">%</span>  <span class="var">b</span><span class="pun">)</span>   <span class="cmt"># 1  ← 餘數</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">**</span> <span class="var">b</span><span class="pun">)</span>   <span class="cmt"># 6561</span></pre>
+        </div>
+      </div>
+
+      <div class="section" id="ch4-2">
+        <h3>4-2 字串運算子</h3>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="cmt"># 字串相加（串接）</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'Hello'</span> <span class="op">+</span> <span class="str">' World'</span><span class="pun">)</span>   <span class="cmt"># Hello World</span>
+<span class="cmt"># 字串相乘（重複）</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'Ha'</span> <span class="op">*</span> <span class="num">3</span><span class="pun">)</span>              <span class="cmt"># HaHaHa</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'GOOD! '</span> <span class="op">*</span> <span class="num">2</span><span class="pun">)</span>         <span class="cmt"># GOOD! GOOD!</span></pre>
+        </div>
+      </div>
+
+      <div class="section" id="ch4-3">
+        <h3>4-3 比較與邏輯運算子</h3>
+        <div class="table-wrap"><table>
+          <tr><th>運算子</th><th>意義</th><th>範例</th><th>結果</th></tr>
+          <tr><td><code>==</code></td><td>等於</td><td><code>5 == 5</code></td><td><code>True</code></td></tr>
+          <tr><td><code>!=</code></td><td>不等於</td><td><code>5 != 3</code></td><td><code>True</code></td></tr>
+          <tr><td><code>&lt;</code></td><td>小於</td><td><code>3 &lt; 5</code></td><td><code>True</code></td></tr>
+          <tr><td><code>&gt;</code></td><td>大於</td><td><code>3 &gt; 5</code></td><td><code>False</code></td></tr>
+          <tr><td><code>and</code></td><td>且</td><td><code>True and False</code></td><td><code>False</code></td></tr>
+          <tr><td><code>or</code></td><td>或</td><td><code>True or False</code></td><td><code>True</code></td></tr>
+          <tr><td><code>not</code></td><td>非</td><td><code>not True</code></td><td><code>False</code></td></tr>
+        </table></div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span> <span class="op">=</span> <span class="num">2</span>, <span class="num">3</span>, <span class="num">5</span>
+<span class="var">x1</span> <span class="op">=</span> <span class="pun">(</span><span class="var">a</span> <span class="op">&lt;</span> <span class="var">b</span><span class="pun">)</span> <span class="kw">and</span> <span class="pun">(</span><span class="var">b</span> <span class="op">&lt;</span> <span class="var">c</span><span class="pun">)</span>   <span class="cmt"># True and True = True</span>
+<span class="var">x2</span> <span class="op">=</span> <span class="pun">(</span><span class="var">b</span> <span class="op">&gt;</span> <span class="var">c</span><span class="pun">)</span> <span class="kw">or</span>  <span class="pun">(</span><span class="var">b</span> <span class="op">==</span> <span class="var">a</span><span class="pun">)</span>  <span class="cmt"># False or False = False</span>
+<span class="var">x3</span> <span class="op">=</span> <span class="kw">not</span><span class="pun">(</span><span class="var">a</span> <span class="op">!=</span> <span class="var">b</span><span class="pun">)</span>             <span class="cmt"># not(True) = False</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">x1</span><span class="pun">,</span> <span class="var">x2</span><span class="pun">,</span> <span class="var">x3</span><span class="pun">)</span>             <span class="cmt"># True False False</span></pre>
+        </div>
+      </div>
+
+      <div class="practice practice-easy">
+        <div class="practice-header" onclick="togglePractice(this)">
+          <span class="practice-badge">⭐ 簡單</span>
+          <span class="practice-title">練習 4-1｜算術運算練習</span>
+          <span style="color:var(--text3)">▼</span>
+        </div>
+        <div class="practice-body">
+          <div class="practice-q">計算並印出：<code>a=3, b=2</code> 時，<code>c = (3+2)*6</code> 和 <code>d = 5**3</code> 的值。</div>
+          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
+          <div class="answer-box">
+            <div class="code-block">
+              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+              <pre><span class="var">a</span> <span class="op">=</span> <span class="num">3</span><span class="pun">;</span>  <span class="var">b</span> <span class="op">=</span> <span class="num">2</span>
+<span class="var">c</span> <span class="op">=</span> <span class="pun">(</span><span class="num">3</span> <span class="op">+</span> <span class="num">2</span><span class="pun">)</span> <span class="op">*</span> <span class="num">6</span>
+<span class="var">d</span> <span class="op">=</span> <span class="num">5</span> <span class="op">**</span> <span class="num">3</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'c ='</span><span class="pun">,</span> <span class="var">c</span><span class="pun">)</span>  <span class="cmt"># c = 30</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'d ='</span><span class="pun">,</span> <span class="var">d</span><span class="pun">)</span>  <span class="cmt"># d = 125</span></pre>
+            </div>
+            <div class="output-block">c = 30
+d = 125</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="practice practice-hard">
+        <div class="practice-header" onclick="togglePractice(this)">
+          <span class="practice-badge">🔥 困難</span>
+          <span class="practice-title">練習 4-2｜三角形合法判斷</span>
+          <span style="color:var(--text3)">▼</span>
+        </div>
+        <div class="practice-body">
+          <div class="practice-q">輸入三角形三邊 a、b、c，利用邏輯運算子判斷是否能構成三角形（任意兩邊之和 &gt; 第三邊）。</div>
+          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
+          <div class="answer-box">
+            <div class="code-block">
+              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+              <pre><span class="var">a</span> <span class="op">=</span> <span class="fn">float</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'第一邊：'</span><span class="pun">))</span>
+<span class="var">b</span> <span class="op">=</span> <span class="fn">float</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'第二邊：'</span><span class="pun">))</span>
+<span class="var">c</span> <span class="op">=</span> <span class="fn">float</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'第三邊：'</span><span class="pun">))</span>
+<span class="kw">if</span> <span class="pun">(</span><span class="var">a</span><span class="op">+</span><span class="var">b</span><span class="op">&gt;</span><span class="var">c</span><span class="pun">)</span> <span class="kw">and</span> <span class="pun">(</span><span class="var">a</span><span class="op">+</span><span class="var">c</span><span class="op">&gt;</span><span class="var">b</span><span class="pun">)</span> <span class="kw">and</span> <span class="pun">(</span><span class="var">b</span><span class="op">+</span><span class="var">c</span><span class="op">&gt;</span><span class="var">a</span><span class="pun">)</span><span class="pun">:</span>
+    <span class="fn">print</span><span class="pun">(</span><span class="str">'可以構成三角形！'</span><span class="pun">)</span>
+<span class="kw">else</span><span class="pun">:</span>
+    <span class="fn">print</span><span class="pun">(</span><span class="str">'無法構成三角形！'</span><span class="pun">)</span></pre>
+            </div>
+            <div class="output-block">第一邊：3
+第二邊：4
+第三邊：5
+可以構成三角形！</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         CH5: 條件判斷
+    ══════════════════════════════════════════ -->
+    <div class="chapter" id="ch5">
+      <div class="chapter-header">
+        <span class="chapter-num">CH 05</span>
+        <h2>條件判斷</h2>
+      </div>
+
+      <div class="section" id="ch5-1">
+        <h3>5-1 if 單一條件</h3>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="var">score</span> <span class="op">=</span> <span class="num">75</span>
+<span class="kw">if</span> <span class="var">score</span> <span class="op">&gt;=</span> <span class="num">60</span><span class="pun">:</span>
+    <span class="fn">print</span><span class="pun">(</span><span class="str">'及格了！'</span><span class="pun">)</span></pre>
+        </div>
+        <div class="warn"><span class="warn-icon">⚠️</span><div><strong>縮排（Indentation）非常重要！</strong>Python 用 4 個空格或 Tab 來表示程式碼的從屬關係，缺少縮排會發生錯誤。</div></div>
+      </div>
+
+      <div class="section" id="ch5-2">
+        <h3>5-2 if-else 雙向判斷</h3>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="var">n</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入整數：'</span><span class="pun">))</span>
+<span class="kw">if</span> <span class="var">n</span> <span class="op">%</span> <span class="num">2</span> <span class="op">==</span> <span class="num">0</span><span class="pun">:</span>
+    <span class="fn">print</span><span class="pun">(</span><span class="var">n</span><span class="pun">,</span> <span class="str">'是偶數'</span><span class="pun">)</span>
+<span class="kw">else</span><span class="pun">:</span>
+    <span class="fn">print</span><span class="pun">(</span><span class="var">n</span><span class="pun">,</span> <span class="str">'是奇數'</span><span class="pun">)</span></pre>
+        </div>
+        <div class="output-block">請輸入整數：10
+10 是偶數</div>
+      </div>
+
+      <div class="section" id="ch5-3">
+        <h3>5-3 if-elif-else 多向判斷</h3>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="var">score</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入成績：'</span><span class="pun">))</span>
+<span class="kw">if</span>   <span class="var">score</span> <span class="op">&gt;=</span> <span class="num">90</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'A 優秀'</span><span class="pun">)</span>
+<span class="kw">elif</span> <span class="var">score</span> <span class="op">&gt;=</span> <span class="num">80</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'B 良好'</span><span class="pun">)</span>
+<span class="kw">elif</span> <span class="var">score</span> <span class="op">&gt;=</span> <span class="num">70</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'C 普通'</span><span class="pun">)</span>
+<span class="kw">elif</span> <span class="var">score</span> <span class="op">&gt;=</span> <span class="num">60</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'D 及格'</span><span class="pun">)</span>
+<span class="kw">else</span><span class="pun">:</span>              <span class="fn">print</span><span class="pun">(</span><span class="str">'F 不及格'</span><span class="pun">)</span></pre>
+        </div>
+
+        <h4>📌 貨幣換算範例</h4>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="fn">print</span><span class="pun">(</span><span class="str">'(1)日幣 (2)韓幣 (3)人民幣 (4)歐元 (5)英鎊'</span><span class="pun">)</span>
+<span class="var">c</span>  <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請選擇幣別：'</span><span class="pun">))</span>
+<span class="var">nt</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入台幣金額：'</span><span class="pun">))</span>
+<span class="kw">if</span>   <span class="var">c</span> <span class="op">==</span> <span class="num">1</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'日幣：'</span><span class="pun">,</span> <span class="fn">int</span><span class="pun">(</span><span class="var">nt</span> <span class="op">/</span> <span class="num">0.21</span><span class="pun">))</span>
+<span class="kw">elif</span> <span class="var">c</span> <span class="op">==</span> <span class="num">2</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'韓幣：'</span><span class="pun">,</span> <span class="fn">int</span><span class="pun">(</span><span class="var">nt</span> <span class="op">/</span> <span class="num">0.026</span><span class="pun">))</span>
+<span class="kw">elif</span> <span class="var">c</span> <span class="op">==</span> <span class="num">3</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'人民幣：'</span><span class="pun">,</span> <span class="fn">int</span><span class="pun">(</span><span class="var">nt</span> <span class="op">/</span> <span class="num">4.4</span><span class="pun">))</span>
+<span class="kw">elif</span> <span class="var">c</span> <span class="op">==</span> <span class="num">4</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'歐元：'</span><span class="pun">,</span> <span class="fn">int</span><span class="pun">(</span><span class="var">nt</span> <span class="op">/</span> <span class="num">35.5</span><span class="pun">))</span>
+<span class="kw">elif</span> <span class="var">c</span> <span class="op">==</span> <span class="num">5</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'英鎊：'</span><span class="pun">,</span> <span class="fn">int</span><span class="pun">(</span><span class="var">nt</span> <span class="op">/</span> <span class="num">41.8</span><span class="pun">))</span>
+<span class="kw">else</span><span class="pun">:</span>          <span class="fn">print</span><span class="pun">(</span><span class="str">'幣別無效'</span><span class="pun">)</span></pre>
+        </div>
+        <div class="output-block">請選擇幣別：1
+請輸入台幣金額：10000
+日幣：47619</div>
+      </div>
+
+      <div class="practice practice-easy">
+        <div class="practice-header" onclick="togglePractice(this)">
+          <span class="practice-badge">⭐ 簡單</span>
+          <span class="practice-title">練習 5-1｜判斷 3 的倍數</span>
+          <span style="color:var(--text3)">▼</span>
+        </div>
+        <div class="practice-body">
+          <div class="practice-q">輸入一個整數，判斷是否為 3 的倍數，並輸出相應訊息。</div>
+          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
+          <div class="answer-box">
+            <div class="code-block">
+              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+              <pre><span class="var">n</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入整數：'</span><span class="pun">))</span>
+<span class="kw">if</span> <span class="var">n</span> <span class="op">%</span> <span class="num">3</span> <span class="op">==</span> <span class="num">0</span><span class="pun">:</span>
+    <span class="fn">print</span><span class="pun">(</span><span class="var">n</span><span class="pun">,</span> <span class="str">'是3的倍數'</span><span class="pun">)</span>
+<span class="kw">else</span><span class="pun">:</span>
+    <span class="fn">print</span><span class="pun">(</span><span class="var">n</span><span class="pun">,</span> <span class="str">'不是3的倍數'</span><span class="pun">)</span></pre>
+            </div>
+            <div class="output-block">請輸入整數：9
+9 是3的倍數</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="practice practice-hard">
+        <div class="practice-header" onclick="togglePractice(this)">
+          <span class="practice-badge">🔥 困難</span>
+          <span class="practice-title">練習 5-2｜BMI 狀態判斷</span>
+          <span style="color:var(--text3)">▼</span>
+        </div>
+        <div class="practice-body">
+          <div class="practice-q">延伸練習 3-2，輸入 BMI 後判斷體重狀態：BMI &lt; 18.5 → 過輕，18.5 ≤ BMI &lt; 24 → 正常，BMI ≥ 24 → 過重。</div>
+          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
+          <div class="answer-box">
+            <div class="code-block">
+              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+              <pre><span class="var">name</span>   <span class="op">=</span> <span class="fn">input</span><span class="pun">(</span><span class="str">'姓名：'</span><span class="pun">)</span>
+<span class="var">height</span> <span class="op">=</span> <span class="fn">float</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'身高(cm)：'</span><span class="pun">))</span> <span class="op">/</span> <span class="num">100</span>
+<span class="var">weight</span> <span class="op">=</span> <span class="fn">float</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'體重(kg)：'</span><span class="pun">))</span>
+<span class="var">bmi</span>    <span class="op">=</span> <span class="var">weight</span> <span class="op">/</span> <span class="pun">(</span><span class="var">height</span> <span class="op">**</span> <span class="num">2</span><span class="pun">)</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">name</span><span class="pun">,</span> <span class="str">'的BMI ='</span><span class="pun">,</span> <span class="fn">round</span><span class="pun">(</span><span class="var">bmi</span><span class="pun">,</span><span class="num">1</span><span class="pun">))</span>
+<span class="kw">if</span>   <span class="var">bmi</span> <span class="op">&lt;</span> <span class="num">18.5</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'體重狀態：過輕'</span><span class="pun">)</span>
+<span class="kw">elif</span> <span class="var">bmi</span> <span class="op">&lt;</span> <span class="num">24</span><span class="pun">:</span>    <span class="fn">print</span><span class="pun">(</span><span class="str">'體重狀態：正常'</span><span class="pun">)</span>
+<span class="kw">else</span><span class="pun">:</span>            <span class="fn">print</span><span class="pun">(</span><span class="str">'體重狀態：過重'</span><span class="pun">)</span></pre>
+            </div>
+            <div class="output-block">姓名：Jack
+身高(cm)：175
+體重(kg)：63
+Jack 的BMI = 20.6
+體重狀態：正常</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         CH6: for 迴圈
+    ══════════════════════════════════════════ -->
+    <div class="chapter" id="ch6">
+      <div class="chapter-header">
+        <span class="chapter-num">CH 06</span>
+        <h2>for 迴圈</h2>
+      </div>
+
+      <div class="section" id="ch6-1">
+        <h3>6-1 range() 函式</h3>
+        <div class="table-wrap"><table>
+          <tr><th>語法</th><th>產生的序列</th><th>範例</th></tr>
+          <tr><td><code>range(n)</code></td><td>0, 1, ..., n-1</td><td><code>range(5)</code> → 0,1,2,3,4</td></tr>
+          <tr><td><code>range(m, n)</code></td><td>m, m+1, ..., n-1</td><td><code>range(1,6)</code> → 1,2,3,4,5</td></tr>
+          <tr><td><code>range(m, n, x)</code></td><td>m 到 n-1，間隔 x</td><td><code>range(1,10,2)</code> → 1,3,5,7,9</td></tr>
+        </table></div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">6</span><span class="pun">):</span>
+    <span class="fn">print</span><span class="pun">(</span><span class="var">i</span><span class="pun">,</span> end<span class="op">=</span><span class="str">' '</span><span class="pun">)</span>  <span class="cmt"># 1 2 3 4 5</span>
+
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">10</span><span class="pun">,</span> <span class="num">2</span><span class="pun">):</span>
+    <span class="fn">print</span><span class="pun">(</span><span class="var">i</span><span class="pun">,</span> end<span class="op">=</span><span class="str">' '</span><span class="pun">)</span>  <span class="cmt"># 1 3 5 7 9</span></pre>
+        </div>
+      </div>
+
+      <div class="section" id="ch6-2">
+        <h3>6-2 累加與條件累加</h3>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="cmt"># 計算 1+2+3+4+5 的總和</span>
+<span class="var">sum</span> <span class="op">=</span> <span class="num">0</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">6</span><span class="pun">):</span>
+    <span class="var">sum</span> <span class="op">=</span> <span class="var">sum</span> <span class="op">+</span> <span class="var">i</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'總和：'</span><span class="pun">,</span> <span class="var">sum</span><span class="pun">)</span>  <span class="cmt"># 15</span>
+
+<span class="cmt"># 計算 1-20 中 5 的倍數之總和</span>
+<span class="var">sum</span> <span class="op">=</span> <span class="num">0</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">21</span><span class="pun">):</span>
+    <span class="kw">if</span> <span class="var">i</span> <span class="op">%</span> <span class="num">5</span> <span class="op">==</span> <span class="num">0</span><span class="pun">:</span>
+        <span class="var">sum</span> <span class="op">+=</span> <span class="var">i</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'5的倍數總和：'</span><span class="pun">,</span> <span class="var">sum</span><span class="pun">)</span>  <span class="cmt"># 50</span></pre>
+        </div>
+      </div>
+
+      <div class="section" id="ch6-3">
+        <h3>6-3 巢狀迴圈</h3>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="cmt"># 直角三角形圖案</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">4</span><span class="pun">):</span>
+    <span class="kw">for</span> <span class="var">j</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="var">i</span><span class="op">+</span><span class="num">1</span><span class="pun">):</span>
+        <span class="fn">print</span><span class="pun">(</span><span class="str">'*'</span><span class="pun">,</span> end<span class="op">=</span><span class="str">' '</span><span class="pun">)</span>
+    <span class="fn">print</span><span class="pun">()</span></pre>
+        </div>
+        <div class="output-block">*
+* *
+* * *</div>
+
+        <h4>📌 乘法表範例</h4>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="var">n</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'乘法表大小：'</span><span class="pun">))</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="var">n</span><span class="op">+</span><span class="num">1</span><span class="pun">):</span>
+    <span class="kw">for</span> <span class="var">j</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="var">n</span><span class="op">+</span><span class="num">1</span><span class="pun">):</span>
+        <span class="fn">print</span><span class="pun">(</span><span class="var">i</span><span class="pun">,</span><span class="str">'*'</span><span class="pun">,</span><span class="var">j</span><span class="pun">,</span><span class="str">'='</span><span class="pun">,</span><span class="var">i</span><span class="op">*</span><span class="var">j</span><span class="pun">,</span> end<span class="op">=</span><span class="str">'\t'</span><span class="pun">)</span>
+    <span class="fn">print</span><span class="pun">()</span></pre>
+        </div>
+      </div>
+
+      <div class="practice practice-easy">
+        <div class="practice-header" onclick="togglePractice(this)">
+          <span class="practice-badge">⭐ 簡單</span>
+          <span class="practice-title">練習 6-1｜偶數總和</span>
+          <span style="color:var(--text3)">▼</span>
+        </div>
+        <div class="practice-body">
+          <div class="practice-q">計算 1 到 100 中，所有偶數的總和。</div>
+          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
+          <div class="answer-box">
+            <div class="code-block">
+              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+              <pre><span class="var">sum</span> <span class="op">=</span> <span class="num">0</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">101</span><span class="pun">):</span>
+    <span class="kw">if</span> <span class="var">i</span> <span class="op">%</span> <span class="num">2</span> <span class="op">==</span> <span class="num">0</span><span class="pun">:</span>
+        <span class="var">sum</span> <span class="op">+=</span> <span class="var">i</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'1到100偶數總和：'</span><span class="pun">,</span> <span class="var">sum</span><span class="pun">)</span></pre>
+            </div>
+            <div class="output-block">1到100偶數總和：2550</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="practice practice-hard">
+        <div class="practice-header" onclick="togglePractice(this)">
+          <span class="practice-badge">🔥 困難</span>
+          <span class="practice-title">練習 6-2｜菱形星號圖案</span>
+          <span style="color:var(--text3)">▼</span>
+        </div>
+        <div class="practice-body">
+          <div class="practice-q">使用巢狀 for 迴圈，印出以下圖案（各列星號數：1, 3, 5, 7, 9）：<br><code>*<br>* * *<br>* * * * *<br>* * * * * * *<br>* * * * * * * * *</code></div>
+          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
+          <div class="answer-box">
+            <div class="code-block">
+              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+              <pre><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">6</span><span class="pun">):</span>         <span class="cmt"># i = 1 到 5</span>
+    <span class="kw">for</span> <span class="var">j</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">2</span><span class="op">*</span><span class="var">i</span><span class="op">-</span><span class="num">1</span><span class="pun">):</span>    <span class="cmt"># 每列印 (2i-1) 個星</span>
+        <span class="fn">print</span><span class="pun">(</span><span class="str">'*'</span><span class="pun">,</span> end<span class="op">=</span><span class="str">' '</span><span class="pun">)</span>
+    <span class="fn">print</span><span class="pun">()</span></pre>
+            </div>
+            <div class="output-block">*
+* * *
+* * * * *
+* * * * * * *
+* * * * * * * * *</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ══════════════════════════════════════════
+         CH7: while 迴圈
+    ══════════════════════════════════════════ -->
+    <div class="chapter" id="ch7">
+      <div class="chapter-header">
+        <span class="chapter-num">CH 07</span>
+        <h2>while 迴圈</h2>
+      </div>
+
+      <div class="section" id="ch7-1">
+        <h3>7-1 while 基本語法</h3>
+        <p>當「不確定要重複幾次」時使用 while 迴圈，條件成立就繼續執行。</p>
+        <div class="warn"><span class="warn-icon">⚠️</span><div>一定要確保條件最終會變成 <code>False</code>！否則會造成<strong>無窮迴圈</strong>，程式永遠不停止。</div></div>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="var">i</span>   <span class="op">=</span> <span class="num">1</span>
+<span class="var">sum</span> <span class="op">=</span> <span class="num">0</span>
+<span class="kw">while</span> <span class="var">i</span> <span class="op">&lt;=</span> <span class="num">5</span><span class="pun">:</span>
+    <span class="var">sum</span> <span class="op">+=</span> <span class="var">i</span>
+    <span class="var">i</span>   <span class="op">+=</span> <span class="num">1</span>    <span class="cmt"># ← 非常重要！讓 i 增加</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'總和：'</span><span class="pun">,</span> <span class="var">sum</span><span class="pun">)</span>  <span class="cmt"># 15</span></pre>
+        </div>
+      </div>
+
+      <div class="section" id="ch7-2">
+        <h3>7-2 break 與 continue</h3>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="cmt"># break：完全跳出迴圈</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">6</span><span class="pun">):</span>
+    <span class="kw">if</span> <span class="var">i</span> <span class="op">==</span> <span class="num">3</span><span class="pun">:</span>
+        <span class="kw">break</span>
+    <span class="fn">print</span><span class="pun">(</span><span class="var">i</span><span class="pun">,</span> end<span class="op">=</span><span class="str">' '</span><span class="pun">)</span>  <span class="cmt"># 1 2</span>
+
+<span class="cmt"># continue：跳過本次，繼續下一次</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">6</span><span class="pun">):</span>
+    <span class="kw">if</span> <span class="var">i</span> <span class="op">==</span> <span class="num">3</span><span class="pun">:</span>
+        <span class="kw">continue</span>
+    <span class="fn">print</span><span class="pun">(</span><span class="var">i</span><span class="pun">,</span> end<span class="op">=</span><span class="str">' '</span><span class="pun">)</span>  <span class="cmt"># 1 2 4 5</span></pre>
+        </div>
+      </div>
+
+      <div class="section" id="ch7-3">
+        <h3>7-3 綜合範例：猜數字遊戲</h3>
+        <div class="code-block">
+          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+          <pre><span class="var">k</span>     <span class="op">=</span> <span class="num">16</span>   <span class="cmt"># 答案</span>
+<span class="var">guess</span> <span class="op">=</span> <span class="num">0</span>
+<span class="var">t</span>     <span class="op">=</span> <span class="num">0</span>    <span class="cmt"># 猜測次數</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'=== 猜數字遊戲（1-20）==='</span><span class="pun">)</span>
+<span class="kw">while</span> <span class="var">guess</span> <span class="op">!=</span> <span class="var">k</span><span class="pun">:</span>
+    <span class="var">t</span>     <span class="op">+=</span> <span class="num">1</span>
+    <span class="var">guess</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'猜測：'</span><span class="pun">))</span>
+    <span class="kw">if</span>   <span class="var">guess</span> <span class="op">&gt;</span> <span class="var">k</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'猜大了！'</span><span class="pun">)</span>
+    <span class="kw">elif</span> <span class="var">guess</span> <span class="op">&lt;</span> <span class="var">k</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'猜小了！'</span><span class="pun">)</span>
+    <span class="kw">else</span><span class="pun">:</span>           <span class="fn">print</span><span class="pun">(</span><span class="str">'答對了！共猜'</span><span class="pun">,</span> <span class="var">t</span><span class="pun">,</span> <span class="str">'次'</span><span class="pun">)</span></pre>
+        </div>
+        <div class="output-block">=== 猜數字遊戲（1-20）===
+猜測：10
+猜小了！
+猜測：18
+猜大了！
+猜測：16
+答對了！共猜 3 次</div>
+      </div>
+
+      <div class="practice practice-easy">
+        <div class="practice-header" onclick="togglePractice(this)">
+          <span class="practice-badge">⭐ 簡單</span>
+          <span class="practice-title">練習 7-1｜奇數總和</span>
+          <span style="color:var(--text3)">▼</span>
+        </div>
+        <div class="practice-body">
+          <div class="practice-q">使用 while 迴圈，計算 1 到 10 中所有奇數的總和。</div>
+          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
+          <div class="answer-box">
+            <div class="code-block">
+              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+              <pre><span class="var">n</span>   <span class="op">=</span> <span class="num">1</span>
+<span class="var">sum</span> <span class="op">=</span> <span class="num">0</span>
+<span class="kw">while</span> <span class="var">n</span> <span class="op">&lt;=</span> <span class="num">10</span><span class="pun">:</span>
+    <span class="kw">if</span> <span class="var">n</span> <span class="op">%</span> <span class="num">2</span> <span class="op">!=</span> <span class="num">0</span><span class="pun">:</span>
+        <span class="var">sum</span> <span class="op">+=</span> <span class="var">n</span>
+    <span class="var">n</span> <span class="op">+=</span> <span class="num">1</span>
+<span class="fn">print</span><span class="pun">(</span><span class="str">'1到10奇數總和：'</span><span class="pun">,</span> <span class="var">sum</span><span class="pun">)</span></pre>
+            </div>
+            <div class="output-block">1到10奇數總和：25</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="practice practice-hard">
+        <div class="practice-header" onclick="togglePractice(this)">
+          <span class="practice-badge">🔥 困難</span>
+          <span class="practice-title">練習 7-2｜成績輸入系統</span>
+          <span style="color:var(--text3)">▼</span>
+        </div>
+        <div class="practice-body">
+          <div class="practice-q">設計成績輸入系統：輸入學生姓名後，重複輸入成績（輸入 -1 結束），最後輸出<strong>總和、平均（小數一位）、最高分</strong>。</div>
+          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
+          <div class="answer-box">
+            <div class="code-block">
+              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
+              <pre><span class="var">name</span>    <span class="op">=</span> <span class="fn">input</span><span class="pun">(</span><span class="str">'學生姓名：'</span><span class="pun">)</span>
+<span class="var">total</span>   <span class="op">=</span> <span class="num">0</span><span class="pun">;</span>  <span class="var">count</span> <span class="op">=</span> <span class="num">0</span><span class="pun">;</span>  <span class="var">highest</span> <span class="op">=</span> <span class="num">0</span>
+<span class="var">score</span>   <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'成績（-1結束）：'</span><span class="pun">))</span>
+<span class="kw">while</span> <span class="var">score</span> <span class="op">!=</span> <span class="op">-</span><span class="num">1</span><span class="pun">:</span>
+    <span class="var">total</span>   <span class="op">+=</span> <span class="var">score</span>
+    <span class="var">count</span>   <span class="op">+=</span> <span class="num">1</span>
+    <span class="kw">if</span> <span class="var">score</span> <span class="op">&gt;</span> <span class="var">highest</span><span class="pun">:</span>  <span class="var">highest</span> <span class="op">=</span> <span class="var">score</span>
+    <span class="var">score</span>   <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'成績（-1結束）：'</span><span class="pun">))</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">name</span><span class="pun">,</span> <span class="str">'總和：'</span><span class="pun">,</span> <span class="var">total</span><span class="pun">)</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">name</span><span class="pun">,</span> <span class="str">'平均：'</span><span class="pun">,</span> <span class="fn">round</span><span class="pun">(</span><span class="var">total</span><span class="op">/</span><span class="var">count</span><span class="pun">,</span><span class="num">1</span><span class="pun">))</span>
+<span class="fn">print</span><span class="pun">(</span><span class="var">name</span><span class="pun">,</span> <span class="str">'最高分：'</span><span class="pun">,</span> <span class="var">highest</span><span class="pun">)</span></pre>
+            </div>
+            <div class="output-block">學生姓名：David
+成績（-1結束）：99
+成績（-1結束）：85
+成績（-1結束）：95
+成績（-1結束）：-1
+David 總和：279
+David 平均：93.0
+David 最高分：99</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div style="margin-top:4rem; padding:2rem; background:var(--bg2); border:1px solid var(--border); border-radius:16px; text-align:center;">
+      <div style="font-family:'JetBrains Mono',monospace; color:var(--green); font-size:1.1rem; margin-bottom:0.5rem;">
+        🐍 Python 互動參考書
+      </div>
+      <div style="color:var(--text3); font-size:0.82rem;">
+        7 章節 · 40+ 範例 · 14 道練習題<br>
+        <span style="color:var(--text2); margin-top:0.3rem; display:inline-block;">加油！程式設計的關鍵在於「多練習」💪</span>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- SCROLL TOP -->
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// ─── CHAPTER DATA ───
+const chapters = [
+  { id:'ch1', title:'認識程式設計', subs:[
+    {id:'ch1-1',label:'1-1 什麼是程式'},
+    {id:'ch1-2',label:'1-2 程式語言種類'},
+    {id:'ch1-3',label:'1-3 開發環境 Colab'},
+    {id:'ch1-4',label:'1-4 錯誤與除錯'},
+  ]},
+  { id:'ch2', title:'變數與資料型態', subs:[
+    {id:'ch2-1',label:'2-1 變數'},
+    {id:'ch2-2',label:'2-2 資料型態'},
+    {id:'ch2-3',label:'2-3 命名規則'},
+    {id:'ch2-4',label:'2-4 變數互換'},
+  ]},
+  { id:'ch3', title:'輸入與輸出', subs:[
+    {id:'ch3-1',label:'3-1 print()'},
+    {id:'ch3-2',label:'3-2 input() 與轉型'},
+  ]},
+  { id:'ch4', title:'運算子', subs:[
+    {id:'ch4-1',label:'4-1 算術運算子'},
+    {id:'ch4-2',label:'4-2 字串運算子'},
+    {id:'ch4-3',label:'4-3 比較與邏輯'},
+  ]},
+  { id:'ch5', title:'條件判斷', subs:[
+    {id:'ch5-1',label:'5-1 if'},
+    {id:'ch5-2',label:'5-2 if-else'},
+    {id:'ch5-3',label:'5-3 if-elif-else'},
+  ]},
+  { id:'ch6', title:'for 迴圈', subs:[
+    {id:'ch6-1',label:'6-1 range()'},
+    {id:'ch6-2',label:'6-2 累加與條件'},
+    {id:'ch6-3',label:'6-3 巢狀迴圈'},
+  ]},
+  { id:'ch7', title:'while 迴圈', subs:[
+    {id:'ch7-1',label:'7-1 基本語法'},
+    {id:'ch7-2',label:'7-2 break & continue'},
+    {id:'ch7-3',label:'7-3 猜數字遊戲'},
+  ]},
+];
+
+// Build sidebar nav
+const navTree = document.getElementById('navTree');
+chapters.forEach((ch, idx) => {
+  const wrap = document.createElement('div');
+  wrap.className = 'nav-chapter';
+
+  const btn = document.createElement('button');
+  btn.className = 'nav-chapter-btn';
+  btn.innerHTML = `
+    <span style="display:flex;align-items:center;gap:8px;">
+      <span class="nav-chapter-num">CH${String(idx+1).padStart(2,'0')}</span>
+      <span>${ch.title}</span>
+    </span>
+    <span class="nav-arrow" style="font-size:0.7rem;transition:transform 0.2s;">▶</span>`;
+  btn.onclick = () => {
+    document.getElementById(ch.id).scrollIntoView({behavior:'smooth', block:'start'});
+    sub.classList.toggle('open');
+    btn.querySelector('.nav-arrow').style.transform = sub.classList.contains('open') ? 'rotate(90deg)' : '';
+  };
+
+  const sub = document.createElement('div');
+  sub.className = 'nav-sub';
+  ch.subs.forEach(s => {
+    const a = document.createElement('a');
+    a.href = `#${s.id}`;
+    a.textContent = s.label;
+    a.onclick = e => { e.preventDefault(); document.getElementById(s.id).scrollIntoView({behavior:'smooth', block:'start'}); };
+    sub.appendChild(a);
+  });
+
+  wrap.appendChild(btn);
+  wrap.appendChild(sub);
+  navTree.appendChild(wrap);
+});
+
+// Build pills
+const pillContainer = document.getElementById('chapterPills');
+chapters.forEach((ch, idx) => {
+  const a = document.createElement('a');
+  a.href = `#${ch.id}`;
+  a.className = 'pill';
+  a.innerHTML = `<span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--text3)">CH${String(idx+1).padStart(2,'0')}</span> ${ch.title}`;
+  a.onclick = e => { e.preventDefault(); document.getElementById(ch.id).scrollIntoView({behavior:'smooth', block:'start'}); };
+  pillContainer.appendChild(a);
+});
+
+// ─── TOGGLE PRACTICE ───
+function togglePractice(header) {
+  // no-op; body always visible
+}
+
+// ─── TOGGLE ANSWER ───
+let answersOpened = 0;
+const totalAnswers = document.querySelectorAll('.toggle-answer').length;
+
+function toggleAnswer(btn) {
+  const box = btn.nextElementSibling;
+  const open = box.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  btn.textContent = open ? '🔒 隱藏解答' : '🔓 顯示解答';
+
+  if (open) {
+    answersOpened = Math.min(answersOpened + 1, totalAnswers);
+    updateProgress();
+  }
+}
+
+function updateProgress() {
+  const pct = Math.round((answersOpened / totalAnswers) * 100);
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+// ─── EXPAND / COLLAPSE ALL ───
+function expandAll() {
+  document.querySelectorAll('.answer-box').forEach(b => {
+    b.classList.add('open');
+    const btn = b.previousElementSibling;
+    btn.classList.add('open');
+    btn.textContent = '🔒 隱藏解答';
+  });
+  document.querySelectorAll('.nav-sub').forEach(s => s.classList.add('open'));
+  document.querySelectorAll('.nav-arrow').forEach(a => a.style.transform = 'rotate(90deg)');
+  answersOpened = totalAnswers;
+  updateProgress();
+}
+
+function collapseAll() {
+  document.querySelectorAll('.answer-box').forEach(b => {
+    b.classList.remove('open');
+    const btn = b.previousElementSibling;
+    btn.classList.remove('open');
+    btn.textContent = '🔓 顯示解答';
+  });
+  document.querySelectorAll('.nav-sub').forEach(s => s.classList.remove('open'));
+  document.querySelectorAll('.nav-arrow').forEach(a => a.style.transform = '');
+}
+
+// ─── COPY CODE ───
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ 已複製';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('copied'); }, 1800);
+  });
+}
+
+// ─── SCROLL SPY ───
+const allChapters = document.querySelectorAll('.chapter');
+const navBtns = navTree.querySelectorAll('.nav-chapter-btn');
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navBtns.forEach(b => b.classList.remove('active'));
+      const idx = chapters.findIndex(c => c.id === id);
+      if (idx !== -1) navBtns[idx].classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -60% 0px' });
+
+allChapters.forEach(c => observer.observe(c));
+
+// ─── SCROLL TOP BUTTON ───
+const scrollTopBtn = document.getElementById('scrollTop');
+window.addEventListener('scroll', () => {
+  scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+});
+
+// ─── SEARCH ───
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  if (!q) {
+    document.querySelectorAll('.highlight').forEach(el => {
+      el.outerHTML = el.innerHTML;
+    });
+    return;
+  }
+  // Simple highlight on paragraphs
+  document.querySelectorAll('p, h3, h4, td, .practice-q').forEach(el => {
+    if (!el.querySelector('.code-block')) {
+      el.innerHTML = el.textContent.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi'),
+        m => `<mark class="highlight">${m}</mark>`);
+    }
+  });
+});
+
+// ─── ANIMATE CHAPTERS ON SCROLL ───
+const chapterObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.05 });
+
+allChapters.forEach(c => chapterObserver.observe(c));
+
+// ─── KEYBOARD SHORTCUT ───
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    searchInput.focus();
+  }
+});
+</script>
+</body>
+</html>
