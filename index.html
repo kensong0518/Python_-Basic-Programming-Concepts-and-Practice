@@ -1,1794 +1,1661 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🐍 Python 互動參考書</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>高中生程式檢定模擬（非官方）</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:        #0b0d14;
-    --bg2:       #111320;
-    --bg3:       #181b2a;
-    --bg4:       #1e2235;
-    --border:    rgba(100,120,255,0.15);
-    --border2:   rgba(100,120,255,0.3);
-    --green:     #00e5a0;
-    --green2:    #00c484;
-    --blue:      #5b8fff;
-    --purple:    #b07fff;
-    --yellow:    #ffd166;
-    --red:       #ff6b6b;
-    --orange:    #ff9f43;
-    --text:      #c8d0e8;
-    --text2:     #7b89b0;
-    --text3:     #4a5474;
-    --white:     #e8eeff;
-    --glow:      0 0 20px rgba(0,229,160,0.25);
-    --glow-b:    0 0 20px rgba(91,143,255,0.25);
-  }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    font-family: 'Noto Sans TC', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.7;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ─── GRID NOISE OVERLAY ─── */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image:
-      linear-gradient(rgba(100,120,255,0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(100,120,255,0.02) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none; z-index: 0;
-  }
-
-  /* ─── HEADER ─── */
-  header {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(11,13,20,0.92);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    display: flex; align-items: center; justify-content: space-between;
-    height: 60px;
-  }
-
-  .logo {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1rem; font-weight: 700;
-    color: var(--green);
-    letter-spacing: 0.05em;
-    display: flex; align-items: center; gap: 8px;
-  }
-
-  .logo-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--green);
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%,100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.8); }
-  }
-
-  .header-nav {
-    display: flex; gap: 0.5rem;
-  }
-
-  .header-nav button {
-    background: none; border: 1px solid var(--border);
-    color: var(--text2); padding: 0.3rem 0.8rem;
-    border-radius: 6px; cursor: pointer;
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 0.8rem; transition: all 0.2s;
-  }
-
-  .header-nav button:hover, .header-nav button.active {
-    background: var(--bg4); color: var(--white);
-    border-color: var(--border2);
-  }
-
-  /* ─── LAYOUT ─── */
-  .layout {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    max-width: 1400px; margin: 0 auto;
-    min-height: calc(100vh - 60px);
-    position: relative; z-index: 1;
-  }
-
-  /* ─── SIDEBAR ─── */
-  aside {
-    position: sticky; top: 60px;
-    height: calc(100vh - 60px);
-    overflow-y: auto;
-    border-right: 1px solid var(--border);
-    padding: 1.5rem 1rem;
-    background: rgba(17,19,32,0.5);
-  }
-
-  aside::-webkit-scrollbar { width: 4px; }
-  aside::-webkit-scrollbar-track { background: transparent; }
-  aside::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
-
-  .sidebar-title {
-    font-size: 0.7rem; font-weight: 700;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--text3); padding: 0 0.5rem; margin-bottom: 0.8rem;
-  }
-
-  .nav-chapter {
-    margin-bottom: 0.25rem;
-  }
-
-  .nav-chapter-btn {
-    width: 100%; text-align: left;
-    background: none; border: none; cursor: pointer;
-    color: var(--text2); padding: 0.45rem 0.7rem;
-    border-radius: 8px; font-size: 0.85rem;
-    font-family: 'Noto Sans TC', sans-serif;
-    display: flex; align-items: center; justify-content: space-between;
-    transition: all 0.2s; gap: 8px;
-  }
-
-  .nav-chapter-btn:hover { background: var(--bg4); color: var(--white); }
-  .nav-chapter-btn.active {
-    background: rgba(0,229,160,0.08);
-    color: var(--green);
-    border-left: 2px solid var(--green);
-  }
-
-  .nav-chapter-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem; color: var(--text3);
-    background: var(--bg4); padding: 2px 6px; border-radius: 4px;
-    flex-shrink: 0;
-  }
-
-  .nav-chapter-btn.active .nav-chapter-num { color: var(--green); background: rgba(0,229,160,0.15); }
-
-  .nav-sub { padding-left: 1rem; display: none; }
-  .nav-sub.open { display: block; }
-
-  .nav-sub a {
-    display: block; color: var(--text3);
-    padding: 0.3rem 0.7rem; border-radius: 6px;
-    text-decoration: none; font-size: 0.78rem;
-    transition: all 0.2s;
-  }
-
-  .nav-sub a:hover { color: var(--text); background: var(--bg3); }
-  .nav-sub a.active { color: var(--blue); }
-
-  /* ─── MAIN ─── */
-  main {
-    padding: 3rem 3rem 5rem;
-    max-width: 960px;
-  }
-
-  /* ─── HERO ─── */
-  .hero {
-    margin-bottom: 4rem;
-    padding: 3rem;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    position: relative; overflow: hidden;
-  }
-
-  .hero::before {
-    content: '';
-    position: absolute; top: -60px; right: -60px;
-    width: 260px; height: 260px;
-    background: radial-gradient(circle, rgba(0,229,160,0.12) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .hero::after {
-    content: '';
-    position: absolute; bottom: -80px; left: 30%;
-    width: 300px; height: 200px;
-    background: radial-gradient(circle, rgba(91,143,255,0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(0,229,160,0.1); border: 1px solid rgba(0,229,160,0.3);
-    color: var(--green); font-size: 0.75rem; font-weight: 600;
-    padding: 4px 12px; border-radius: 20px;
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: 0.05em; margin-bottom: 1.2rem;
-  }
-
-  .hero h1 {
-    font-size: 2.8rem; font-weight: 900;
-    color: var(--white);
-    line-height: 1.2; margin-bottom: 1rem;
-  }
-
-  .hero h1 span { color: var(--green); }
-
-  .hero p { color: var(--text2); font-size: 1rem; max-width: 500px; }
-
-  .hero-stats {
-    display: flex; gap: 2rem; margin-top: 2rem;
-    flex-wrap: wrap;
-  }
-
-  .stat {
-    display: flex; flex-direction: column;
-  }
-
-  .stat-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.8rem; font-weight: 700;
-    color: var(--white);
-    line-height: 1;
-  }
-
-  .stat-label {
-    font-size: 0.75rem; color: var(--text3); margin-top: 4px;
-  }
-
-  /* ─── CHAPTER ─── */
-  .chapter {
-    margin-bottom: 5rem;
-    animation: fadeUp 0.5s ease both;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .chapter-header {
-    display: flex; align-items: center; gap: 1rem;
-    margin-bottom: 2rem; padding-bottom: 1.2rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .chapter-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem; font-weight: 700;
-    color: var(--green); background: rgba(0,229,160,0.1);
-    border: 1px solid rgba(0,229,160,0.2);
-    padding: 4px 10px; border-radius: 6px;
-    white-space: nowrap;
-  }
-
-  .chapter h2 {
-    font-size: 1.7rem; font-weight: 800; color: var(--white);
-  }
-
-  /* ─── SECTION ─── */
-  .section { margin-bottom: 2.5rem; }
-
-  .section h3 {
-    font-size: 1.15rem; font-weight: 700;
-    color: var(--white); margin-bottom: 1rem;
-    display: flex; align-items: center; gap: 0.6rem;
-  }
-
-  .section h3::before {
-    content: '';
-    width: 4px; height: 20px;
-    background: linear-gradient(180deg, var(--green), var(--blue));
-    border-radius: 2px; flex-shrink: 0;
-  }
-
-  .section h4 {
-    font-size: 0.95rem; font-weight: 700;
-    color: var(--blue); margin: 1.2rem 0 0.6rem;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  p { margin-bottom: 0.8rem; color: var(--text); }
-
-  /* ─── CODE BLOCK ─── */
-  .code-block {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 12px; overflow: hidden;
-    margin: 1rem 0;
-    transition: border-color 0.2s;
-  }
-
-  .code-block:hover { border-color: var(--border2); }
-
-  .code-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0.6rem 1rem;
-    background: var(--bg3);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .code-dots { display: flex; gap: 6px; }
-  .code-dots span {
-    width: 10px; height: 10px; border-radius: 50%;
-  }
-  .code-dots span:nth-child(1) { background: #ff5f56; }
-  .code-dots span:nth-child(2) { background: #ffbd2e; }
-  .code-dots span:nth-child(3) { background: #27c93f; }
-
-  .code-lang {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem; color: var(--text3);
-    letter-spacing: 0.08em;
-  }
-
-  .copy-btn {
-    background: none; border: 1px solid var(--border);
-    color: var(--text3); padding: 3px 10px;
-    border-radius: 5px; cursor: pointer;
-    font-size: 0.72rem; transition: all 0.2s;
-    font-family: 'Noto Sans TC', sans-serif;
-  }
-
-  .copy-btn:hover { background: var(--bg4); color: var(--white); border-color: var(--border2); }
-  .copy-btn.copied { color: var(--green); border-color: rgba(0,229,160,0.4); }
-
-  pre {
-    padding: 1.2rem 1.4rem;
-    overflow-x: auto;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
-    line-height: 1.65;
-  }
-
-  pre::-webkit-scrollbar { height: 4px; }
-  pre::-webkit-scrollbar-track { background: transparent; }
-  pre::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
-
-  /* syntax */
-  .kw  { color: #c792ea; font-weight: 600; }
-  .fn  { color: var(--blue); }
-  .str { color: var(--green); }
-  .num { color: var(--orange); }
-  .cmt { color: var(--text3); font-style: italic; }
-  .var { color: #82aaff; }
-  .op  { color: var(--yellow); }
-  .pun { color: var(--text2); }
-
-  /* output block */
-  .output-block {
-    background: rgba(0,229,160,0.04);
-    border: 1px solid rgba(0,229,160,0.15);
-    border-left: 3px solid var(--green);
-    border-radius: 0 10px 10px 0;
-    padding: 0.9rem 1.2rem;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.82rem;
-    color: var(--green);
-    margin: 0.5rem 0 1rem;
-  }
-
-  .output-block::before {
-    content: '▶ 執行結果';
-    display: block; font-size: 0.68rem;
-    color: var(--green2); opacity: 0.7;
-    margin-bottom: 0.4rem; letter-spacing: 0.08em;
-  }
-
-  /* ─── INFO BOXES ─── */
-  .tip, .warn, .note {
-    border-radius: 10px; padding: 1rem 1.2rem;
-    margin: 1rem 0; font-size: 0.9rem;
-    display: flex; gap: 0.8rem; align-items: flex-start;
-  }
-
-  .tip {
-    background: rgba(0,229,160,0.06);
-    border: 1px solid rgba(0,229,160,0.2);
-    color: var(--text);
-  }
-
-  .warn {
-    background: rgba(255,107,107,0.06);
-    border: 1px solid rgba(255,107,107,0.2);
-    color: var(--text);
-  }
-
-  .note {
-    background: rgba(91,143,255,0.06);
-    border: 1px solid rgba(91,143,255,0.2);
-    color: var(--text);
-  }
-
-  .tip-icon, .warn-icon, .note-icon {
-    font-size: 1.1rem; flex-shrink: 0; margin-top: 1px;
-  }
-
-  /* ─── TABLE ─── */
-  .table-wrap { overflow-x: auto; margin: 1rem 0; border-radius: 10px; }
-
-  table {
-    width: 100%; border-collapse: collapse;
-    font-size: 0.85rem;
-  }
-
-  th {
-    background: var(--bg3);
-    color: var(--white); font-weight: 700;
-    padding: 0.75rem 1rem; text-align: left;
-    font-size: 0.8rem; letter-spacing: 0.04em;
-    border-bottom: 2px solid var(--border2);
-  }
-
-  td {
-    padding: 0.7rem 1rem;
-    border-bottom: 1px solid var(--border);
-    color: var(--text);
-  }
-
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(255,255,255,0.02); }
-
-  td code, th code {
-    font-family: 'JetBrains Mono', monospace;
-    background: var(--bg4); color: var(--yellow);
-    padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;
-  }
-
-  /* ─── PRACTICE CARDS ─── */
-  .practice {
-    border-radius: 14px; overflow: hidden;
-    margin: 2rem 0;
-    border: 1px solid var(--border);
-  }
-
-  .practice-easy .practice-header { background: rgba(0,229,160,0.08); border-bottom-color: rgba(0,229,160,0.2); }
-  .practice-hard .practice-header { background: rgba(255,107,107,0.08); border-bottom-color: rgba(255,107,107,0.2); }
-
-  .practice-header {
-    padding: 1rem 1.2rem;
-    display: flex; align-items: center; gap: 0.8rem;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-  }
-
-  .practice-badge {
-    font-size: 0.7rem; font-weight: 700;
-    padding: 3px 10px; border-radius: 20px;
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: 0.05em; white-space: nowrap;
-  }
-
-  .practice-easy .practice-badge {
-    background: rgba(0,229,160,0.15); color: var(--green);
-    border: 1px solid rgba(0,229,160,0.3);
-  }
-
-  .practice-hard .practice-badge {
-    background: rgba(255,107,107,0.15); color: var(--red);
-    border: 1px solid rgba(255,107,107,0.3);
-  }
-
-  .practice-title {
-    font-weight: 700; color: var(--white); font-size: 0.95rem;
-    flex: 1;
-  }
-
-  .practice-body {
-    padding: 1.2rem; background: var(--bg2);
-  }
-
-  .practice-q { color: var(--text); margin-bottom: 1rem; }
-
-  .toggle-answer {
-    background: var(--bg3); border: 1px solid var(--border);
-    color: var(--text2); padding: 0.5rem 1rem;
-    border-radius: 8px; cursor: pointer;
-    font-size: 0.82rem; transition: all 0.25s;
-    font-family: 'Noto Sans TC', sans-serif;
-    display: flex; align-items: center; gap: 6px;
-    margin-top: 0.5rem;
-  }
-
-  .toggle-answer:hover { background: var(--bg4); color: var(--white); border-color: var(--border2); }
-  .toggle-answer.open { color: var(--yellow); border-color: rgba(255,209,102,0.3); }
-
-  .answer-box {
-    display: none; margin-top: 1rem;
-    animation: slideDown 0.3s ease;
-  }
-
-  .answer-box.open { display: block; }
-
-  @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ─── OPERATOR GRID ─── */
-  .op-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 0.6rem; margin: 1rem 0;
-  }
-
-  .op-card {
-    background: var(--bg3); border: 1px solid var(--border);
-    border-radius: 10px; padding: 0.8rem;
-    text-align: center; transition: all 0.2s;
-  }
-
-  .op-card:hover { border-color: var(--border2); transform: translateY(-2px); }
-
-  .op-symbol {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.3rem; font-weight: 700; color: var(--yellow);
-    line-height: 1;
-  }
-
-  .op-name { font-size: 0.72rem; color: var(--text3); margin-top: 4px; }
-  .op-example { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text2); margin-top: 2px; }
-
-  /* ─── CHAPTER NAV PILLS ─── */
-  .chapter-pills {
-    display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 3rem;
-  }
-
-  .pill {
-    background: var(--bg3); border: 1px solid var(--border);
-    color: var(--text2); padding: 0.5rem 1rem;
-    border-radius: 30px; font-size: 0.8rem;
-    cursor: pointer; transition: all 0.2s;
-    text-decoration: none; display: inline-block;
-  }
-
-  .pill:hover { background: var(--bg4); color: var(--white); border-color: var(--border2); }
-
-  /* ─── PROGRESS BAR ─── */
-  .progress-track {
-    background: var(--bg3); border: 1px solid var(--border);
-    border-radius: 12px; padding: 1.2rem 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .progress-label {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 0.7rem;
-  }
-
-  .progress-text { font-size: 0.82rem; color: var(--text2); }
-  .progress-pct { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: 700; color: var(--green); }
-
-  .progress-bar {
-    height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%; width: 0%;
-    background: linear-gradient(90deg, var(--green), var(--blue));
-    border-radius: 3px;
-    transition: width 0.5s ease;
-  }
-
-  /* ─── INLINE CODE ─── */
-  code {
-    font-family: 'JetBrains Mono', monospace;
-    background: var(--bg4); color: var(--yellow);
-    padding: 2px 6px; border-radius: 4px; font-size: 0.85em;
-  }
-
-  /* ─── SEARCH ─── */
-  .search-box {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--bg3); border: 1px solid var(--border);
-    border-radius: 8px; padding: 0.4rem 0.8rem;
-    transition: border-color 0.2s;
-  }
-
-  .search-box:focus-within { border-color: var(--border2); }
-  .search-icon { color: var(--text3); font-size: 0.9rem; }
-
-  .search-input {
-    background: none; border: none; outline: none;
-    color: var(--text); font-size: 0.82rem;
-    font-family: 'Noto Sans TC', sans-serif;
-    width: 160px;
-  }
-
-  .search-input::placeholder { color: var(--text3); }
-
-  /* ─── FLOW CHART / CONCEPT VIZ ─── */
-  .concept-flow {
-    display: flex; align-items: center; gap: 0;
-    flex-wrap: wrap; margin: 1rem 0;
-  }
-
-  .flow-box {
-    background: var(--bg3); border: 1px solid var(--border);
-    border-radius: 10px; padding: 0.6rem 1rem;
-    font-size: 0.82rem; color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  .flow-arrow { color: var(--text3); padding: 0 0.5rem; font-size: 1.1rem; }
-
-  /* ─── SCROLL INDICATOR ─── */
-  .scroll-top {
-    position: fixed; bottom: 2rem; right: 2rem;
-    width: 40px; height: 40px;
-    background: var(--bg3); border: 1px solid var(--border2);
-    border-radius: 10px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text2); font-size: 1rem;
-    opacity: 0; pointer-events: none;
-    transition: all 0.3s; z-index: 50;
-  }
-
-  .scroll-top.visible { opacity: 1; pointer-events: all; }
-  .scroll-top:hover { background: var(--bg4); color: var(--white); }
-
-  /* ─── CHAPTER DIVIDER ─── */
-  .divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border), transparent);
-    margin: 3rem 0;
-  }
-
-  /* ─── RESPONSIVE ─── */
-  @media (max-width: 900px) {
-    .layout { grid-template-columns: 1fr; }
-    aside { display: none; }
-    main { padding: 2rem 1.5rem 4rem; }
-    .hero h1 { font-size: 2rem; }
-    .hero { padding: 2rem; }
-  }
-
-  /* ─── ANIMATIONS ─── */
-  .chapter { opacity: 0; transform: translateY(24px); transition: opacity 0.5s ease, transform 0.5s ease; }
-  .chapter.visible { opacity: 1; transform: translateY(0); }
-
-  /* ─── SEARCH HIGHLIGHT ─── */
-  .highlight { background: rgba(255,209,102,0.25); border-radius: 2px; }
-
-  /* ─── TOOLTIP ─── */
-  [data-tip] { position: relative; cursor: help; }
-  [data-tip]::after {
-    content: attr(data-tip);
-    position: absolute; bottom: 120%; left: 50%;
-    transform: translateX(-50%);
-    background: var(--bg4); color: var(--text);
-    border: 1px solid var(--border); border-radius: 6px;
-    padding: 4px 10px; font-size: 0.75rem;
-    white-space: nowrap; pointer-events: none;
-    opacity: 0; transition: opacity 0.2s;
-    font-family: 'Noto Sans TC', sans-serif;
-  }
-  [data-tip]:hover::after { opacity: 1; }
-
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#1a1a2e;--dim:#4a4a6a;--muted:#8a8aaa;--line:#e0e0f0;--bg:#f5f4f0;--green:#1d5c3a;--greenl:#2d8a5a;--greenll:#e8f5ee;--blue:#1a3f7a;--bluell:#e5edf8;--red:#b52a2a;--redl:#fce8e8;--code-bg:#0d1117;--code-text:#c9d1d9;--shadow:0 2px 16px rgba(0,0,0,.08);--radius:14px}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px}
+button{cursor:pointer;font-family:inherit}
+.hidden{display:none!important}
+#topbar{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:400;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+#topbar-inner{max-width:1060px;margin:0 auto;padding:0 20px;height:58px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{font-family:'Noto Serif TC',serif;font-size:17px;font-weight:700;color:var(--green);display:flex;align-items:center;gap:8px;white-space:nowrap}
+.logo-badge{font-size:10px;background:var(--greenll);color:var(--green);border-radius:5px;padding:2px 7px;font-weight:700;font-family:'Noto Sans TC',sans-serif}
+#nav{display:flex;gap:2px;flex-wrap:wrap}
+.ntab{padding:7px 12px;border-radius:8px;border:none;background:none;font-size:13px;font-weight:600;color:var(--dim);transition:all .15s;white-space:nowrap}
+.ntab.on{background:var(--greenll);color:var(--green)}
+.ntab:hover:not(.on){background:#f0f0f0}
+.user-wrap{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.chip{font-size:12px;padding:4px 10px;border-radius:16px;background:#f0f0f0;color:var(--dim)}
+.chip.t{background:var(--bluell);color:var(--blue)}
+#wrap{max-width:1060px;margin:0 auto;padding:22px 20px 90px}
+.page{display:none}.page.on{display:block}
+#login-screen{min-height:100vh;background:linear-gradient(160deg,#0a0f1e,#162435,#1a3a2a);display:flex;align-items:center;justify-content:center;padding:20px}
+.lbox{width:100%;max-width:460px}
+.licon{font-size:56px;text-align:center;margin-bottom:10px}
+.ltitle{font-family:'Noto Serif TC',serif;font-size:26px;color:#e8f4f0;text-align:center;margin-bottom:4px}
+.lsub{font-size:13px;color:#6abea0;text-align:center;margin-bottom:24px}
+.lcard{background:rgba(255,255,255,.07);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:2rem}
+.llbl{color:#90c8b4;font-size:12px;font-weight:700;margin-bottom:8px;display:block;letter-spacing:.05em;text-transform:uppercase}
+.role-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.rbtn{padding:14px;border-radius:12px;border:1.5px solid rgba(255,255,255,.18);background:transparent;color:#90bdb0;font-weight:700;font-size:14px;transition:all .2s;text-align:center}
+.rbtn .ri{font-size:26px;margin-bottom:4px;display:block}
+.rbtn.on{border-color:#4ade80;background:rgba(74,222,128,.15);color:#4ade80}
+.linp{width:100%;padding:12px 16px;border-radius:11px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#e8f4f0;font-size:15px;outline:none;font-family:inherit;margin-bottom:14px}
+.linp::placeholder{color:rgba(255,255,255,.3)}
+.lgo{width:100%;padding:14px;border-radius:11px;border:none;background:linear-gradient(135deg,#1d5c3a,#2d8a5a);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+.lgo:disabled{opacity:.35;cursor:not-allowed}
+.lstats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+.lstat{text-align:center;color:rgba(255,255,255,.5)}
+.lstat .v{font-size:20px;font-weight:700;color:#e8f4f0;display:block}
+.lstat .l{font-size:12px;margin-top:2px}
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.5rem}
+.stitle{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.divider{height:1px;background:var(--line);margin:20px 0}
+.between{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:10px;border:none;font-weight:700;font-size:14px;transition:all .15s;cursor:pointer}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:#155230}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-outline{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+.btn-sm{padding:7px 15px;font-size:13px;border-radius:8px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.full{width:100%;justify-content:center}
+select,input[type=text]{width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--line);font-size:14px;color:var(--ink);background:#fff;outline:none;font-family:inherit}
+input[type=range]{width:100%;accent-color:var(--green)}
+.pbar{height:6px;background:#f0f0f0;border-radius:4px;overflow:hidden}
+.pbar-fill{height:100%;border-radius:4px;transition:width .5s}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:5px;padding:2px 8px;margin-right:4px}
+.tag-ch{background:var(--greenll);color:var(--green)}
+.tag-topic{background:#f0f0f0;color:var(--dim)}
+.tag-derived{background:#fef3c7;color:#92400e}
+.hero{background:linear-gradient(135deg,#0a0f1e,#162435,#1d3a28);border-radius:18px;padding:1.75rem;margin-bottom:20px;color:#fff}
+.hero h2{font-family:'Noto Serif TC',serif;font-size:21px;margin:0 0 4px}
+.hero p{font-size:13px;opacity:.75;margin:0 0 16px}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.hs{background:rgba(255,255,255,.1);border-radius:11px;padding:12px;text-align:center}
+.hs .v{font-size:22px;font-weight:800}
+.hs .l{font-size:11px;opacity:.7;margin-top:2px}
+.ch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:20px}
+.ch-card{background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);padding:18px;cursor:pointer;transition:all .2s;text-align:left;width:100%}
+.ch-card:hover{border-color:var(--greenl);box-shadow:0 4px 20px rgba(29,92,58,.1)}
+.ch-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.ch-ico{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.ch-name{font-size:15px;font-weight:700;color:var(--ink)}
+.ch-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.mode-toggle{display:flex;gap:6px;background:#fff;border-radius:11px;padding:4px;border:1.5px solid var(--line)}
+.mt-btn{padding:7px 14px;border-radius:8px;border:none;background:none;font-size:13px;font-weight:600;color:var(--dim);cursor:pointer;flex:1}
+.mt-btn.on{background:var(--greenll);color:var(--green)}
+.lang-pills{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lang-pill{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:14px 10px;border-radius:11px;border:2px solid var(--line);background:#fff;color:var(--dim);cursor:pointer;transition:all .15s;font-family:inherit;line-height:1.3}
+.lang-pill:hover{border-color:var(--greenl);color:var(--ink)}
+.lang-pill.on{border-color:var(--green);background:var(--greenll);color:var(--green);box-shadow:0 2px 8px rgba(29,92,58,.12)}
+.code-wrap{background:var(--code-bg);border-radius:10px;margin:12px 0;overflow:hidden;border:1px solid #30363d}
+.code-header{background:#161b22;padding:8px 14px;font-size:11px;color:#8b949e;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:8px;border-bottom:1px solid #30363d}
+.code-dots{display:flex;gap:5px}
+.code-dots span{width:11px;height:11px;border-radius:50%;display:inline-block}
+.code-dots .r{background:#ff5f57}.code-dots .y{background:#ffbd2e}.code-dots .g{background:#28c840}
+.code-lang{margin-left:auto;font-size:11px;font-weight:600;background:#21262d;padding:2px 9px;border-radius:5px;color:#c9d1d9}
+.code-wrap pre.code-block{margin:0;border:none;border-radius:0;background:transparent}
+pre.code-block{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--code-bg);color:var(--code-text);padding:16px;overflow-x:auto;line-height:1.7;white-space:pre;tab-size:4;margin:12px 0;border-radius:10px;border:1px solid #30363d}
+pre.code-block .kw{color:#d2a8ff}
+pre.code-block .nm{color:#e3b341}
+pre.code-block .st{color:#a5d6ff}
+pre.code-block .cm{color:#8b949e;font-style:italic}
+.qcard{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:14px;border:1.5px solid transparent}
+.qtags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.qnum{font-size:13px;font-weight:700;color:var(--muted)}
+.qtext{font-size:14.5px;font-weight:600;color:var(--ink);line-height:1.9;margin:8px 0 14px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt-btn{display:flex;align-items:flex-start;gap:11px;padding:13px 16px;border-radius:11px;border:1.5px solid var(--line);background:#fafafa;cursor:pointer;width:100%;text-align:left;font-family:inherit;font-size:13.5px;transition:all .15s;color:var(--ink);line-height:1.6}
+.opt-btn:hover:not(:disabled){border-color:var(--greenl);background:var(--greenll)}
+.opt-btn.correct{border-color:var(--green)!important;background:var(--greenll)}
+.opt-btn.wrong{border-color:var(--red)!important;background:var(--redl)}
+.opt-btn.neutral{opacity:.45}
+.opt-btn:disabled{cursor:not-allowed}
+.oc{min-width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;background:#e8e8f0;color:var(--dim)}
+.oc.c{background:var(--green);color:#fff}
+.oc.w{background:var(--red);color:#fff}
+.explain{margin-top:14px;background:var(--bluell);border:1px solid #b8d4f5;border-radius:11px;padding:14px 16px}
+.explain-head{font-weight:700;color:var(--blue);font-size:12px;margin-bottom:6px;letter-spacing:.03em;text-transform:uppercase}
+.explain-body{font-size:13px;color:#1a3a5a;line-height:1.95;white-space:pre-wrap}
+.exp-box{margin-top:14px;background:#fafbfc;border:1px solid #e5e7eb;border-radius:12px;padding:16px 18px;font-size:13.5px;line-height:1.95;color:#1f2937}
+.exp-sec{font-weight:700;font-size:14.5px;margin:14px 0 6px;padding:6px 10px;border-radius:7px;border-left:4px solid}
+.exp-sec:first-child{margin-top:0}
+.exp-sec-blue{background:#eff6ff;color:#1e40af;border-color:#3b82f6}
+.exp-sec-green{background:#ecfdf5;color:#065f46;border-color:#10b981}
+.exp-sec-amber{background:#fffbeb;color:#92400e;border-color:#f59e0b}
+.exp-sec-red{background:#fef2f2;color:#991b1b;border-color:#ef4444}
+.exp-sec-pink{background:#fdf2f8;color:#9d174d;border-color:#ec4899}
+.exp-sec-purple{background:#f5f3ff;color:#5b21b6;border-color:#8b5cf6}
+.exam-bar{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-radius:13px;background:var(--bluell);border:1px solid #b8d4f5;margin-bottom:14px}
+.exam-bar.urg{background:var(--redl);border-color:#f0b8b8}
+.timer{font-size:28px;font-weight:800;color:var(--blue);font-family:'JetBrains Mono',monospace;letter-spacing:-.02em}
+.timer.urg{color:var(--red);animation:pulse .8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.q-palette{display:flex;flex-wrap:wrap;gap:5px;margin:14px 0}
+.q-dot{width:32px;height:32px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.q-dot.done{background:var(--greenll);color:var(--green)}
+.q-dot.cur{background:var(--green);color:#fff}
+.q-dot.und{background:#f0f0f0;color:var(--muted)}
+.exam-nav{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;margin-top:16px;align-items:center}
+.exam-qn{font-size:13px;color:var(--muted);text-align:center;font-weight:600}
+.result-hero{background:linear-gradient(135deg,#0a0f1e,#1d3a28);border-radius:18px;padding:2rem;color:#fff;text-align:center;margin-bottom:20px}
+.score-circle{width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.1);border:4px solid #4ade80;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 18px}
+.score-num{font-size:40px;font-weight:800}
+.score-lbl{font-size:12px;opacity:.75}
+.result-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.rg{background:rgba(255,255,255,.1);border-radius:11px;padding:14px;text-align:center}
+.rg .v{font-size:24px;font-weight:800}
+.rg .l{font-size:11px;opacity:.7;margin-top:3px}
+.ai-explain-wrap{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.5rem;margin-bottom:14px}
+.ai-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.ai-badge{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.05em}
+.loading-dots{display:flex;gap:4px}
+.loading-dots span{width:8px;height:8px;border-radius:50%;background:#4a7fd4;animation:bounce .7s infinite alternate}
+.loading-dots span:nth-child(2){animation-delay:.15s}
+.loading-dots span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{to{transform:translateY(-6px)}}
+.q-explain-item{border:1.5px solid var(--line);border-radius:11px;margin-bottom:12px;overflow:hidden}
+.qei-head{padding:12px 16px;background:#f8f8fc;font-weight:700;font-size:13px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.qei-status{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.qei-status.ok{background:var(--greenll);color:var(--green)}
+.qei-status.ng{background:var(--redl);color:var(--red)}
+.qei-body{padding:14px 16px;display:none;border-top:1px solid var(--line)}
+.qei-body.open{display:block}
+.ai-text{font-size:13px;color:var(--ink);line-height:2;white-space:pre-wrap}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat-c{background:#fff;border-radius:13px;box-shadow:var(--shadow);padding:16px;text-align:center}
+.stat-v{font-size:28px;font-weight:800;color:var(--ink)}
+.stat-l{font-size:12px;color:var(--muted);margin-top:3px}
+.bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.bar-lbl{font-size:13px;color:var(--dim);width:130px;flex-shrink:0}
+.bar-track{flex:1;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .8s ease}
+.bar-pct{font-size:12px;color:var(--muted);width:38px;text-align:right}
+.t-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:680px){.t-grid{grid-template-columns:1fr}}
+.t-sec{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.prev-box{background:#f8f8fc;border:1px solid var(--line);border-radius:11px;padding:14px;max-height:420px;overflow-y:auto}
+.prev-q{padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line)}
+.prev-q:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
+.prev-qh{font-size:13px;font-weight:700;margin-bottom:7px;line-height:1.65}
+.prev-opts{display:grid;grid-template-columns:1fr 1fr;gap:3px 14px}
+.prev-opt{font-size:12px;color:var(--dim)}
+.prev-opt.ans{color:var(--green);font-weight:700}
+.prev-exp{font-size:12px;color:var(--blue);margin-top:7px;line-height:1.75;padding:7px 10px;background:var(--bluell);border-radius:8px}
+.prev-code{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--code-bg);color:var(--code-text);padding:8px;border-radius:6px;margin:6px 0;overflow-x:auto;white-space:pre;line-height:1.5}
+.ch-tog{padding:6px 13px;border-radius:18px;border:1.5px solid var(--line);background:#f8f8f8;font-size:12px;font-weight:700;cursor:pointer;color:var(--dim);margin:3px}
+.ch-tog.on{background:var(--bluell);color:var(--blue);border-color:#90bbf0}
+.ver-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.ver-btn{padding:11px;border-radius:11px;border:1.5px solid var(--line);background:#f8f8f8;font-size:13px;font-weight:700;cursor:pointer;color:var(--dim);text-align:center}
+.ver-btn.on{background:var(--bluell);color:var(--blue);border-color:#90bbf0}
+.lb-row{display:flex;align-items:center;gap:14px;padding:12px 16px;background:#fff;border:1px solid var(--line);border-radius:11px;margin-bottom:8px}
+.lb-rank{font-size:18px;font-weight:800;width:30px;text-align:center}
+.lb-name{font-size:14px;flex:1;font-weight:600}
+.lb-score{font-size:16px;font-weight:800;color:var(--green)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:11px 24px;border-radius:12px;font-size:14px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.empty{text-align:center;padding:50px 20px;color:var(--muted)}
+.teacher-hero{background:linear-gradient(135deg,#1a3f7a,#2d5a9b);border-radius:18px;padding:1.75rem;margin-bottom:20px;color:#fff}
+.diff-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
+.diff-1{background:#e8f5ee;color:#1d5c3a}
+.diff-2{background:#fff3d6;color:#c47800}
+.diff-3{background:#fce8e8;color:#b52a2a}
+.word-download-area{background:linear-gradient(135deg,#1a3f7a11,#1d5c3a11);border:1.5px dashed var(--greenl);border-radius:12px;padding:18px;text-align:center;margin-bottom:16px}
+@media(max-width:600px){.hero-stats,.result-grid{grid-template-columns:repeat(2,1fr)}.ch-grid{grid-template-columns:1fr}.exam-nav{grid-template-columns:1fr 1fr;gap:8px}.exam-nav .exam-qn{display:none}#nav .ntab{font-size:12px;padding:6px 9px}}
 </style>
 </head>
 <body>
 
-<!-- ─── HEADER ─── -->
-<header>
-  <div class="logo">
-    <div class="logo-dot"></div>
-    Python 互動參考書
+<div id="login-screen">
+  <div class="lbox">
+    <div class="licon">⌨️</div>
+    <div class="ltitle">高中生程式檢定模擬</div>
+    <div style="text-align:center;margin-bottom:6px"><span style="display:inline-block;font-size:11px;background:rgba(255,200,100,.18);color:#ffc857;border:1px solid rgba(255,200,100,.4);padding:3px 10px;border-radius:12px;font-weight:600">⚠️ 非官方學習工具</span></div>
+    <div class="lsub">標準考試格式 · 完整詳解 · Word 下載</div>
+    <div class="lcard">
+      <span class="llbl">姓名</span>
+      <input class="linp" id="lname" placeholder="請輸入姓名" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="lgo" id="lbtn" onclick="doLogin()" disabled>開始考試 →</button>
+      <div class="lstats">
+        <div class="lstat"><span class="v">📝</span><div class="l">標準考試</div></div>
+        <div class="lstat"><span class="v">💡</span><div class="l">完整詳解</div></div>
+        <div class="lstat"><span class="v">6</span><div class="l">章節</div></div>
+      </div>
+    </div>
+    <div style="margin-top:18px;padding:12px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;font-size:11px;line-height:1.7;color:rgba(255,255,255,.5);text-align:left">
+      <strong style="color:rgba(255,255,255,.7)">⚠️ 免責聲明：</strong>本工具為<strong>非官方</strong>學習輔助，與任何官方程式設計檢定主辦單位<strong>無任何隸屬或授權關係</strong>。所有題目皆由程式即時生成，僅供教學與自學練習參考，不代表任何官方真題。
+    </div>
   </div>
-  <div style="display:flex;align-items:center;gap:1rem;">
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input class="search-input" type="text" id="searchInput" placeholder="搜尋關鍵字...">
-    </div>
-    <div class="header-nav">
-      <button onclick="expandAll()">展開全部</button>
-      <button onclick="collapseAll()">收合全部</button>
-    </div>
-  </div>
-</header>
-
-<!-- ─── LAYOUT ─── -->
-<div class="layout">
-
-  <!-- ─── SIDEBAR ─── -->
-  <aside>
-    <div class="sidebar-title">章節目錄</div>
-
-    <div id="navTree"></div>
-
-    <div style="margin-top:2rem; padding:0 0.5rem;">
-      <div class="sidebar-title" style="margin-bottom:0.6rem;">學習進度</div>
-      <div class="progress-track" style="padding:0.8rem;">
-        <div class="progress-label">
-          <span class="progress-text">解鎖題目</span>
-          <span class="progress-pct" id="progressPct">0%</span>
-        </div>
-        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- ─── MAIN ─── -->
-  <main id="mainContent">
-
-    <!-- HERO -->
-    <div class="hero">
-      <div class="hero-badge">
-        <span>●</span> Python 3 互動參考書
-      </div>
-      <h1>從零開始學<br><span>Python</span> 程式設計</h1>
-      <p>涵蓋 7 大章節、完整範例、詳細說明與互動練習題，適合零基礎初學者。</p>
-      <div class="hero-stats">
-        <div class="stat"><div class="stat-num">7</div><div class="stat-label">章節</div></div>
-        <div class="stat"><div class="stat-num">40+</div><div class="stat-label">程式範例</div></div>
-        <div class="stat"><div class="stat-num">14</div><div class="stat-label">互動練習</div></div>
-      </div>
-    </div>
-
-    <!-- chapter pills -->
-    <div class="chapter-pills" id="chapterPills"></div>
-
-    <!-- ══════════════════════════════════════════
-         CH1: 認識程式設計
-    ══════════════════════════════════════════ -->
-    <div class="chapter" id="ch1">
-      <div class="chapter-header">
-        <span class="chapter-num">CH 01</span>
-        <h2>認識程式設計</h2>
-      </div>
-
-      <div class="section" id="ch1-1">
-        <h3>1-1 什麼是程式？</h3>
-        <p><strong style="color:var(--white)">程式（Program）</strong>是由一連串指令所組成，用來告訴電腦如何執行特定的工作。</p>
-        <div class="table-wrap"><table>
-          <tr><th>名詞</th><th>說明</th><th>比喻</th></tr>
-          <tr><td><strong style="color:var(--yellow)">演算法</strong>（Algorithm）</td><td>解決問題的步驟與方法</td><td>食譜</td></tr>
-          <tr><td><strong style="color:var(--yellow)">程式</strong>（Program）</td><td>用程式語言撰寫的演算法</td><td>依照食譜寫下的步驟</td></tr>
-          <tr><td><strong style="color:var(--yellow)">軟體</strong>（Software）</td><td>由一個或多個程式組成的系統</td><td>整本食譜書</td></tr>
-        </table></div>
-        <div class="tip"><span class="tip-icon">💡</span><div><strong>程式設計師（Programmer）</strong> 負責撰寫程式，讓使用者（User）能透過程式完成任務，例如：計算成績、傳送訊息、播放音樂。</div></div>
-      </div>
-
-      <div class="section" id="ch1-2">
-        <h3>1-2 程式語言種類</h3>
-        <div class="table-wrap"><table>
-          <tr><th>類型</th><th>說明</th><th>範例</th></tr>
-          <tr><td>機器語言</td><td>由 0 和 1 組成，電腦直接執行</td><td><code>10110000 01100001</code></td></tr>
-          <tr><td>高階語言</td><td>接近人類語言，需翻譯才能執行</td><td>Python、C/C++、Java</td></tr>
-        </table></div>
-        <p><strong style="color:var(--green)">Python 的特色：</strong>語法簡潔、功能強大（AI/網頁/資料分析）、跨平台、免費開源。</p>
-      </div>
-
-      <div class="section" id="ch1-3">
-        <h3>1-3 開發環境：Google Colab</h3>
-        <p>Google Colab 是免費線上 Python 執行環境，不需安裝任何軟體。</p>
-        <p>第一個 Python 程式範例：</p>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="fn">print</span><span class="pun">(</span><span class="str">"Hello, World!"</span><span class="pun">)</span></pre>
-        </div>
-        <div class="output-block">Hello, World!</div>
-      </div>
-
-      <div class="section" id="ch1-4">
-        <h3>1-4 錯誤與除錯</h3>
-        <div class="table-wrap"><table>
-          <tr><th>錯誤類型</th><th>說明</th><th>範例</th></tr>
-          <tr><td>語法錯誤（Syntax Error）</td><td>程式碼格式寫錯</td><td><code>prnt("Hello")</code> 拼字錯誤</td></tr>
-          <tr><td>邏輯錯誤（Logic Error）</td><td>程式能執行，但結果不正確</td><td>加法寫成減法</td></tr>
-          <tr><td>執行時錯誤（Runtime Error）</td><td>執行過程中發生錯誤</td><td>除以 0</td></tr>
-        </table></div>
-        <div class="warn"><span class="warn-icon">⚠️</span><div>Python 是<strong>大小寫敏感</strong>的語言，<code>Print</code> 和 <code>print</code> 是不同的！</div></div>
-      </div>
-
-      <!-- Practice 1 -->
-      <div class="practice practice-easy">
-        <div class="practice-header" onclick="togglePractice(this)">
-          <span class="practice-badge">⭐ 簡單</span>
-          <span class="practice-title">練習 1-1｜第一個程式</span>
-          <span style="color:var(--text3)">▼</span>
-        </div>
-        <div class="practice-body">
-          <div class="practice-q">撰寫程式，在螢幕上分三行印出：<br><code>我是Python初學者</code>、<code>我喜歡寫程式</code>、<code>加油！</code></div>
-          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
-          <div class="answer-box">
-            <div class="code-block">
-              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-              <pre><span class="fn">print</span><span class="pun">(</span><span class="str">"我是Python初學者"</span><span class="pun">)</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">"我喜歡寫程式"</span><span class="pun">)</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">"加油！"</span><span class="pun">)</span></pre>
-            </div>
-            <div class="output-block">我是Python初學者
-我喜歡寫程式
-加油！</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="practice practice-hard">
-        <div class="practice-header" onclick="togglePractice(this)">
-          <span class="practice-badge">🔥 困難</span>
-          <span class="practice-title">練習 1-2｜sep 與 end 應用</span>
-          <span style="color:var(--text3)">▼</span>
-        </div>
-        <div class="practice-body">
-          <div class="practice-q">用<strong>一行 print()</strong>，利用 <code>sep</code> 和 <code>end</code> 印出：<br><code>P-Y-T-H-O-N!</code>（每字母間用 <code>-</code> 分隔，結尾為 <code>!</code>）</div>
-          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
-          <div class="answer-box">
-            <div class="code-block">
-              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-              <pre><span class="fn">print</span><span class="pun">(</span><span class="str">'P'</span><span class="pun">,</span><span class="str">'Y'</span><span class="pun">,</span><span class="str">'T'</span><span class="pun">,</span><span class="str">'H'</span><span class="pun">,</span><span class="str">'O'</span><span class="pun">,</span><span class="str">'N'</span><span class="pun">,</span> sep<span class="op">=</span><span class="str">'-'</span><span class="pun">,</span> end<span class="op">=</span><span class="str">'!\n'</span><span class="pun">)</span></pre>
-            </div>
-            <div class="output-block">P-Y-T-H-O-N!</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- ══════════════════════════════════════════
-         CH2: 變數與資料型態
-    ══════════════════════════════════════════ -->
-    <div class="chapter" id="ch2">
-      <div class="chapter-header">
-        <span class="chapter-num">CH 02</span>
-        <h2>變數與資料型態</h2>
-      </div>
-
-      <div class="section" id="ch2-1">
-        <h3>2-1 變數（Variable）</h3>
-        <p><strong style="color:var(--white)">變數</strong>是用來儲存資料的容器，可以想像成一個有名字的盒子。語法：<code>變數名稱 = 值</code></p>
-        <div class="warn"><span class="warn-icon">⚠️</span><div><code>=</code> 是「指定」，不是數學上的「等於」！等於判斷在 Python 中是 <code>==</code></div></div>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="var">name</span>       <span class="op">=</span> <span class="str">'Alice'</span>    <span class="cmt"># 字串型態</span>
-<span class="var">age</span>        <span class="op">=</span> <span class="num">16</span>         <span class="cmt"># 整數型態</span>
-<span class="var">height</span>     <span class="op">=</span> <span class="num">160.5</span>      <span class="cmt"># 浮點數型態</span>
-<span class="var">is_student</span> <span class="op">=</span> <span class="kw">True</span>       <span class="cmt"># 布林型態</span></pre>
-        </div>
-      </div>
-
-      <div class="section" id="ch2-2">
-        <h3>2-2 四種資料型態</h3>
-        <div class="table-wrap"><table>
-          <tr><th>型態</th><th>英文</th><th>範例值</th><th>說明</th></tr>
-          <tr><td>整數</td><td><code>int</code></td><td><code>10, -5, 0</code></td><td>沒有小數點的數字</td></tr>
-          <tr><td>浮點數</td><td><code>float</code></td><td><code>3.14, 98.5</code></td><td>有小數點的數字</td></tr>
-          <tr><td>字串</td><td><code>str</code></td><td><code>'Hello', "台北"</code></td><td>用引號包起的文字</td></tr>
-          <tr><td>布林</td><td><code>bool</code></td><td><code>True, False</code></td><td>真或假，只有兩個值</td></tr>
-        </table></div>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="fn">print</span><span class="pun">(</span><span class="fn">type</span><span class="pun">(</span><span class="num">10</span><span class="pun">))</span>       <span class="cmt"># &lt;class 'int'&gt;</span>
-<span class="fn">print</span><span class="pun">(</span><span class="fn">type</span><span class="pun">(</span><span class="num">3.14</span><span class="pun">))</span>     <span class="cmt"># &lt;class 'float'&gt;</span>
-<span class="fn">print</span><span class="pun">(</span><span class="fn">type</span><span class="pun">(</span><span class="str">'hello'</span><span class="pun">))</span>  <span class="cmt"># &lt;class 'str'&gt;</span>
-<span class="fn">print</span><span class="pun">(</span><span class="fn">type</span><span class="pun">(</span><span class="kw">True</span><span class="pun">))</span>      <span class="cmt"># &lt;class 'bool'&gt;</span></pre>
-        </div>
-      </div>
-
-      <div class="section" id="ch2-3">
-        <h3>2-3 命名規則</h3>
-        <p>✅ 只能用英文字母、數字、底線 <code>_</code>，且<strong>不能以數字開頭</strong>。</p>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="cmt"># ✅ 合法命名</span>
-<span class="var">_pay</span>         <span class="op">=</span> <span class="num">14</span>
-<span class="var">sum_total</span>    <span class="op">=</span> <span class="num">100</span>
-<span class="var">studentName</span>  <span class="op">=</span> <span class="str">"Bob"</span>
-
-<span class="cmt"># ❌ 不合法（會發生錯誤）</span>
-<span class="cmt"># 7lucky = 11     ← 以數字開頭</span>
-<span class="cmt"># w-e-6-K = 2.5   ← 含有連字號</span></pre>
-        </div>
-      </div>
-
-      <div class="section" id="ch2-4">
-        <h3>2-4 變數互換</h3>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="cmt"># 方法一：暫存變數</span>
-<span class="var">x</span>, <span class="var">y</span> <span class="op">=</span> <span class="num">3</span>, <span class="num">5</span>
-<span class="var">temp</span> <span class="op">=</span> <span class="var">x</span>
-<span class="var">x</span> <span class="op">=</span> <span class="var">y</span>
-<span class="var">y</span> <span class="op">=</span> <span class="var">temp</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">x</span>, <span class="var">y</span><span class="pun">)</span>  <span class="cmt"># 5 3</span>
-
-<span class="cmt"># 方法二：Python 一行互換（更簡潔！）</span>
-<span class="var">x</span>, <span class="var">y</span> <span class="op">=</span> <span class="num">3</span>, <span class="num">5</span>
-<span class="var">x</span>, <span class="var">y</span> <span class="op">=</span> <span class="var">y</span>, <span class="var">x</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">x</span>, <span class="var">y</span><span class="pun">)</span>  <span class="cmt"># 5 3</span></pre>
-        </div>
-      </div>
-
-      <div class="practice practice-easy">
-        <div class="practice-header" onclick="togglePractice(this)">
-          <span class="practice-badge">⭐ 簡單</span>
-          <span class="practice-title">練習 2-1｜自我介紹輸出</span>
-          <span style="color:var(--text3)">▼</span>
-        </div>
-        <div class="practice-body">
-          <div class="practice-q">定義三個變數 <code>name</code>、<code>age</code>、<code>city</code>，分別儲存姓名、年齡、城市，然後印出：<br><code>我叫 Alice，今年 16 歲，住在 台北。</code></div>
-          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
-          <div class="answer-box">
-            <div class="code-block">
-              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-              <pre><span class="var">name</span> <span class="op">=</span> <span class="str">'Alice'</span>
-<span class="var">age</span>  <span class="op">=</span> <span class="num">16</span>
-<span class="var">city</span> <span class="op">=</span> <span class="str">'台北'</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'我叫'</span><span class="pun">,</span> <span class="var">name</span><span class="pun">,</span> <span class="str">'，今年'</span><span class="pun">,</span> <span class="var">age</span><span class="pun">,</span> <span class="str">'歲，住在'</span><span class="pun">,</span> <span class="var">city</span><span class="pun">,</span> <span class="str">'。'</span><span class="pun">,</span> sep<span class="op">=</span><span class="str">''</span><span class="pun">)</span></pre>
-            </div>
-            <div class="output-block">我叫Alice，今年16歲，住在台北。</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="practice practice-hard">
-        <div class="practice-header" onclick="togglePractice(this)">
-          <span class="practice-badge">🔥 困難</span>
-          <span class="practice-title">練習 2-2｜三變數循環位移</span>
-          <span style="color:var(--text3)">▼</span>
-        </div>
-        <div class="practice-body">
-          <div class="practice-q"><code>a=1, b=2, c=3</code>，不新增額外變數，讓值循環位移：<code>a→2, b→3, c→1</code></div>
-          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
-          <div class="answer-box">
-            <div class="code-block">
-              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-              <pre><span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span> <span class="op">=</span> <span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>
-<span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span> <span class="op">=</span> <span class="var">b</span>, <span class="var">c</span>, <span class="var">a</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span><span class="pun">)</span>  <span class="cmt"># 2 3 1</span></pre>
-            </div>
-            <div class="output-block">2 3 1</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- ══════════════════════════════════════════
-         CH3: 輸入與輸出
-    ══════════════════════════════════════════ -->
-    <div class="chapter" id="ch3">
-      <div class="chapter-header">
-        <span class="chapter-num">CH 03</span>
-        <h2>輸入與輸出</h2>
-      </div>
-
-      <div class="section" id="ch3-1">
-        <h3>3-1 輸出：print()</h3>
-        <div class="table-wrap"><table>
-          <tr><th>參數</th><th>預設值</th><th>功能</th><th>範例</th></tr>
-          <tr><td><code>sep</code></td><td>空格</td><td>多個值之間的分隔符</td><td><code>sep='-'</code> → <code>A-B-C</code></td></tr>
-          <tr><td><code>end</code></td><td>換行 <code>\n</code></td><td>輸出結尾符號</td><td><code>end=''</code> → 不換行</td></tr>
-        </table></div>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="fn">print</span><span class="pun">(</span><span class="str">'A'</span><span class="pun">,</span> <span class="str">'B'</span><span class="pun">,</span> <span class="str">'C'</span><span class="pun">)</span>              <span class="cmt"># A B C</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'A'</span><span class="pun">,</span> <span class="str">'B'</span><span class="pun">,</span> <span class="str">'C'</span><span class="pun">,</span> sep<span class="op">=</span><span class="str">'-'</span><span class="pun">)</span>    <span class="cmt"># A-B-C</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'Hello!'</span><span class="pun">,</span> end<span class="op">=</span><span class="str">' '</span><span class="pun">)</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'World!'</span><span class="pun">)</span>                   <span class="cmt"># Hello! World!</span></pre>
-        </div>
-      </div>
-
-      <div class="section" id="ch3-2">
-        <h3>3-2 輸入：input() 與型態轉換</h3>
-        <div class="warn"><span class="warn-icon">⚠️</span><div><code>input()</code> 回傳的值<strong>永遠是字串（str）</strong>！若要做數學運算，必須先用 <code>int()</code> 或 <code>float()</code> 轉換。</div></div>
-        <div class="table-wrap"><table>
-          <tr><th>函式</th><th>功能</th><th>範例</th></tr>
-          <tr><td><code>int(x)</code></td><td>轉換為整數</td><td><code>int("10")</code> → <code>10</code></td></tr>
-          <tr><td><code>float(x)</code></td><td>轉換為浮點數</td><td><code>float("3.14")</code> → <code>3.14</code></td></tr>
-          <tr><td><code>str(x)</code></td><td>轉換為字串</td><td><code>str(100)</code> → <code>"100"</code></td></tr>
-        </table></div>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="cmt"># ❌ 錯誤：字串相加不是數字相加</span>
-<span class="var">a</span> <span class="op">=</span> <span class="fn">input</span><span class="pun">(</span><span class="str">'輸入數字：'</span><span class="pun">)</span>   <span class="cmt"># 輸入 5</span>
-<span class="var">b</span> <span class="op">=</span> <span class="fn">input</span><span class="pun">(</span><span class="str">'輸入數字：'</span><span class="pun">)</span>   <span class="cmt"># 輸入 3</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">+</span> <span class="var">b</span><span class="pun">)</span>              <span class="cmt"># 輸出：53（字串串接！）</span>
-
-<span class="cmt"># ✅ 正確：先轉換為整數</span>
-<span class="var">a</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'輸入數字：'</span><span class="pun">))</span>
-<span class="var">b</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'輸入數字：'</span><span class="pun">))</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">+</span> <span class="var">b</span><span class="pun">)</span>              <span class="cmt"># 輸出：8</span></pre>
-        </div>
-
-        <h4>📌 綜合範例：輸入三科成績計算總分</h4>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="var">name</span> <span class="op">=</span> <span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入姓名：'</span><span class="pun">)</span>
-<span class="var">s1</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入國文成績：'</span><span class="pun">))</span>
-<span class="var">s2</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入英文成績：'</span><span class="pun">))</span>
-<span class="var">s3</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入數學成績：'</span><span class="pun">))</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">name</span><span class="pun">,</span> <span class="str">'的總分：'</span><span class="pun">,</span> <span class="var">s1</span> <span class="op">+</span> <span class="var">s2</span> <span class="op">+</span> <span class="var">s3</span><span class="pun">)</span></pre>
-        </div>
-        <div class="output-block">請輸入姓名：Cathy
-請輸入國文成績：9
-請輸入英文成績：8
-請輸入數學成績：7
-Cathy 的總分：24</div>
-      </div>
-
-      <div class="practice practice-easy">
-        <div class="practice-header" onclick="togglePractice(this)">
-          <span class="practice-badge">⭐ 簡單</span>
-          <span class="practice-title">練習 3-1｜畢氏定理計算斜邊</span>
-          <span style="color:var(--text3)">▼</span>
-        </div>
-        <div class="practice-body">
-          <div class="practice-q">輸入直角三角形兩邊 <code>a</code> 和 <code>b</code>，計算斜邊 <code>c = √(a²+b²)</code> 並輸出。</div>
-          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
-          <div class="answer-box">
-            <div class="code-block">
-              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-              <pre><span class="var">a</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入直角邊 a：'</span><span class="pun">))</span>
-<span class="var">b</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入直角邊 b：'</span><span class="pun">))</span>
-<span class="var">c</span> <span class="op">=</span> <span class="pun">(</span><span class="var">a</span><span class="op">**</span><span class="num">2</span> <span class="op">+</span> <span class="var">b</span><span class="op">**</span><span class="num">2</span><span class="pun">)</span> <span class="op">**</span> <span class="num">0.5</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'斜邊長 c ='</span><span class="pun">,</span> <span class="var">c</span><span class="pun">)</span></pre>
-            </div>
-            <div class="output-block">請輸入直角邊 a：3
-請輸入直角邊 b：4
-斜邊長 c = 5.0</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="practice practice-hard">
-        <div class="practice-header" onclick="togglePractice(this)">
-          <span class="practice-badge">🔥 困難</span>
-          <span class="practice-title">練習 3-2｜BMI 計算器</span>
-          <span style="color:var(--text3)">▼</span>
-        </div>
-        <div class="practice-body">
-          <div class="practice-q">輸入姓名、身高（cm）、體重（kg），計算 BMI = 體重 ÷ 身高(m)²，並輸出 BMI 值（取小數點一位）。</div>
-          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
-          <div class="answer-box">
-            <div class="code-block">
-              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-              <pre><span class="var">name</span>   <span class="op">=</span> <span class="fn">input</span><span class="pun">(</span><span class="str">'姓名：'</span><span class="pun">)</span>
-<span class="var">height</span> <span class="op">=</span> <span class="fn">float</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'身高(cm)：'</span><span class="pun">))</span> <span class="op">/</span> <span class="num">100</span>
-<span class="var">weight</span> <span class="op">=</span> <span class="fn">float</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'體重(kg)：'</span><span class="pun">))</span>
-<span class="var">bmi</span>    <span class="op">=</span> <span class="var">weight</span> <span class="op">/</span> <span class="pun">(</span><span class="var">height</span> <span class="op">**</span> <span class="num">2</span><span class="pun">)</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">name</span><span class="pun">,</span> <span class="str">'的 BMI ='</span><span class="pun">,</span> <span class="fn">round</span><span class="pun">(</span><span class="var">bmi</span><span class="pun">,</span> <span class="num">1</span><span class="pun">))</span></pre>
-            </div>
-            <div class="output-block">姓名：Jack
-身高(cm)：175
-體重(kg)：63
-Jack 的 BMI = 20.6</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- ══════════════════════════════════════════
-         CH4: 運算子
-    ══════════════════════════════════════════ -->
-    <div class="chapter" id="ch4">
-      <div class="chapter-header">
-        <span class="chapter-num">CH 04</span>
-        <h2>運算子</h2>
-      </div>
-
-      <div class="section" id="ch4-1">
-        <h3>4-1 算術運算子</h3>
-        <div class="op-grid">
-          <div class="op-card"><div class="op-symbol">+</div><div class="op-name">加法</div><div class="op-example">5+3 = 8</div></div>
-          <div class="op-card"><div class="op-symbol">-</div><div class="op-name">減法</div><div class="op-example">5-3 = 2</div></div>
-          <div class="op-card"><div class="op-symbol">*</div><div class="op-name">乘法</div><div class="op-example">5*3 = 15</div></div>
-          <div class="op-card"><div class="op-symbol">/</div><div class="op-name">除法</div><div class="op-example">5/2 = 2.5</div></div>
-          <div class="op-card"><div class="op-symbol">//</div><div class="op-name">整除</div><div class="op-example">5//2 = 2</div></div>
-          <div class="op-card"><div class="op-symbol">%</div><div class="op-name">取餘數</div><div class="op-example">5%2 = 1</div></div>
-          <div class="op-card"><div class="op-symbol">**</div><div class="op-name">次方</div><div class="op-example">5**3 = 125</div></div>
-        </div>
-        <div class="tip"><span class="tip-icon">💡</span><div><strong>優先順序（高→低）：</strong> <code>()</code> &gt; <code>**</code> &gt; <code>* / // %</code> &gt; <code>+ -</code></div></div>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="var">a</span> <span class="op">=</span> <span class="num">9</span><span class="pun">;</span>  <span class="var">b</span> <span class="op">=</span> <span class="num">4</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">+</span>  <span class="var">b</span><span class="pun">)</span>   <span class="cmt"># 13</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">-</span>  <span class="var">b</span><span class="pun">)</span>   <span class="cmt"># 5</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">*</span>  <span class="var">b</span><span class="pun">)</span>   <span class="cmt"># 36</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">/</span>  <span class="var">b</span><span class="pun">)</span>   <span class="cmt"># 2.25</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">//</span> <span class="var">b</span><span class="pun">)</span>   <span class="cmt"># 2  ← 商</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">%</span>  <span class="var">b</span><span class="pun">)</span>   <span class="cmt"># 1  ← 餘數</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">a</span> <span class="op">**</span> <span class="var">b</span><span class="pun">)</span>   <span class="cmt"># 6561</span></pre>
-        </div>
-      </div>
-
-      <div class="section" id="ch4-2">
-        <h3>4-2 字串運算子</h3>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="cmt"># 字串相加（串接）</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'Hello'</span> <span class="op">+</span> <span class="str">' World'</span><span class="pun">)</span>   <span class="cmt"># Hello World</span>
-<span class="cmt"># 字串相乘（重複）</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'Ha'</span> <span class="op">*</span> <span class="num">3</span><span class="pun">)</span>              <span class="cmt"># HaHaHa</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'GOOD! '</span> <span class="op">*</span> <span class="num">2</span><span class="pun">)</span>         <span class="cmt"># GOOD! GOOD!</span></pre>
-        </div>
-      </div>
-
-      <div class="section" id="ch4-3">
-        <h3>4-3 比較與邏輯運算子</h3>
-        <div class="table-wrap"><table>
-          <tr><th>運算子</th><th>意義</th><th>範例</th><th>結果</th></tr>
-          <tr><td><code>==</code></td><td>等於</td><td><code>5 == 5</code></td><td><code>True</code></td></tr>
-          <tr><td><code>!=</code></td><td>不等於</td><td><code>5 != 3</code></td><td><code>True</code></td></tr>
-          <tr><td><code>&lt;</code></td><td>小於</td><td><code>3 &lt; 5</code></td><td><code>True</code></td></tr>
-          <tr><td><code>&gt;</code></td><td>大於</td><td><code>3 &gt; 5</code></td><td><code>False</code></td></tr>
-          <tr><td><code>and</code></td><td>且</td><td><code>True and False</code></td><td><code>False</code></td></tr>
-          <tr><td><code>or</code></td><td>或</td><td><code>True or False</code></td><td><code>True</code></td></tr>
-          <tr><td><code>not</code></td><td>非</td><td><code>not True</code></td><td><code>False</code></td></tr>
-        </table></div>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span> <span class="op">=</span> <span class="num">2</span>, <span class="num">3</span>, <span class="num">5</span>
-<span class="var">x1</span> <span class="op">=</span> <span class="pun">(</span><span class="var">a</span> <span class="op">&lt;</span> <span class="var">b</span><span class="pun">)</span> <span class="kw">and</span> <span class="pun">(</span><span class="var">b</span> <span class="op">&lt;</span> <span class="var">c</span><span class="pun">)</span>   <span class="cmt"># True and True = True</span>
-<span class="var">x2</span> <span class="op">=</span> <span class="pun">(</span><span class="var">b</span> <span class="op">&gt;</span> <span class="var">c</span><span class="pun">)</span> <span class="kw">or</span>  <span class="pun">(</span><span class="var">b</span> <span class="op">==</span> <span class="var">a</span><span class="pun">)</span>  <span class="cmt"># False or False = False</span>
-<span class="var">x3</span> <span class="op">=</span> <span class="kw">not</span><span class="pun">(</span><span class="var">a</span> <span class="op">!=</span> <span class="var">b</span><span class="pun">)</span>             <span class="cmt"># not(True) = False</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">x1</span><span class="pun">,</span> <span class="var">x2</span><span class="pun">,</span> <span class="var">x3</span><span class="pun">)</span>             <span class="cmt"># True False False</span></pre>
-        </div>
-      </div>
-
-      <div class="practice practice-easy">
-        <div class="practice-header" onclick="togglePractice(this)">
-          <span class="practice-badge">⭐ 簡單</span>
-          <span class="practice-title">練習 4-1｜算術運算練習</span>
-          <span style="color:var(--text3)">▼</span>
-        </div>
-        <div class="practice-body">
-          <div class="practice-q">計算並印出：<code>a=3, b=2</code> 時，<code>c = (3+2)*6</code> 和 <code>d = 5**3</code> 的值。</div>
-          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
-          <div class="answer-box">
-            <div class="code-block">
-              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-              <pre><span class="var">a</span> <span class="op">=</span> <span class="num">3</span><span class="pun">;</span>  <span class="var">b</span> <span class="op">=</span> <span class="num">2</span>
-<span class="var">c</span> <span class="op">=</span> <span class="pun">(</span><span class="num">3</span> <span class="op">+</span> <span class="num">2</span><span class="pun">)</span> <span class="op">*</span> <span class="num">6</span>
-<span class="var">d</span> <span class="op">=</span> <span class="num">5</span> <span class="op">**</span> <span class="num">3</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'c ='</span><span class="pun">,</span> <span class="var">c</span><span class="pun">)</span>  <span class="cmt"># c = 30</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'d ='</span><span class="pun">,</span> <span class="var">d</span><span class="pun">)</span>  <span class="cmt"># d = 125</span></pre>
-            </div>
-            <div class="output-block">c = 30
-d = 125</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="practice practice-hard">
-        <div class="practice-header" onclick="togglePractice(this)">
-          <span class="practice-badge">🔥 困難</span>
-          <span class="practice-title">練習 4-2｜三角形合法判斷</span>
-          <span style="color:var(--text3)">▼</span>
-        </div>
-        <div class="practice-body">
-          <div class="practice-q">輸入三角形三邊 a、b、c，利用邏輯運算子判斷是否能構成三角形（任意兩邊之和 &gt; 第三邊）。</div>
-          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
-          <div class="answer-box">
-            <div class="code-block">
-              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-              <pre><span class="var">a</span> <span class="op">=</span> <span class="fn">float</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'第一邊：'</span><span class="pun">))</span>
-<span class="var">b</span> <span class="op">=</span> <span class="fn">float</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'第二邊：'</span><span class="pun">))</span>
-<span class="var">c</span> <span class="op">=</span> <span class="fn">float</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'第三邊：'</span><span class="pun">))</span>
-<span class="kw">if</span> <span class="pun">(</span><span class="var">a</span><span class="op">+</span><span class="var">b</span><span class="op">&gt;</span><span class="var">c</span><span class="pun">)</span> <span class="kw">and</span> <span class="pun">(</span><span class="var">a</span><span class="op">+</span><span class="var">c</span><span class="op">&gt;</span><span class="var">b</span><span class="pun">)</span> <span class="kw">and</span> <span class="pun">(</span><span class="var">b</span><span class="op">+</span><span class="var">c</span><span class="op">&gt;</span><span class="var">a</span><span class="pun">)</span><span class="pun">:</span>
-    <span class="fn">print</span><span class="pun">(</span><span class="str">'可以構成三角形！'</span><span class="pun">)</span>
-<span class="kw">else</span><span class="pun">:</span>
-    <span class="fn">print</span><span class="pun">(</span><span class="str">'無法構成三角形！'</span><span class="pun">)</span></pre>
-            </div>
-            <div class="output-block">第一邊：3
-第二邊：4
-第三邊：5
-可以構成三角形！</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- ══════════════════════════════════════════
-         CH5: 條件判斷
-    ══════════════════════════════════════════ -->
-    <div class="chapter" id="ch5">
-      <div class="chapter-header">
-        <span class="chapter-num">CH 05</span>
-        <h2>條件判斷</h2>
-      </div>
-
-      <div class="section" id="ch5-1">
-        <h3>5-1 if 單一條件</h3>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="var">score</span> <span class="op">=</span> <span class="num">75</span>
-<span class="kw">if</span> <span class="var">score</span> <span class="op">&gt;=</span> <span class="num">60</span><span class="pun">:</span>
-    <span class="fn">print</span><span class="pun">(</span><span class="str">'及格了！'</span><span class="pun">)</span></pre>
-        </div>
-        <div class="warn"><span class="warn-icon">⚠️</span><div><strong>縮排（Indentation）非常重要！</strong>Python 用 4 個空格或 Tab 來表示程式碼的從屬關係，缺少縮排會發生錯誤。</div></div>
-      </div>
-
-      <div class="section" id="ch5-2">
-        <h3>5-2 if-else 雙向判斷</h3>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="var">n</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入整數：'</span><span class="pun">))</span>
-<span class="kw">if</span> <span class="var">n</span> <span class="op">%</span> <span class="num">2</span> <span class="op">==</span> <span class="num">0</span><span class="pun">:</span>
-    <span class="fn">print</span><span class="pun">(</span><span class="var">n</span><span class="pun">,</span> <span class="str">'是偶數'</span><span class="pun">)</span>
-<span class="kw">else</span><span class="pun">:</span>
-    <span class="fn">print</span><span class="pun">(</span><span class="var">n</span><span class="pun">,</span> <span class="str">'是奇數'</span><span class="pun">)</span></pre>
-        </div>
-        <div class="output-block">請輸入整數：10
-10 是偶數</div>
-      </div>
-
-      <div class="section" id="ch5-3">
-        <h3>5-3 if-elif-else 多向判斷</h3>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="var">score</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入成績：'</span><span class="pun">))</span>
-<span class="kw">if</span>   <span class="var">score</span> <span class="op">&gt;=</span> <span class="num">90</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'A 優秀'</span><span class="pun">)</span>
-<span class="kw">elif</span> <span class="var">score</span> <span class="op">&gt;=</span> <span class="num">80</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'B 良好'</span><span class="pun">)</span>
-<span class="kw">elif</span> <span class="var">score</span> <span class="op">&gt;=</span> <span class="num">70</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'C 普通'</span><span class="pun">)</span>
-<span class="kw">elif</span> <span class="var">score</span> <span class="op">&gt;=</span> <span class="num">60</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'D 及格'</span><span class="pun">)</span>
-<span class="kw">else</span><span class="pun">:</span>              <span class="fn">print</span><span class="pun">(</span><span class="str">'F 不及格'</span><span class="pun">)</span></pre>
-        </div>
-
-        <h4>📌 貨幣換算範例</h4>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="fn">print</span><span class="pun">(</span><span class="str">'(1)日幣 (2)韓幣 (3)人民幣 (4)歐元 (5)英鎊'</span><span class="pun">)</span>
-<span class="var">c</span>  <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請選擇幣別：'</span><span class="pun">))</span>
-<span class="var">nt</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入台幣金額：'</span><span class="pun">))</span>
-<span class="kw">if</span>   <span class="var">c</span> <span class="op">==</span> <span class="num">1</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'日幣：'</span><span class="pun">,</span> <span class="fn">int</span><span class="pun">(</span><span class="var">nt</span> <span class="op">/</span> <span class="num">0.21</span><span class="pun">))</span>
-<span class="kw">elif</span> <span class="var">c</span> <span class="op">==</span> <span class="num">2</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'韓幣：'</span><span class="pun">,</span> <span class="fn">int</span><span class="pun">(</span><span class="var">nt</span> <span class="op">/</span> <span class="num">0.026</span><span class="pun">))</span>
-<span class="kw">elif</span> <span class="var">c</span> <span class="op">==</span> <span class="num">3</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'人民幣：'</span><span class="pun">,</span> <span class="fn">int</span><span class="pun">(</span><span class="var">nt</span> <span class="op">/</span> <span class="num">4.4</span><span class="pun">))</span>
-<span class="kw">elif</span> <span class="var">c</span> <span class="op">==</span> <span class="num">4</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'歐元：'</span><span class="pun">,</span> <span class="fn">int</span><span class="pun">(</span><span class="var">nt</span> <span class="op">/</span> <span class="num">35.5</span><span class="pun">))</span>
-<span class="kw">elif</span> <span class="var">c</span> <span class="op">==</span> <span class="num">5</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'英鎊：'</span><span class="pun">,</span> <span class="fn">int</span><span class="pun">(</span><span class="var">nt</span> <span class="op">/</span> <span class="num">41.8</span><span class="pun">))</span>
-<span class="kw">else</span><span class="pun">:</span>          <span class="fn">print</span><span class="pun">(</span><span class="str">'幣別無效'</span><span class="pun">)</span></pre>
-        </div>
-        <div class="output-block">請選擇幣別：1
-請輸入台幣金額：10000
-日幣：47619</div>
-      </div>
-
-      <div class="practice practice-easy">
-        <div class="practice-header" onclick="togglePractice(this)">
-          <span class="practice-badge">⭐ 簡單</span>
-          <span class="practice-title">練習 5-1｜判斷 3 的倍數</span>
-          <span style="color:var(--text3)">▼</span>
-        </div>
-        <div class="practice-body">
-          <div class="practice-q">輸入一個整數，判斷是否為 3 的倍數，並輸出相應訊息。</div>
-          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
-          <div class="answer-box">
-            <div class="code-block">
-              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-              <pre><span class="var">n</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'請輸入整數：'</span><span class="pun">))</span>
-<span class="kw">if</span> <span class="var">n</span> <span class="op">%</span> <span class="num">3</span> <span class="op">==</span> <span class="num">0</span><span class="pun">:</span>
-    <span class="fn">print</span><span class="pun">(</span><span class="var">n</span><span class="pun">,</span> <span class="str">'是3的倍數'</span><span class="pun">)</span>
-<span class="kw">else</span><span class="pun">:</span>
-    <span class="fn">print</span><span class="pun">(</span><span class="var">n</span><span class="pun">,</span> <span class="str">'不是3的倍數'</span><span class="pun">)</span></pre>
-            </div>
-            <div class="output-block">請輸入整數：9
-9 是3的倍數</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="practice practice-hard">
-        <div class="practice-header" onclick="togglePractice(this)">
-          <span class="practice-badge">🔥 困難</span>
-          <span class="practice-title">練習 5-2｜BMI 狀態判斷</span>
-          <span style="color:var(--text3)">▼</span>
-        </div>
-        <div class="practice-body">
-          <div class="practice-q">延伸練習 3-2，輸入 BMI 後判斷體重狀態：BMI &lt; 18.5 → 過輕，18.5 ≤ BMI &lt; 24 → 正常，BMI ≥ 24 → 過重。</div>
-          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
-          <div class="answer-box">
-            <div class="code-block">
-              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-              <pre><span class="var">name</span>   <span class="op">=</span> <span class="fn">input</span><span class="pun">(</span><span class="str">'姓名：'</span><span class="pun">)</span>
-<span class="var">height</span> <span class="op">=</span> <span class="fn">float</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'身高(cm)：'</span><span class="pun">))</span> <span class="op">/</span> <span class="num">100</span>
-<span class="var">weight</span> <span class="op">=</span> <span class="fn">float</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'體重(kg)：'</span><span class="pun">))</span>
-<span class="var">bmi</span>    <span class="op">=</span> <span class="var">weight</span> <span class="op">/</span> <span class="pun">(</span><span class="var">height</span> <span class="op">**</span> <span class="num">2</span><span class="pun">)</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">name</span><span class="pun">,</span> <span class="str">'的BMI ='</span><span class="pun">,</span> <span class="fn">round</span><span class="pun">(</span><span class="var">bmi</span><span class="pun">,</span><span class="num">1</span><span class="pun">))</span>
-<span class="kw">if</span>   <span class="var">bmi</span> <span class="op">&lt;</span> <span class="num">18.5</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'體重狀態：過輕'</span><span class="pun">)</span>
-<span class="kw">elif</span> <span class="var">bmi</span> <span class="op">&lt;</span> <span class="num">24</span><span class="pun">:</span>    <span class="fn">print</span><span class="pun">(</span><span class="str">'體重狀態：正常'</span><span class="pun">)</span>
-<span class="kw">else</span><span class="pun">:</span>            <span class="fn">print</span><span class="pun">(</span><span class="str">'體重狀態：過重'</span><span class="pun">)</span></pre>
-            </div>
-            <div class="output-block">姓名：Jack
-身高(cm)：175
-體重(kg)：63
-Jack 的BMI = 20.6
-體重狀態：正常</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- ══════════════════════════════════════════
-         CH6: for 迴圈
-    ══════════════════════════════════════════ -->
-    <div class="chapter" id="ch6">
-      <div class="chapter-header">
-        <span class="chapter-num">CH 06</span>
-        <h2>for 迴圈</h2>
-      </div>
-
-      <div class="section" id="ch6-1">
-        <h3>6-1 range() 函式</h3>
-        <div class="table-wrap"><table>
-          <tr><th>語法</th><th>產生的序列</th><th>範例</th></tr>
-          <tr><td><code>range(n)</code></td><td>0, 1, ..., n-1</td><td><code>range(5)</code> → 0,1,2,3,4</td></tr>
-          <tr><td><code>range(m, n)</code></td><td>m, m+1, ..., n-1</td><td><code>range(1,6)</code> → 1,2,3,4,5</td></tr>
-          <tr><td><code>range(m, n, x)</code></td><td>m 到 n-1，間隔 x</td><td><code>range(1,10,2)</code> → 1,3,5,7,9</td></tr>
-        </table></div>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">6</span><span class="pun">):</span>
-    <span class="fn">print</span><span class="pun">(</span><span class="var">i</span><span class="pun">,</span> end<span class="op">=</span><span class="str">' '</span><span class="pun">)</span>  <span class="cmt"># 1 2 3 4 5</span>
-
-<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">10</span><span class="pun">,</span> <span class="num">2</span><span class="pun">):</span>
-    <span class="fn">print</span><span class="pun">(</span><span class="var">i</span><span class="pun">,</span> end<span class="op">=</span><span class="str">' '</span><span class="pun">)</span>  <span class="cmt"># 1 3 5 7 9</span></pre>
-        </div>
-      </div>
-
-      <div class="section" id="ch6-2">
-        <h3>6-2 累加與條件累加</h3>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="cmt"># 計算 1+2+3+4+5 的總和</span>
-<span class="var">sum</span> <span class="op">=</span> <span class="num">0</span>
-<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">6</span><span class="pun">):</span>
-    <span class="var">sum</span> <span class="op">=</span> <span class="var">sum</span> <span class="op">+</span> <span class="var">i</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'總和：'</span><span class="pun">,</span> <span class="var">sum</span><span class="pun">)</span>  <span class="cmt"># 15</span>
-
-<span class="cmt"># 計算 1-20 中 5 的倍數之總和</span>
-<span class="var">sum</span> <span class="op">=</span> <span class="num">0</span>
-<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">21</span><span class="pun">):</span>
-    <span class="kw">if</span> <span class="var">i</span> <span class="op">%</span> <span class="num">5</span> <span class="op">==</span> <span class="num">0</span><span class="pun">:</span>
-        <span class="var">sum</span> <span class="op">+=</span> <span class="var">i</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'5的倍數總和：'</span><span class="pun">,</span> <span class="var">sum</span><span class="pun">)</span>  <span class="cmt"># 50</span></pre>
-        </div>
-      </div>
-
-      <div class="section" id="ch6-3">
-        <h3>6-3 巢狀迴圈</h3>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="cmt"># 直角三角形圖案</span>
-<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">4</span><span class="pun">):</span>
-    <span class="kw">for</span> <span class="var">j</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="var">i</span><span class="op">+</span><span class="num">1</span><span class="pun">):</span>
-        <span class="fn">print</span><span class="pun">(</span><span class="str">'*'</span><span class="pun">,</span> end<span class="op">=</span><span class="str">' '</span><span class="pun">)</span>
-    <span class="fn">print</span><span class="pun">()</span></pre>
-        </div>
-        <div class="output-block">*
-* *
-* * *</div>
-
-        <h4>📌 乘法表範例</h4>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="var">n</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'乘法表大小：'</span><span class="pun">))</span>
-<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="var">n</span><span class="op">+</span><span class="num">1</span><span class="pun">):</span>
-    <span class="kw">for</span> <span class="var">j</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="var">n</span><span class="op">+</span><span class="num">1</span><span class="pun">):</span>
-        <span class="fn">print</span><span class="pun">(</span><span class="var">i</span><span class="pun">,</span><span class="str">'*'</span><span class="pun">,</span><span class="var">j</span><span class="pun">,</span><span class="str">'='</span><span class="pun">,</span><span class="var">i</span><span class="op">*</span><span class="var">j</span><span class="pun">,</span> end<span class="op">=</span><span class="str">'\t'</span><span class="pun">)</span>
-    <span class="fn">print</span><span class="pun">()</span></pre>
-        </div>
-      </div>
-
-      <div class="practice practice-easy">
-        <div class="practice-header" onclick="togglePractice(this)">
-          <span class="practice-badge">⭐ 簡單</span>
-          <span class="practice-title">練習 6-1｜偶數總和</span>
-          <span style="color:var(--text3)">▼</span>
-        </div>
-        <div class="practice-body">
-          <div class="practice-q">計算 1 到 100 中，所有偶數的總和。</div>
-          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
-          <div class="answer-box">
-            <div class="code-block">
-              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-              <pre><span class="var">sum</span> <span class="op">=</span> <span class="num">0</span>
-<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">101</span><span class="pun">):</span>
-    <span class="kw">if</span> <span class="var">i</span> <span class="op">%</span> <span class="num">2</span> <span class="op">==</span> <span class="num">0</span><span class="pun">:</span>
-        <span class="var">sum</span> <span class="op">+=</span> <span class="var">i</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'1到100偶數總和：'</span><span class="pun">,</span> <span class="var">sum</span><span class="pun">)</span></pre>
-            </div>
-            <div class="output-block">1到100偶數總和：2550</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="practice practice-hard">
-        <div class="practice-header" onclick="togglePractice(this)">
-          <span class="practice-badge">🔥 困難</span>
-          <span class="practice-title">練習 6-2｜菱形星號圖案</span>
-          <span style="color:var(--text3)">▼</span>
-        </div>
-        <div class="practice-body">
-          <div class="practice-q">使用巢狀 for 迴圈，印出以下圖案（各列星號數：1, 3, 5, 7, 9）：<br><code>*<br>* * *<br>* * * * *<br>* * * * * * *<br>* * * * * * * * *</code></div>
-          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
-          <div class="answer-box">
-            <div class="code-block">
-              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-              <pre><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">6</span><span class="pun">):</span>         <span class="cmt"># i = 1 到 5</span>
-    <span class="kw">for</span> <span class="var">j</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">2</span><span class="op">*</span><span class="var">i</span><span class="op">-</span><span class="num">1</span><span class="pun">):</span>    <span class="cmt"># 每列印 (2i-1) 個星</span>
-        <span class="fn">print</span><span class="pun">(</span><span class="str">'*'</span><span class="pun">,</span> end<span class="op">=</span><span class="str">' '</span><span class="pun">)</span>
-    <span class="fn">print</span><span class="pun">()</span></pre>
-            </div>
-            <div class="output-block">*
-* * *
-* * * * *
-* * * * * * *
-* * * * * * * * *</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- ══════════════════════════════════════════
-         CH7: while 迴圈
-    ══════════════════════════════════════════ -->
-    <div class="chapter" id="ch7">
-      <div class="chapter-header">
-        <span class="chapter-num">CH 07</span>
-        <h2>while 迴圈</h2>
-      </div>
-
-      <div class="section" id="ch7-1">
-        <h3>7-1 while 基本語法</h3>
-        <p>當「不確定要重複幾次」時使用 while 迴圈，條件成立就繼續執行。</p>
-        <div class="warn"><span class="warn-icon">⚠️</span><div>一定要確保條件最終會變成 <code>False</code>！否則會造成<strong>無窮迴圈</strong>，程式永遠不停止。</div></div>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="var">i</span>   <span class="op">=</span> <span class="num">1</span>
-<span class="var">sum</span> <span class="op">=</span> <span class="num">0</span>
-<span class="kw">while</span> <span class="var">i</span> <span class="op">&lt;=</span> <span class="num">5</span><span class="pun">:</span>
-    <span class="var">sum</span> <span class="op">+=</span> <span class="var">i</span>
-    <span class="var">i</span>   <span class="op">+=</span> <span class="num">1</span>    <span class="cmt"># ← 非常重要！讓 i 增加</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'總和：'</span><span class="pun">,</span> <span class="var">sum</span><span class="pun">)</span>  <span class="cmt"># 15</span></pre>
-        </div>
-      </div>
-
-      <div class="section" id="ch7-2">
-        <h3>7-2 break 與 continue</h3>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="cmt"># break：完全跳出迴圈</span>
-<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">6</span><span class="pun">):</span>
-    <span class="kw">if</span> <span class="var">i</span> <span class="op">==</span> <span class="num">3</span><span class="pun">:</span>
-        <span class="kw">break</span>
-    <span class="fn">print</span><span class="pun">(</span><span class="var">i</span><span class="pun">,</span> end<span class="op">=</span><span class="str">' '</span><span class="pun">)</span>  <span class="cmt"># 1 2</span>
-
-<span class="cmt"># continue：跳過本次，繼續下一次</span>
-<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span><span class="pun">(</span><span class="num">1</span><span class="pun">,</span> <span class="num">6</span><span class="pun">):</span>
-    <span class="kw">if</span> <span class="var">i</span> <span class="op">==</span> <span class="num">3</span><span class="pun">:</span>
-        <span class="kw">continue</span>
-    <span class="fn">print</span><span class="pun">(</span><span class="var">i</span><span class="pun">,</span> end<span class="op">=</span><span class="str">' '</span><span class="pun">)</span>  <span class="cmt"># 1 2 4 5</span></pre>
-        </div>
-      </div>
-
-      <div class="section" id="ch7-3">
-        <h3>7-3 綜合範例：猜數字遊戲</h3>
-        <div class="code-block">
-          <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-          <pre><span class="var">k</span>     <span class="op">=</span> <span class="num">16</span>   <span class="cmt"># 答案</span>
-<span class="var">guess</span> <span class="op">=</span> <span class="num">0</span>
-<span class="var">t</span>     <span class="op">=</span> <span class="num">0</span>    <span class="cmt"># 猜測次數</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'=== 猜數字遊戲（1-20）==='</span><span class="pun">)</span>
-<span class="kw">while</span> <span class="var">guess</span> <span class="op">!=</span> <span class="var">k</span><span class="pun">:</span>
-    <span class="var">t</span>     <span class="op">+=</span> <span class="num">1</span>
-    <span class="var">guess</span> <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'猜測：'</span><span class="pun">))</span>
-    <span class="kw">if</span>   <span class="var">guess</span> <span class="op">&gt;</span> <span class="var">k</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'猜大了！'</span><span class="pun">)</span>
-    <span class="kw">elif</span> <span class="var">guess</span> <span class="op">&lt;</span> <span class="var">k</span><span class="pun">:</span>  <span class="fn">print</span><span class="pun">(</span><span class="str">'猜小了！'</span><span class="pun">)</span>
-    <span class="kw">else</span><span class="pun">:</span>           <span class="fn">print</span><span class="pun">(</span><span class="str">'答對了！共猜'</span><span class="pun">,</span> <span class="var">t</span><span class="pun">,</span> <span class="str">'次'</span><span class="pun">)</span></pre>
-        </div>
-        <div class="output-block">=== 猜數字遊戲（1-20）===
-猜測：10
-猜小了！
-猜測：18
-猜大了！
-猜測：16
-答對了！共猜 3 次</div>
-      </div>
-
-      <div class="practice practice-easy">
-        <div class="practice-header" onclick="togglePractice(this)">
-          <span class="practice-badge">⭐ 簡單</span>
-          <span class="practice-title">練習 7-1｜奇數總和</span>
-          <span style="color:var(--text3)">▼</span>
-        </div>
-        <div class="practice-body">
-          <div class="practice-q">使用 while 迴圈，計算 1 到 10 中所有奇數的總和。</div>
-          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
-          <div class="answer-box">
-            <div class="code-block">
-              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-              <pre><span class="var">n</span>   <span class="op">=</span> <span class="num">1</span>
-<span class="var">sum</span> <span class="op">=</span> <span class="num">0</span>
-<span class="kw">while</span> <span class="var">n</span> <span class="op">&lt;=</span> <span class="num">10</span><span class="pun">:</span>
-    <span class="kw">if</span> <span class="var">n</span> <span class="op">%</span> <span class="num">2</span> <span class="op">!=</span> <span class="num">0</span><span class="pun">:</span>
-        <span class="var">sum</span> <span class="op">+=</span> <span class="var">n</span>
-    <span class="var">n</span> <span class="op">+=</span> <span class="num">1</span>
-<span class="fn">print</span><span class="pun">(</span><span class="str">'1到10奇數總和：'</span><span class="pun">,</span> <span class="var">sum</span><span class="pun">)</span></pre>
-            </div>
-            <div class="output-block">1到10奇數總和：25</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="practice practice-hard">
-        <div class="practice-header" onclick="togglePractice(this)">
-          <span class="practice-badge">🔥 困難</span>
-          <span class="practice-title">練習 7-2｜成績輸入系統</span>
-          <span style="color:var(--text3)">▼</span>
-        </div>
-        <div class="practice-body">
-          <div class="practice-q">設計成績輸入系統：輸入學生姓名後，重複輸入成績（輸入 -1 結束），最後輸出<strong>總和、平均（小數一位）、最高分</strong>。</div>
-          <button class="toggle-answer" onclick="toggleAnswer(this)">🔓 顯示解答</button>
-          <div class="answer-box">
-            <div class="code-block">
-              <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">複製</button></div>
-              <pre><span class="var">name</span>    <span class="op">=</span> <span class="fn">input</span><span class="pun">(</span><span class="str">'學生姓名：'</span><span class="pun">)</span>
-<span class="var">total</span>   <span class="op">=</span> <span class="num">0</span><span class="pun">;</span>  <span class="var">count</span> <span class="op">=</span> <span class="num">0</span><span class="pun">;</span>  <span class="var">highest</span> <span class="op">=</span> <span class="num">0</span>
-<span class="var">score</span>   <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'成績（-1結束）：'</span><span class="pun">))</span>
-<span class="kw">while</span> <span class="var">score</span> <span class="op">!=</span> <span class="op">-</span><span class="num">1</span><span class="pun">:</span>
-    <span class="var">total</span>   <span class="op">+=</span> <span class="var">score</span>
-    <span class="var">count</span>   <span class="op">+=</span> <span class="num">1</span>
-    <span class="kw">if</span> <span class="var">score</span> <span class="op">&gt;</span> <span class="var">highest</span><span class="pun">:</span>  <span class="var">highest</span> <span class="op">=</span> <span class="var">score</span>
-    <span class="var">score</span>   <span class="op">=</span> <span class="fn">int</span><span class="pun">(</span><span class="fn">input</span><span class="pun">(</span><span class="str">'成績（-1結束）：'</span><span class="pun">))</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">name</span><span class="pun">,</span> <span class="str">'總和：'</span><span class="pun">,</span> <span class="var">total</span><span class="pun">)</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">name</span><span class="pun">,</span> <span class="str">'平均：'</span><span class="pun">,</span> <span class="fn">round</span><span class="pun">(</span><span class="var">total</span><span class="op">/</span><span class="var">count</span><span class="pun">,</span><span class="num">1</span><span class="pun">))</span>
-<span class="fn">print</span><span class="pun">(</span><span class="var">name</span><span class="pun">,</span> <span class="str">'最高分：'</span><span class="pun">,</span> <span class="var">highest</span><span class="pun">)</span></pre>
-            </div>
-            <div class="output-block">學生姓名：David
-成績（-1結束）：99
-成績（-1結束）：85
-成績（-1結束）：95
-成績（-1結束）：-1
-David 總和：279
-David 平均：93.0
-David 最高分：99</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- FOOTER -->
-    <div style="margin-top:4rem; padding:2rem; background:var(--bg2); border:1px solid var(--border); border-radius:16px; text-align:center;">
-      <div style="font-family:'JetBrains Mono',monospace; color:var(--green); font-size:1.1rem; margin-bottom:0.5rem;">
-        🐍 Python 互動參考書
-      </div>
-      <div style="color:var(--text3); font-size:0.82rem;">
-        7 章節 · 40+ 範例 · 14 道練習題<br>
-        <span style="color:var(--text2); margin-top:0.3rem; display:inline-block;">加油！程式設計的關鍵在於「多練習」💪</span>
-      </div>
-    </div>
-
-  </main>
 </div>
 
-<!-- SCROLL TOP -->
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<div id="app" class="hidden">
+  <div id="topbar"><div id="topbar-inner">
+    <div class="logo">⌨️ 高中生程式檢定模擬</div>
+    <div id="nav">
+      <button class="ntab on" id="nav-exam" onclick="navTo('exam')">🎯 模擬考</button>
+      <button class="ntab" id="nav-stats" onclick="navTo('stats')">📊 成績</button>
+    </div>
+    <div class="user-wrap"><span class="chip" id="user-chip">—</span></div>
+  </div></div>
+
+  <div id="wrap">
+    <div class="page on" id="page-exam">
+      <div class="hero" style="text-align:center">
+        <h2 id="hero-greet">歡迎！</h2>
+        <p>高中生程式檢定模擬考・完整解析・Word 報告下載</p>
+        <div class="hero-stats">
+          <div class="hs"><div class="v" id="hs-exam">0</div><div class="l">已完成模擬考</div></div>
+          <div class="hs"><div class="v" id="hs-best">—</div><div class="l">最佳成績</div></div>
+          <div class="hs"><div class="v" id="hs-avg">—</div><div class="l">平均成績</div></div>
+        </div>
+      </div>
+      <div id="exam-intro">
+        <div class="card" style="text-align:center;padding:2rem;margin-bottom:16px">
+          <div style="font-size:50px;margin-bottom:12px">🎯</div>
+          <div style="font-size:22px;font-weight:700;margin-bottom:8px">程式檢定模擬考</div>
+          <p style="color:var(--muted);font-size:13px;margin-bottom:22px">標準考試格式・程式碼縮排顯示・考完直接顯示完整解析 + Word 下載</p>
+          <div style="background:var(--greenll);border-radius:11px;padding:14px;margin-bottom:18px;text-align:left">
+            <div style="font-weight:700;color:var(--green);margin-bottom:6px">📋 標準考試規則</div>
+            <div style="font-size:13px;color:#1d5c3a;line-height:1.8">
+              • 每題 4 選 1，僅能選擇一個答案<br>
+              • 限時 <strong>90 分鐘</strong>，計時器不可暫停<br>
+              • 可切換題目，提交後不可修改<br>
+              • 考完立即顯示完整詳解（含核心觀念、解題步驟、常見陷阱）
+            </div>
+          </div>
+
+          <div style="margin-bottom:14px;text-align:left">
+            <div style="font-size:12px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">🖥️ 程式語言</div>
+            <div class="lang-pills">
+              <button type="button" class="lang-pill on" id="lang-cpp" onclick="pickLang('cpp')">
+                <span style="font-size:18px">⚙️</span>
+                <span style="font-weight:700">C++</span>
+                <span style="font-size:11px;opacity:.7">含指標題</span>
+              </button>
+              <button type="button" class="lang-pill" id="lang-py" onclick="pickLang('python')">
+                <span style="font-size:18px">🐍</span>
+                <span style="font-weight:700">Python</span>
+                <span style="font-size:11px;opacity:.7">略過指標題</span>
+              </button>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+            <select id="exam-ch" style="padding:10px 14px;font-size:14px"></select>
+            <select id="exam-cnt" style="padding:10px 14px;font-size:14px">
+              <option value="10">10 題</option>
+              <option value="15">15 題</option>
+              <option value="20">20 題</option>
+              <option value="25" selected>25 題</option>
+            </select>
+          </div>
+          <button class="btn btn-green full" style="font-size:15px;padding:14px" onclick="startExam()">🚀 開始模擬考試</button>
+        </div>
+        <div id="exam-hist"></div>
+      </div>
+
+      <div id="exam-run" class="hidden">
+        <div class="exam-bar" id="exam-bar">
+          <div style="display:flex;align-items:center;gap:10px"><div>⏱️</div><div class="timer" id="timer">00:00</div></div>
+          <div id="exam-prog-txt" style="font-size:13px;color:var(--dim);font-weight:600">0/25</div>
+          <button class="btn btn-red btn-sm" onclick="if(confirm('確定要交卷嗎？'))submitExam()">📝 交卷</button>
+        </div>
+        <div class="pbar" style="margin-bottom:10px"><div class="pbar-fill" id="exam-pbar" style="width:0%;background:var(--green)"></div></div>
+        <div class="q-palette" id="q-palette"></div>
+        <div id="exam-qwrap"></div>
+        <div class="exam-nav">
+          <button class="btn btn-outline btn-sm" id="eprev" onclick="examNav(-1)" disabled>← 上一題</button>
+          <div class="exam-qn" id="exam-qn-lbl">第 1 題</div>
+          <button class="btn btn-outline btn-sm" id="enext" onclick="examNav(1)">下一題 →</button>
+        </div>
+      </div>
+
+      <div id="exam-result" class="hidden"></div>
+    </div>
+
+    <div class="page" id="page-stats">
+      <div class="stitle">📊 模擬考成績分析</div>
+      <div class="stat-grid" id="stat-grid"></div>
+      <div class="card" style="margin-bottom:16px"><div class="stitle" style="margin-bottom:14px">📚 各章節答題正確率（歷次累積）</div><div id="ch-bars"></div></div>
+      <div class="stitle">📜 全部考試紀錄</div>
+      <div id="exam-hist-stats"></div>
+    </div>
+
+    <footer style="margin-top:40px;padding:20px 16px;border-top:1px solid var(--line);text-align:center;font-size:11px;color:var(--muted);line-height:1.8">
+      <div style="margin-bottom:6px"><strong>⚠️ 非官方學習工具</strong></div>
+      <div>本站為高中生程式檢定學習輔助工具，與任何官方程式設計檢定主辦單位均無隸屬或授權關係。</div>
+      <div>所有題目皆為程式即時生成的衍生題目，僅供教學與自學參考；正式考試請以各官方考試網站公告為準。</div>
+    </footer>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
 
 <script>
-// ─── CHAPTER DATA ───
-const chapters = [
-  { id:'ch1', title:'認識程式設計', subs:[
-    {id:'ch1-1',label:'1-1 什麼是程式'},
-    {id:'ch1-2',label:'1-2 程式語言種類'},
-    {id:'ch1-3',label:'1-3 開發環境 Colab'},
-    {id:'ch1-4',label:'1-4 錯誤與除錯'},
-  ]},
-  { id:'ch2', title:'變數與資料型態', subs:[
-    {id:'ch2-1',label:'2-1 變數'},
-    {id:'ch2-2',label:'2-2 資料型態'},
-    {id:'ch2-3',label:'2-3 命名規則'},
-    {id:'ch2-4',label:'2-4 變數互換'},
-  ]},
-  { id:'ch3', title:'輸入與輸出', subs:[
-    {id:'ch3-1',label:'3-1 print()'},
-    {id:'ch3-2',label:'3-2 input() 與轉型'},
-  ]},
-  { id:'ch4', title:'運算子', subs:[
-    {id:'ch4-1',label:'4-1 算術運算子'},
-    {id:'ch4-2',label:'4-2 字串運算子'},
-    {id:'ch4-3',label:'4-3 比較與邏輯'},
-  ]},
-  { id:'ch5', title:'條件判斷', subs:[
-    {id:'ch5-1',label:'5-1 if'},
-    {id:'ch5-2',label:'5-2 if-else'},
-    {id:'ch5-3',label:'5-3 if-elif-else'},
-  ]},
-  { id:'ch6', title:'for 迴圈', subs:[
-    {id:'ch6-1',label:'6-1 range()'},
-    {id:'ch6-2',label:'6-2 累加與條件'},
-    {id:'ch6-3',label:'6-3 巢狀迴圈'},
-  ]},
-  { id:'ch7', title:'while 迴圈', subs:[
-    {id:'ch7-1',label:'7-1 基本語法'},
-    {id:'ch7-2',label:'7-2 break & continue'},
-    {id:'ch7-3',label:'7-3 猜數字遊戲'},
-  ]},
+/* ============ DATA ============ */
+const CHS = [
+  {id:2, name:'基礎概念', icon:'🔢', desc:'進位、運算子、型別、位元'},
+  {id:3, name:'流程控制', icon:'🔁', desc:'迴圈、判斷、跳躍'},
+  {id:4, name:'陣列字串', icon:'📦', desc:'一維/二維陣列、字串處理'},
+  {id:5, name:'函式範疇', icon:'🧩', desc:'函式、傳值/傳址、範疇'},
+  {id:6, name:'指標',     icon:'🎯', desc:'指標、位址、解參考'},
+  {id:7, name:'遞迴搜尋', icon:'🌀', desc:'遞迴、搜尋、排序、複雜度'}
 ];
 
-// Build sidebar nav
-const navTree = document.getElementById('navTree');
-chapters.forEach((ch, idx) => {
-  const wrap = document.createElement('div');
-  wrap.className = 'nav-chapter';
+/* ============ DERIVED GENERATORS（衍生題產生器，40+ 種） ============ */
+const rnd = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick = arr => arr[rnd(0,arr.length-1)];
+const shuf = arr => { const r=[...arr]; for(let i=r.length-1;i>0;i--){const j=rnd(0,i);[r[i],r[j]]=[r[j],r[i]];} return r; };
+const mk = (correct, wrongs) => {
+  const set = new Set([String(correct)]);
+  const finalWrongs = [];
+  for(const w of wrongs){
+    const s = String(w);
+    if(!set.has(s)){ set.add(s); finalWrongs.push(s); }
+    if(finalWrongs.length>=3) break;
+  }
+  while(finalWrongs.length<3){ const x=String(rnd(1,999)); if(!set.has(x)){set.add(x); finalWrongs.push(x);} }
+  const all = shuf([String(correct), ...finalWrongs]);
+  return { opts: all, a: all.indexOf(String(correct)) };
+};
 
-  const btn = document.createElement('button');
-  btn.className = 'nav-chapter-btn';
-  btn.innerHTML = `
-    <span style="display:flex;align-items:center;gap:8px;">
-      <span class="nav-chapter-num">CH${String(idx+1).padStart(2,'0')}</span>
-      <span>${ch.title}</span>
-    </span>
-    <span class="nav-arrow" style="font-size:0.7rem;transition:transform 0.2s;">▶</span>`;
-  btn.onclick = () => {
-    document.getElementById(ch.id).scrollIntoView({behavior:'smooth', block:'start'});
-    sub.classList.toggle('open');
-    btn.querySelector('.nav-arrow').style.transform = sub.classList.contains('open') ? 'rotate(90deg)' : '';
-  };
+const GEN = [
+  /* === Ch2 基礎概念 === */
+  ()=>{ // 二進位轉十進位
+    const n = rnd(5,255), bin = n.toString(2);
+    const o = mk(n, [n+1,n-1,parseInt(bin,10)%256,n^1]);
+    return {ch:2, q:`下列二進位數 <code>${bin}₂</code> 的十進位值為何？`, code:null, opts:o.opts, a:o.a,
+      exp:`將每個位元乘以對應的 2 次方：${bin.split('').reverse().map((b,i)=>b==='1'?`2^${i}`:null).filter(Boolean).reverse().join(' + ')} = ${n}`};
+  },
+  ()=>{ // 十六進位轉十進位
+    const n = rnd(20,255), hex = n.toString(16).toUpperCase();
+    const o = mk(n, [n+1,n-1,parseInt(hex,10),n+16]);
+    return {ch:2, q:`下列十六進位數 <code>${hex}₁₆</code> 的十進位值為何？`, code:null, opts:o.opts, a:o.a,
+      exp:`${hex}₁₆ = ${hex.split('').map((c,i)=>`${parseInt(c,16)}×16^${hex.length-1-i}`).join(' + ')} = ${n}`};
+  },
+  ()=>{ // 邏輯運算（三變數）
+    const a=rnd(0,1), b=rnd(0,1), c=rnd(0,1);
+    const exprs = [
+      {e:`(a && b) || c`, v:(a&&b)||c, t:`a&&b 為 ${a&&b?1:0}，再與 c=${c} 做 OR`},
+      {e:`a || (b && c)`, v:a||(b&&c), t:`b&&c 為 ${b&&c?1:0}，再與 a=${a} 做 OR`},
+      {e:`(a || b) && !c`, v:(a||b)&&!c, t:`a||b 為 ${a||b?1:0}，!c 為 ${c?0:1}，再做 AND`}
+    ];
+    const E = pick(exprs);
+    const code = `int a = ${a}, b = ${b}, c = ${c};\nif(${E.e}) printf("T");\nelse printf("F");`;
+    return {ch:2, q:'下列 C 程式輸出為何？', code, opts:['T','F','TF','錯誤'], a:E.v?0:1,
+      exp:`${E.t}，最終結果為 ${E.v?'真':'假'}，輸出 ${E.v?'T':'F'}`};
+  },
+  ()=>{ // 運算子優先順序
+    const a=rnd(2,9), b=rnd(2,9), c=rnd(2,9);
+    const ans = a + b * c;
+    const o = mk(ans, [(a+b)*c, a*b+c, a+b+c]);
+    return {ch:2, q:'下列 C 程式輸出為何？',
+      code:`int a = ${a}, b = ${b}, c = ${c};\nint x = a + b * c;\nprintf("%d", x);`,
+      opts:o.opts, a:o.a,
+      exp:`乘法優先於加法：b*c = ${b*c}，a + ${b*c} = ${ans}`};
+  },
+  ()=>{ // 位元 AND
+    const a=rnd(5,30), b=rnd(5,30), ans=a&b;
+    const o = mk(ans, [a|b, a^b, a+b]);
+    return {ch:2, q:'下列 C 程式輸出為何？',
+      code:`int a = ${a}, b = ${b};\nprintf("%d", a & b);`,
+      opts:o.opts, a:o.a,
+      exp:`${a}₂=${a.toString(2)}, ${b}₂=${b.toString(2)}，逐位 AND = ${ans.toString(2)}₂ = ${ans}`};
+  },
+  ()=>{ // 位元 OR
+    const a=rnd(5,30), b=rnd(5,30), ans=a|b;
+    const o = mk(ans, [a&b, a^b, a-b]);
+    return {ch:2, q:'下列 C 程式輸出為何？',
+      code:`int a = ${a}, b = ${b};\nprintf("%d", a | b);`,
+      opts:o.opts, a:o.a,
+      exp:`${a}₂=${a.toString(2)}, ${b}₂=${b.toString(2)}，逐位 OR = ${ans.toString(2)}₂ = ${ans}`};
+  },
+  ()=>{ // 位元 XOR
+    const a=rnd(5,30), b=rnd(5,30), ans=a^b;
+    const o = mk(ans, [a&b, a|b, a%b]);
+    return {ch:2, q:'下列 C 程式輸出為何？',
+      code:`int a = ${a}, b = ${b};\nprintf("%d", a ^ b);`,
+      opts:o.opts, a:o.a,
+      exp:`${a}₂=${a.toString(2)}, ${b}₂=${b.toString(2)}，逐位 XOR (相同為0、相異為1) = ${ans.toString(2)}₂ = ${ans}`};
+  },
+  ()=>{ // 強制轉型
+    const d = (rnd(20,99)/10).toFixed(1);
+    const ans = Math.trunc(parseFloat(d));
+    const o = mk(ans, [Math.round(parseFloat(d)), ans+1, Math.ceil(parseFloat(d))]);
+    return {ch:2, q:'下列 C 程式輸出為何？',
+      code:`double d = ${d};\nint i = (int)d;\nprintf("%d", i);`,
+      opts:o.opts, a:o.a,
+      exp:`(int) 強制轉型會「截斷」小數部分（非四捨五入），${d} 截斷後為 ${ans}`};
+  },
+  ()=>{ // 複合指定運算子
+    const x0=rnd(3,15), a1=rnd(2,8), a2=rnd(2,5);
+    const ans = (x0+a1)*a2;
+    const o = mk(ans, [x0+a1*a2, x0*a2+a1, x0+a1+a2]);
+    return {ch:2, q:'下列 C 程式片段執行後 x 的值為何？',
+      code:`int x = ${x0};\nx += ${a1};\nx *= ${a2};\nprintf("%d", x);`,
+      opts:o.opts, a:o.a,
+      exp:`x = ${x0} + ${a1} = ${x0+a1}，再 x = ${x0+a1} × ${a2} = ${ans}`};
+  },
+  ()=>{ // / 與 %
+    const a=rnd(30,99), b=rnd(3,9);
+    const q=Math.floor(a/b), r=a%b;
+    const correct=`${q} ${r}`;
+    const w1=`${r} ${q}`, w2=`${q+1} ${r}`, w3=`${q} ${r+1}`;
+    const all = shuf([correct, w1, w2, w3]);
+    return {ch:2, q:'下列 C 程式輸出為何？',
+      code:`int a = ${a}, b = ${b};\nprintf("%d %d", a/b, a%b);`,
+      opts: all, a: all.indexOf(correct),
+      exp:`整數除法 ${a}/${b} = ${q}（取商），${a}%${b} = ${r}（取餘）`};
+  },
 
-  const sub = document.createElement('div');
-  sub.className = 'nav-sub';
-  ch.subs.forEach(s => {
-    const a = document.createElement('a');
-    a.href = `#${s.id}`;
-    a.textContent = s.label;
-    a.onclick = e => { e.preventDefault(); document.getElementById(s.id).scrollIntoView({behavior:'smooth', block:'start'}); };
-    sub.appendChild(a);
+  /* === Ch3 流程控制 === */
+  ()=>{ // 等差和
+    const n = rnd(5,20);
+    const ans = n*(n+1)/2;
+    const o = mk(ans, [n*(n-1)/2, n*n/2, n*n]);
+    return {ch:3, q:'下列 C 程式輸出為何？',
+      code:`int s = 0;\nfor(int i = 1; i <= ${n}; i++) s += i;\nprintf("%d", s);`,
+      opts:o.opts, a:o.a,
+      exp:`1+2+...+${n} = n(n+1)/2 = ${n}×${n+1}/2 = ${ans}`};
+  },
+  ()=>{ // 平方和
+    const n = rnd(3,8);
+    let ans=0; for(let i=1;i<=n;i++) ans += i*i;
+    const o = mk(ans, [n*(n+1)/2, n*n, ans+n]);
+    return {ch:3, q:'下列 C 程式輸出為何？',
+      code:`int s = 0;\nfor(int i = 1; i <= ${n}; i++) s += i * i;\nprintf("%d", s);`,
+      opts:o.opts, a:o.a,
+      exp:`1²+2²+...+${n}² = ${Array.from({length:n},(_,i)=>(i+1)*(i+1)).join('+')} = ${ans}`};
+  },
+  ()=>{ // 巢狀方陣
+    const a=rnd(3,8), b=rnd(3,8);
+    const ans=a*b;
+    const o = mk(ans, [a+b, a*a, b*b]);
+    return {ch:3, q:'下列 C 程式片段執行後 cnt 的值為何？',
+      code:`int cnt = 0;\nfor(int i = 0; i < ${a}; i++)\n  for(int j = 0; j < ${b}; j++)\n    cnt++;`,
+      opts:o.opts, a:o.a,
+      exp:`外迴圈跑 ${a} 次，內迴圈每次跑 ${b} 次，共 ${a}×${b} = ${ans} 次`};
+  },
+  ()=>{ // 巢狀三角形
+    const n = rnd(4,8);
+    const ans = n*(n+1)/2;
+    const o = mk(ans, [n*n, n*(n-1)/2, n+n]);
+    return {ch:3, q:'下列 C 程式最內層 x++ 執行幾次？',
+      code:`int x = 0;\nfor(int i = 1; i <= ${n}; i++)\n  for(int j = 1; j <= i; j++)\n    x++;`,
+      opts:o.opts, a:o.a,
+      exp:`內層 j 從 1 到 i，當 i=1..${n} 時內層分別執行 1,2,...,${n} 次，總和 = 1+2+...+${n} = ${ans}`};
+  },
+  ()=>{ // Collatz
+    const starts = [{n:6,steps:8},{n:7,steps:16},{n:10,steps:6},{n:12,steps:9},{n:20,steps:7}];
+    const c = pick(starts);
+    const o = mk(c.steps, [c.steps-1, c.steps+1, c.steps+2]);
+    return {ch:3, q:'下列 C 程式片段執行後 c 的值為何？',
+      code:`int n = ${c.n}, c = 0;\nwhile(n > 1){\n  if(n % 2 == 0) n /= 2;\n  else n = 3 * n + 1;\n  c++;\n}\nprintf("%d", c);`,
+      opts:o.opts, a:o.a,
+      exp:`Collatz 序列：從 ${c.n} 開始，偶數則除 2，奇數則 3n+1，直到變 1，共 ${c.steps} 步`};
+  },
+  ()=>{ // 數位個數
+    const n = rnd(1000,99999);
+    const ans = String(n).length;
+    const o = mk(ans, [ans-1, ans+1, ans*2]);
+    return {ch:3, q:'下列 C 程式片段執行後 d 的值為何？',
+      code:`int n = ${n}, d = 0;\nwhile(n > 0){\n  d++;\n  n /= 10;\n}\nprintf("%d", d);`,
+      opts:o.opts, a:o.a,
+      exp:`迴圈每次將 n 整除 10（去掉個位），直到 n=0。${n} 有 ${ans} 個位數，故迴圈跑 ${ans} 次`};
+  },
+  ()=>{ // 倍增到上限
+    const base=rnd(2,5), limit=rnd(50,500);
+    let n=1, c=0; while(n<limit){ n*=base; c++; }
+    const o = mk(c, [c-1, c+1, c*2]);
+    return {ch:3, q:'下列 C 程式片段執行後 c 的值為何？',
+      code:`int n = 1, c = 0;\nwhile(n < ${limit}){\n  n *= ${base};\n  c++;\n}\nprintf("%d", c);`,
+      opts:o.opts, a:o.a,
+      exp:`n 從 1 開始每次乘 ${base}：${(()=>{let x=1,s=[1];while(x<limit){x*=base;s.push(x);}return s.join(' → ');})()}，共乘 ${c} 次`};
+  },
+  ()=>{ // 多重 if-else
+    const x = rnd(0,30);
+    let out = x>20?'A':(x>10?'B':(x>5?'C':'D'));
+    return {ch:3, q:'下列 C 程式輸出為何？',
+      code:`int x = ${x};\nif(x > 20) printf("A");\nelse if(x > 10) printf("B");\nelse if(x > 5) printf("C");\nelse printf("D");`,
+      opts:['A','B','C','D'], a:['A','B','C','D'].indexOf(out),
+      exp:`x = ${x}，由上而下檢查：${x>20?'符合 x>20':(x>10?'不符 x>20，符合 x>10':(x>5?'不符前兩條件，符合 x>5':'前面都不符，進入 else'))}，輸出 ${out}`};
+  },
+  ()=>{ // switch 漏 break
+    const vals = [1,2,3];
+    const x = pick(vals);
+    const outs = {1:'ABC', 2:'BC', 3:'C'};
+    return {ch:3, cppOnly:true, q:'下列 C 程式輸出為何？',
+      code:`int x = ${x};\nswitch(x){\n  case 1: printf("A");\n  case 2: printf("B");\n  case 3: printf("C"); break;\n  default: printf("D");\n}`,
+      opts:['A','AB','ABC','BC'].includes(outs[x])?shuf(['A','AB','ABC','BC']):shuf([outs[x],'A','AB','BC']),
+      a:0,exp:`x=${x}，從 case ${x} 開始執行，因為沒有 break 會「貫穿 (fall-through)」往下執行，直到遇到 case 3 的 break，故輸出 ${outs[x]}`};
+  },
+  ()=>{ // break/continue
+    const a=rnd(2,4), b=rnd(6,9);
+    let s=0; for(let i=1;i<=10;i++){ if(i===a) continue; if(i===b) break; s+=i; }
+    const o = mk(s, [s+a, s+b, 55]);
+    return {ch:3, q:'下列 C 程式片段執行後 s 的值為何？',
+      code:`int s = 0;\nfor(int i = 1; i <= 10; i++){\n  if(i == ${a}) continue;\n  if(i == ${b}) break;\n  s += i;\n}\nprintf("%d", s);`,
+      opts:o.opts, a:o.a,
+      exp:`continue 跳過 i=${a}（不累加），break 在 i=${b} 中止迴圈（也不累加）。實際累加：${Array.from({length:b-1},(_,i)=>i+1).filter(x=>x!==a).join('+')} = ${s}`};
+  },
+  ()=>{ // do-while
+    const init=rnd(5,15), lim=rnd(1,3);
+    const o = mk(1, [0,2,'無窮']);
+    return {ch:3, q:'下列 do-while 迴圈共執行幾次？',
+      code:`int i = ${init};\ndo{\n  i++;\n} while(i < ${lim});`,
+      opts:o.opts, a:o.a,
+      exp:`do-while 至少執行一次（先做後判斷），${init+1} < ${lim} 為假，迴圈結束，共執行 1 次`};
+  },
+
+  /* === Ch4 陣列字串 === */
+  ()=>{ // 二維陣列位址
+    const base=1000+rnd(0,9)*100, rows=rnd(3,5), cols=rnd(3,5), i=rnd(1,rows-1), j=rnd(0,cols-1);
+    const ans = base + (i*cols+j)*4;
+    const o = mk(ans, [base+(j*rows+i)*4, base+(i*cols+j)*2, base+(i+j)*4]);
+    return {ch:4, cppOnly:true, q:`若 <code>int a[${rows}][${cols}]</code>, <code>&a[0][0] = ${base}</code>, <code>sizeof(int) = 4</code>, 則 <code>&a[${i}][${j}]</code> 為何？`,
+      code:null, opts:o.opts, a:o.a,
+      exp:`位移公式：(${i}×${cols} + ${j}) × 4 = ${i*cols+j}×4 = ${(i*cols+j)*4}，位址 = ${base} + ${(i*cols+j)*4} = ${ans}`};
+  },
+  ()=>{ // 陣列線性變換 a[i] = a[i]*k + c
+    const arr = [rnd(1,5),rnd(1,5),rnd(1,5),rnd(1,5),rnd(1,5)];
+    const k = rnd(2,3), c = rnd(1,3);
+    const idx = rnd(0,4);
+    const ans = arr[idx]*k+c;
+    const o = mk(ans, [arr[idx], arr[idx]*k, arr[idx]+c]);
+    return {ch:4, q:`下列 C 程式執行後 a[${idx}] 的值為何？`,
+      code:`int a[5] = {${arr.join(',')}};\nfor(int i = 0; i < 5; i++) a[i] = a[i] * ${k} + ${c};`,
+      opts:o.opts, a:o.a,
+      exp:`a[${idx}] 原值 = ${arr[idx]}，經 a[i] = a[i]×${k} + ${c} 變換後 = ${arr[idx]}×${k} + ${c} = ${ans}`};
+  },
+  ()=>{ // 對角線和
+    const m = [[rnd(1,9),rnd(1,9),rnd(1,9)],[rnd(1,9),rnd(1,9),rnd(1,9)],[rnd(1,9),rnd(1,9),rnd(1,9)]];
+    const ans = m[0][0]+m[1][1]+m[2][2];
+    const o = mk(ans, [m[0][2]+m[1][1]+m[2][0], ans+1, ans-1]);
+    return {ch:4, q:'下列 C 程式片段執行後 s 的值為何？',
+      code:`int a[3][3] = {{${m[0].join(',')}},{${m[1].join(',')}},{${m[2].join(',')}}};\nint s = 0;\nfor(int i = 0; i < 3; i++) s += a[i][i];`,
+      opts:o.opts, a:o.a,
+      exp:`主對角線元素 a[0][0]+a[1][1]+a[2][2] = ${m[0][0]}+${m[1][1]}+${m[2][2]} = ${ans}`};
+  },
+  ()=>{ // 反對角線和
+    const m = [[rnd(1,9),rnd(1,9),rnd(1,9)],[rnd(1,9),rnd(1,9),rnd(1,9)],[rnd(1,9),rnd(1,9),rnd(1,9)]];
+    const ans = m[0][2]+m[1][1]+m[2][0];
+    const o = mk(ans, [m[0][0]+m[1][1]+m[2][2], ans+1, ans-1]);
+    return {ch:4, q:'下列 C 程式片段執行後 s 的值為何？',
+      code:`int a[3][3] = {{${m[0].join(',')}},{${m[1].join(',')}},{${m[2].join(',')}}};\nint s = 0;\nfor(int i = 0; i < 3; i++) s += a[i][2-i];`,
+      opts:o.opts, a:o.a,
+      exp:`反對角線元素 a[0][2]+a[1][1]+a[2][0] = ${m[0][2]}+${m[1][1]}+${m[2][0]} = ${ans}`};
+  },
+  ()=>{ // 字串長度
+    const ss = ['Hello','Code','Computer','Taiwan','Programming','Algorithm'];
+    const s = pick(ss);
+    const o = mk(s.length, [s.length-1, s.length+1, s.length+2]);
+    return {ch:4, q:'下列 C 程式輸出為何？',
+      code:`char s[] = "${s}";\nprintf("%d", strlen(s));`,
+      opts:o.opts, a:o.a,
+      exp:`strlen 計算字串長度（不含結尾 '\\0'），"${s}" 共 ${s.length} 個字元`};
+  },
+  ()=>{ // sizeof 字串
+    const ss = ['Hi','ABC','Code','Hello'];
+    const s = pick(ss);
+    const o = mk(s.length+1, [s.length, s.length+2, s.length*2]);
+    return {ch:4, cppOnly:true, q:'下列 C 程式輸出為何？',
+      code:`char s[] = "${s}";\nprintf("%d", (int)sizeof(s));`,
+      opts:o.opts, a:o.a,
+      exp:`sizeof 計算記憶體大小，字串需多 1 byte 存結尾 '\\0'，"${s}" 共 ${s.length+1} byte`};
+  },
+
+  /* === Ch5 函式範疇 === */
+  ()=>{ // 階乘
+    const n = rnd(3,7);
+    let ans=1; for(let i=1;i<=n;i++) ans*=i;
+    const o = mk(ans, [ans/n, n*(n+1)/2, ans*n]);
+    return {ch:5, q:`下列遞迴函式 f(${n}) 的回傳值為何？`,
+      code:`int f(int n){\n  if(n <= 1) return 1;\n  return n * f(n - 1);\n}`,
+      opts:o.opts, a:o.a,
+      exp:`此為階乘 n! 函式。${n}! = ${Array.from({length:n},(_,i)=>i+1).reverse().join('×')} = ${ans}`};
+  },
+  ()=>{ // 費氏
+    const fibs=[0,1,1,2,3,5,8,13,21,34,55,89,144];
+    const n = rnd(5,10);
+    const o = mk(fibs[n], [fibs[n-1], fibs[n+1], fibs[n]+1]);
+    return {ch:5, q:`下列費氏函式 fib(${n}) 的回傳值為何？`,
+      code:`int fib(int n){\n  if(n < 2) return n;\n  return fib(n-1) + fib(n-2);\n}`,
+      opts:o.opts, a:o.a,
+      exp:`費氏數列：0,1,1,2,3,5,8,13,21,34,...，第 ${n} 項為 ${fibs[n]}`};
+  },
+  ()=>{ // 傳值
+    const a = rnd(3,10);
+    const o = mk(a, [a*2, a*a, 0]);
+    return {ch:5, q:'下列 C 程式輸出為何？',
+      code:`void f(int x){\n  x = x * 2;\n}\nint main(){\n  int a = ${a};\n  f(a);\n  printf("%d", a);\n}`,
+      opts:o.opts, a:o.a,
+      exp:`「傳值呼叫」會複製一份 x 給函式使用，函式內修改 x 不會影響 main 中的 a，故 a 仍為 ${a}`};
+  },
+  ()=>{ // 傳址
+    const a = rnd(3,10);
+    const o = mk(a*2, [a, a+2, 0]);
+    return {ch:5, cppOnly:true, q:'下列 C 程式輸出為何？',
+      code:`void f(int *x){\n  *x = *x * 2;\n}\nint main(){\n  int a = ${a};\n  f(&a);\n  printf("%d", a);\n}`,
+      opts:o.opts, a:o.a,
+      exp:`「傳址呼叫」傳入 a 的位址，函式透過指標修改 *x 即修改 a，故 a 變為 ${a}×2 = ${a*2}`};
+  },
+  ()=>{ // static
+    const n = rnd(3,5);
+    return {ch:5, cppOnly:true, q:`下列 C 程式輸出為何？（連續呼叫 ${n} 次）`,
+      code:`int f(){\n  static int c = 0;\n  return ++c;\n}\nint main(){\n  for(int i = 0; i < ${n}; i++)\n    printf("%d", f());\n}`,
+      opts:shuf([Array.from({length:n},(_,i)=>i+1).join(''),'0'.repeat(n), '1'.repeat(n), Array.from({length:n},(_,i)=>n-i).join('')]),
+      a:-1, // will be set after shuf
+      exp:`static 區域變數只初始化一次，跨呼叫保留值。第 1 次呼叫回 1、第 2 次回 2、...第 ${n} 次回 ${n}，輸出 ${Array.from({length:n},(_,i)=>i+1).join('')}`,
+      _setAns:(q)=>{ q.a = q.opts.indexOf(Array.from({length:n},(_,i)=>i+1).join('')); return q; }
+    };
+  },
+  ()=>{ // 累加遞迴
+    const n = rnd(3,8);
+    const ans = n*(n+1)/2;
+    const o = mk(ans, [n, n*n, ans+n]);
+    return {ch:5, q:`下列函式 g(${n}) 的回傳值為何？`,
+      code:`int g(int n){\n  if(n == 0) return 0;\n  return n + g(n - 1);\n}`,
+      opts:o.opts, a:o.a,
+      exp:`此函式遞迴計算 n+(n-1)+...+1 = n(n+1)/2 = ${n}×${n+1}/2 = ${ans}`};
+  },
+  ()=>{ // 範疇 (scope)
+    return {ch:5, q:'下列關於 C 變數範疇 (scope) 的敘述，何者正確？',
+      code:null,
+      opts:['區域變數預設初值為 0','函式內變數可被其他函式直接存取','全域變數未初始化時預設為 0','所有變數都是全域'],
+      a:2,exp:'C 規定：全域變數與 static 區域變數未初始化時自動為 0；自動 (auto) 區域變數則為「未定值」(垃圾值)。函式內的區域變數僅在該函式可見'};
+  },
+
+  /* === Ch6 指標 === */
+  ()=>{ // 解參考修改
+    const a = rnd(5,30), b = rnd(5,30);
+    return {ch:6, cppOnly:true, q:'下列 C 程式輸出為何？',
+      code:`int a = ${a};\nint *p = &a;\n*p = ${b};\nprintf("%d", a);`,
+      opts:shuf([String(a),String(b),'&a','錯誤']), a:-1,
+      exp:`p 指向 a，*p = ${b} 等同 a = ${b}，故輸出 ${b}`,
+      _setAns:(q)=>{ q.a = q.opts.indexOf(String(b)); return q; }
+    };
+  },
+  ()=>{ // 指標走訪
+    const arr=[rnd(1,9)*10,rnd(1,9)*10,rnd(1,9)*10,rnd(1,9)*10,rnd(1,9)*10];
+    const i = rnd(1,4);
+    const o = mk(arr[i], [arr[0], arr[i-1], arr[i+1]||arr[0]]);
+    return {ch:6, cppOnly:true, q:'下列 C 程式輸出為何？',
+      code:`int a[5] = {${arr.join(',')}};\nint *p = a;\nprintf("%d", *(p + ${i}));`,
+      opts:o.opts, a:o.a,
+      exp:`*(p + ${i}) 等同 a[${i}]，故輸出 a[${i}] = ${arr[i]}`};
+  },
+  ()=>{ // 雙重指標
+    const a = rnd(10,99);
+    return {ch:6, cppOnly:true, q:'下列 C 程式輸出為何？',
+      code:`int a = ${a};\nint *p = &a;\nint **pp = &p;\nprintf("%d", **pp);`,
+      opts:shuf([String(a),'&a','&p','錯誤']), a:-1,
+      exp:`pp 為「指向指標的指標」。**pp 解兩次參考：先得 *pp (即 p)，再 *p (即 a)，故輸出 ${a}`,
+      _setAns:(q)=>{ q.a = q.opts.indexOf(String(a)); return q; }
+    };
+  },
+  ()=>{ // swap
+    return {ch:6, cppOnly:true, q:'若有 swap 函式如下，下列哪個呼叫方式正確？',
+      code:`void swap(int *x, int *y){\n  int t = *x;\n  *x = *y;\n  *y = t;\n}`,
+      opts:['swap(a, b);','swap(&a, &b);','swap(*a, *b);','swap(&&a, &&b);'],
+      a:1,exp:'swap 參數為指標 (int*)，必須傳入變數位址，故使用 &a, &b 取位址。直接傳值無法修改原變數'};
+  },
+  ()=>{ // 指標交換
+    const a=rnd(10,30), b=rnd(31,50);
+    const correct = `${b} ${a}`;
+    const all = shuf([correct, `${a} ${b}`, `${a} ${a}`, `${b} ${b}`]);
+    return {ch:6, cppOnly:true, q:'下列 C 程式輸出為何？',
+      code:`int a = ${a}, b = ${b};\nint *p = &a, *q = &b;\nint *t = p; p = q; q = t;\nprintf("%d %d", *p, *q);`,
+      opts:all, a:all.indexOf(correct),
+      exp:`只交換「指標 p 與 q 指向的位址」，並未交換 a、b 本身。交換後 p 指向 b、q 指向 a，故 *p = ${b}、*q = ${a}`};
+  },
+
+  /* === Ch7 遞迴搜尋 === */
+  ()=>{ // 二元搜尋次數
+    const k = rnd(8,14);
+    const n = Math.pow(2,k);
+    const o = mk(k, [k-1, k+1, k*2]);
+    return {ch:7, q:`對已排序的 N = ${n} 個元素進行二元搜尋，最壞情況需要比較幾次？`,
+      code:null, opts:o.opts, a:o.a,
+      exp:`二元搜尋每次將範圍折半，最多比較 log₂N 次。log₂(${n}) = log₂(2^${k}) = ${k}`};
+  },
+  ()=>{ // GCD
+    const pairs=[[24,36,12],[18,24,6],[48,36,12],[60,48,12],[35,42,7],[100,75,25]];
+    const p = pick(pairs);
+    const o = mk(p[2], [p[2]/2, p[2]*2, p[0]+p[1]]);
+    return {ch:7, q:`下列輾轉相除法 gcd(${p[0]}, ${p[1]}) 的結果為何？`,
+      code:`int gcd(int a, int b){\n  if(b == 0) return a;\n  return gcd(b, a % b);\n}`,
+      opts:o.opts, a:o.a,
+      exp:`歐幾里得演算法：不斷以「b、a%b」遞迴，當 b=0 時 a 即為 GCD。gcd(${p[0]},${p[1]}) = ${p[2]}`};
+  },
+  ()=>{ // 河內塔
+    const n = rnd(3,6);
+    const ans = Math.pow(2,n)-1;
+    const o = mk(ans, [n*n, 2*n, ans+1]);
+    return {ch:7, q:`河內塔 (Tower of Hanoi) 共 ${n} 個盤子，至少需移動幾步？`,
+      code:null, opts:o.opts, a:o.a,
+      exp:`河內塔最少步數公式 = 2^n - 1。2^${n} - 1 = ${ans}`};
+  },
+  ()=>{ // 排序最壞複雜度
+    return {ch:7, q:'下列哪個排序演算法的最壞時間複雜度為 O(n log n)？',
+      code:null,
+      opts:['Bubble Sort','Selection Sort','Merge Sort','Insertion Sort'],
+      a:2,exp:'Merge Sort 不論最好/平均/最壞情況皆為 O(n log n)。Bubble/Selection/Insertion 最壞皆為 O(n²)'};
+  },
+  ()=>{ // DP 線性
+    return {ch:7, q:'以動態規劃 (Dynamic Programming) 由下而上計算 fib(n) 的時間複雜度為？',
+      code:null,
+      opts:['O(2^n)','O(n log n)','O(n)','O(log n)'],
+      a:2,exp:'DP 將子問題答案儲存避免重複計算，從 fib(0) 線性算到 fib(n)，故為 O(n)。未記憶化的純遞迴才是 O(2^n)'};
+  },
+  ()=>{ // 漸進複雜度比較
+    return {ch:7, q:'下列何者的成長速度最快 (最不有效率)？',
+      code:null,
+      opts:['O(log n)','O(n)','O(n log n)','O(n²)'],
+      a:3,exp:'成長由慢到快：O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2^n) < O(n!)'};
+  },
+  ()=>{ // 線性搜尋
+    return {ch:7, q:'線性搜尋 (Linear Search) 對長度 N 的陣列搜尋一個元素，最壞情況需比較幾次？',
+      code:null,
+      opts:['log₂N','N','N/2','N²'],
+      a:1,exp:'線性搜尋從頭逐一比對，最壞情況（元素不存在或在最末）需比較 N 次'};
+  },
+  ()=>{ // 河內塔遞迴呼叫
+    const n = rnd(3,5);
+    const ans = Math.pow(2,n)-1;
+    const o = mk(ans, [n, 2*n, n*n]);
+    return {ch:7, q:`下列河內塔函式 hanoi(${n}, 'A', 'B', 'C') 共印出幾行 "Move"？`,
+      code:`void hanoi(int n, char a, char b, char c){\n  if(n == 0) return;\n  hanoi(n - 1, a, c, b);\n  printf("Move %d: %c -> %c\\n", n, a, c);\n  hanoi(n - 1, b, a, c);\n}`,
+      opts:o.opts, a:o.a,
+      exp:`遞迴關係 T(n) = 2·T(n-1) + 1，T(0)=0，解得 T(n) = 2^n - 1 = 2^${n} - 1 = ${ans}`};
+  }
+];
+
+/* 套用 _setAns 後處理 */
+function applyPostFix(q){ if(q._setAns){ return q._setAns(q); } return q; }
+
+/* ============ 生成 1000+ 衍生題庫 ============ */
+/* ============ 章節知識庫（用於生成超詳細解析） ============ */
+const CH_INFO = {
+  2: {
+    name: '基礎概念',
+    concept: '本章重點：進位轉換（二/八/十/十六進位）、運算子優先順序、資料型別與型別轉換、位元運算（&|^~<<>>）、邏輯運算與短路求值。',
+    tips: '解題訣竅：\n  1. 進位轉換：二進位轉十進位用「位元×2的次方」相加；十六進位轉用「位元×16的次方」。\n  2. 運算子優先序口訣：括號 > 一元(!、~、++、--) > 乘除取餘 > 加減 > 位移(<< >>) > 比較(< > <= >=) > 相等(== !=) > 位元AND > 位元XOR > 位元OR > 邏輯AND(&&) > 邏輯OR(||) > 賦值(=)。\n  3. 整數除法會截斷小數：7/2 = 3 不是 3.5；要小數需強制轉型 (double)7/2。\n  4. 位元AND常用於「遮罩」、OR用於「設定旗標」、XOR用於「翻轉」、左移=×2、右移=÷2。',
+    pitfall: '常見陷阱：\n  ⚠️ && 與 & 不同：&& 是邏輯運算回傳 0/1；& 是位元運算逐位 AND。\n  ⚠️ (int)d 是截斷不是四捨五入：(int)7.9 = 7，不是 8。\n  ⚠️ 二進位轉換時容易把位元方向搞錯——最右邊是 2^0。\n  ⚠️ 短路求值：a || b 若 a 為真，b 就不會被執行（可能漏掉副作用）。',
+    extend: '延伸知識：位元運算的實用技巧——判斷奇偶用 n&1、判斷 2 的次方用 (n&(n-1))==0、交換兩數不用暫存變數可用 XOR：a^=b; b^=a; a^=b;。十六進位常見於 MAC 位址、HTML 顏色（#RRGGBB）、記憶體位址。'
+  },
+  3: {
+    name: '流程控制',
+    concept: '本章重點：for/while/do-while 三種迴圈、if-else if-else 多重判斷、switch-case 多重分支、break（中止迴圈）與 continue（跳到下次迴圈）、巢狀迴圈次數計算。',
+    tips: '解題訣竅：\n  1. for 迴圈執行次數：for(i=a; i<b; i+=s) 執行 ⌈(b-a)/s⌉ 次；i<=b 時則執行 ⌊(b-a)/s⌋+1 次。\n  2. 巢狀迴圈總次數＝外層次數 × 內層次數（若內層相依於外層 i，則是 1+2+...+n = n(n+1)/2）。\n  3. switch 沒有 break 會「fall-through」連續執行下一個 case，直到遇到 break 或 } 為止。\n  4. do-while 無論條件如何「至少執行一次」；while 則可能一次都不執行。',
+    pitfall: '常見陷阱：\n  ⚠️ for(i=0; i<=n; i++) 與 for(i=0; i<n; i++) 差 1 次——前者執行 n+1 次。\n  ⚠️ continue 在 for 中仍會執行 i++，但在 while 中可能造成無窮迴圈（如果 i++ 在 continue 後面）。\n  ⚠️ switch 忘記 break 是經典考點，要逐 case 追蹤輸出。\n  ⚠️ break 只跳出最內一層迴圈，多層巢狀要用 flag 或 goto。',
+    extend: '延伸知識：巢狀迴圈時間複雜度通常為 O(n²)（如氣泡排序）；三層巢狀為 O(n³)（如三維陣列走訪）。while(1)+break 適合條件複雜或多出口的情境。Collatz 數列（3n+1 問題）是經典 while 題型。'
+  },
+  4: {
+    name: '陣列字串',
+    concept: '本章重點：一維與二維陣列的宣告/存取、陣列位址計算公式、字串以 \\0 結尾的特性、字串長度（strlen）與佔用空間（sizeof）的差別、字串/陣列函式（strlen、strcpy、strcmp）。',
+    tips: '解題訣竅：\n  1. C 陣列下標從 0 開始：int a[n] 合法範圍是 a[0] ~ a[n-1]。\n  2. 二維陣列位址公式（列優先）：&a[i][j] = base + (i × 行數 + j) × sizeof(元素)。\n  3. strlen 不算結尾 \\0，所以 strlen("ABC") = 3；sizeof 算到 \\0，所以 sizeof("ABC") = 4。\n  4. char s[] = "ABC" 佔 4 byte；對角線元素為 a[0][0], a[1][1], ..., a[n-1][n-1]。',
+    pitfall: '常見陷阱：\n  ⚠️ 越界存取 a[n] 不會被 C 阻止，但會印出垃圾值或覆蓋其他變數。\n  ⚠️ sizeof 與 strlen 容易混淆：char s[100] = "Hi"; sizeof(s)=100, strlen(s)=2。\n  ⚠️ 二維陣列位址別用「行優先」算（C/C++ 是列優先）。\n  ⚠️ char *s 與 char s[] 雖看似相同，前者指向唯讀區可能不能修改。',
+    extend: '延伸知識：字串相關常見題型——反轉字串（雙指標）、判斷回文（首尾比對）、計算子字串出現次數。排序常結合陣列：氣泡 O(n²)、快排 O(n log n) 平均、合併排序 O(n log n) 穩定。'
+  },
+  5: {
+    name: '函式範疇',
+    concept: '本章重點：函式定義與呼叫、傳值（pass by value）vs 傳址（pass by reference）、區域變數 vs 全域變數、static 靜態變數的記憶體生命週期、遞迴函式的設計與終止條件。',
+    tips: '解題訣竅：\n  1. 傳值：函式內參數是「副本」，修改不影響呼叫端的原變數。\n  2. 傳址：用 int *p 接位址，*p = 新值；呼叫端要寫 func(&a)。\n  3. static 變數：跨多次函式呼叫保留值，初始化只發生一次；常用於計數器。\n  4. 遞迴必須有「基底條件」（base case），否則 stack overflow。例：f(0)=1, f(n)=n*f(n-1)。',
+    pitfall: '常見陷阱：\n  ⚠️ 區域變數的初值未定義（垃圾值）；全域變數預設為 0。\n  ⚠️ 傳整個陣列其實是傳「指標」，所以函式內修改會影響外面（陣列特例）。\n  ⚠️ 函式內宣告的 static 變數，下次呼叫時保留上次的值，不會重新初始化。\n  ⚠️ 遞迴呼叫深度太深會 stack overflow（每呼叫一次都占用 stack frame）。',
+    extend: '延伸知識：尾遞迴（tail recursion）可被編譯器優化為迴圈，但 C 不保證。費氏數列遞迴版本是 O(2^n)（極慢），改用 memoization 或 DP 可降為 O(n)。函式指標可作為參數傳遞（如 qsort 的比較函式）。'
+  },
+  6: {
+    name: '指標',
+    concept: '本章重點：指標宣告（int *p）、取位址運算子（&）、解參考運算子（*）、指標算術（p++ 移動 sizeof(指向型別) 個 byte）、雙重指標（int **pp）、指標與陣列的關係。',
+    tips: '解題訣竅：\n  1. 宣告 int *p = &a; 則 p 是 a 的位址，*p 是 a 的值，&p 是 p 自己的位址。\n  2. 對 int 型指標 p++ 不是加 1 byte，而是加 sizeof(int) = 4 byte。\n  3. 陣列名 a 等同於 &a[0]，所以 *(a+i) === a[i]。\n  4. 雙重指標 **pp：pp 是位址的位址，*pp 是中間指標，**pp 是最終值。',
+    pitfall: '常見陷阱：\n  ⚠️ 野指標（wild pointer）：指標宣告後沒指定有效位址就解參考，造成程式崩潰。\n  ⚠️ 空指標解參考：int *p = NULL; *p = 5; 立即 segmentation fault。\n  ⚠️ p+1 移動的 byte 數依「指向型別」而定，不是固定 1。\n  ⚠️ const int *p（指向不可變的 int）與 int * const p（指標本身不變）容易混淆。',
+    extend: '延伸知識：指標核心用途——函式傳址（修改實參）、動態記憶體配置（malloc/free）、函式指標（callback）、資料結構（鏈結串列、樹）。記憶體管理：malloc 配置後必須 free，否則 memory leak。'
+  },
+  7: {
+    name: '遞迴搜尋',
+    concept: '本章重點：遞迴函式（特別是分而治之）、線性搜尋 vs 二元搜尋、排序演算法（氣泡、選擇、插入、快排、合併、堆積）、時間/空間複雜度（Big-O 表示法）、河內塔等經典遞迴問題。',
+    tips: '解題訣竅：\n  1. 二元搜尋必須先排序：每次砍半，時間 O(log n)。N=1024 最多 log₂(1024)=10 次。\n  2. 線性搜尋無需排序，最壞 O(n)；平均比較次數約 n/2。\n  3. 河內塔 N 盤需 T(N) = 2^N - 1 步；遞迴關係 T(N) = 2·T(N-1) + 1。\n  4. 排序複雜度：氣泡/插入/選擇 O(n²)；快排/合併/堆積 O(n log n)；快排最壞 O(n²)。',
+    pitfall: '常見陷阱：\n  ⚠️ 二元搜尋對未排序資料完全錯誤——必須先排序。\n  ⚠️ 快排「平均」O(n log n) 但「最壞」O(n²)（已排序或全相同元素）。\n  ⚠️ 大 O 只看最高次項：O(n² + n + 1) = O(n²)。\n  ⚠️ 遞迴的空間複雜度＝呼叫深度（佔用 stack）。',
+    extend: '延伸知識：排序穩定性——氣泡、插入、合併「穩定」（相等元素保持原順序）；快排、選擇、堆積「不穩定」。動態規劃（DP）以陣列記憶子問題結果，把指數時間降為多項式時間，是費氏數列、最長共同子序列、背包問題的解法。'
+  }
+};
+
+function buildDetailedExp(q){
+  const ch = CH_INFO[q.ch] || {name:'', concept:'', tips:'', pitfall:'', extend:''};
+  const ansLetter = String.fromCharCode(65 + q.a);
+  const ansText = q.opts[q.a];
+
+  // 自動分析錯誤選項（嘗試找出可能的計算錯誤）
+  let wrongAnalysis = '';
+  q.opts.forEach((opt, i) => {
+    if(i === q.a) return;
+    const letter = String.fromCharCode(65 + i);
+    let reason = '此選項不符合題目要求';
+    // 嘗試針對數值類型推測錯誤類型
+    const ansNum = parseFloat(ansText);
+    const optNum = parseFloat(opt);
+    if(!isNaN(ansNum) && !isNaN(optNum)){
+      const diff = optNum - ansNum;
+      if(diff === 1 || diff === -1) reason = `常見「差一錯誤」(off-by-one)，計算時可能多算或少算一次迭代`;
+      else if(diff === ansNum) reason = `將結果誤乘以 2，可能多算了一輪`;
+      else if(diff === -ansNum) reason = `將結果誤算為 0 或漏計一部分`;
+      else if(optNum === ansNum * 2) reason = `誤將結果加倍，可能重複計算或誤判迴圈次數`;
+      else if(optNum * 2 === ansNum) reason = `誤將結果減半，可能漏掉部分計算`;
+      else if(Math.abs(diff) <= 5) reason = `數值接近正確答案，可能是邊界條件或進位處理錯誤`;
+      else reason = `數值差距較大，可能是運算順序或公式套用錯誤`;
+    }
+    wrongAnalysis += `  • ${letter}: ${opt} ── ${reason}\n`;
   });
 
-  wrap.appendChild(btn);
-  wrap.appendChild(sub);
-  navTree.appendChild(wrap);
-});
+  return `🎯 核心觀念
+${ch.concept}
 
-// Build pills
-const pillContainer = document.getElementById('chapterPills');
-chapters.forEach((ch, idx) => {
-  const a = document.createElement('a');
-  a.href = `#${ch.id}`;
-  a.className = 'pill';
-  a.innerHTML = `<span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--text3)">CH${String(idx+1).padStart(2,'0')}</span> ${ch.title}`;
-  a.onclick = e => { e.preventDefault(); document.getElementById(ch.id).scrollIntoView({behavior:'smooth', block:'start'}); };
-  pillContainer.appendChild(a);
-});
+📝 詳細解題步驟
+${q.exp}
+✅ 正確答案：${ansLetter}: ${ansText}
 
-// ─── TOGGLE PRACTICE ───
-function togglePractice(header) {
-  // no-op; body always visible
+🔑 關鍵技巧
+${ch.tips}
+
+⚠️ 常見陷阱
+${ch.pitfall}
+
+❌ 錯誤選項分析
+${wrongAnalysis.trimEnd()}
+
+🚀 延伸知識
+${ch.extend}`;
 }
 
-// ─── TOGGLE ANSWER ───
-let answersOpened = 0;
-const totalAnswers = document.querySelectorAll('.toggle-answer').length;
 
-function toggleAnswer(btn) {
-  const box = btn.nextElementSibling;
-  const open = box.classList.toggle('open');
-  btn.classList.toggle('open', open);
-  btn.textContent = open ? '🔒 隱藏解答' : '🔓 顯示解答';
+/* ============ 生成衍生題庫 ============ */
+function generateDerived(count, chFilter, lang){
+  lang = lang || 'cpp';
+  const out=[], seen=new Set();
+  let attempts=0, maxAttempts=count*40;
+  while(out.length<count && attempts<maxAttempts){
+    attempts++;
+    const gen = GEN[rnd(0, GEN.length-1)];
+    let q;
+    try { q = applyPostFix(gen()); } catch(e){ continue; }
+    if(chFilter && q.ch !== chFilter) continue;
+    if(q.a<0 || q.a>3) continue;
+    // Python 模式跳過 C++ 專屬題（指標、sizeof、傳址、static）
+    if(lang === 'python' && q.cppOnly) continue;
+    const fp = q.ch+'|'+q.q+'|'+(q.code||'')+'|'+q.opts.join(',');
+    if(seen.has(fp)) continue;
+    seen.add(fp);
+    const item = {...q, id:'D'+(out.length+1), derived:true, lang};
+    // 題目中「C 程式」改為對應語言
+    if(lang === 'python'){
+      item.q = item.q.replace(/下列\s*C\s*程式/g, '下列 Python 程式').replace(/下列\s*C\+\+\s*程式/g, '下列 Python 程式');
+    } else {
+      item.q = item.q.replace(/下列\s*C\s*程式/g, '下列 C++ 程式');
+    }
+    item.detailedExp = buildDetailedExp(item);
+    out.push(item);
+  }
+  return out;
+}
 
-  if (open) {
-    answersOpened = Math.min(answersOpened + 1, totalAnswers);
-    updateProgress();
+/* 預生成題庫（首次載入時） */
+let MASTER_DERIVED = [];
+function buildMasterBank(){
+  MASTER_DERIVED = generateDerived(1000, null, G.lang);
+}
+
+/* ============ STATE ============ */
+let G = {
+  user:null,
+  lang:'cpp',          // 'cpp' or 'python'
+  examState:null,
+  exams:[]
+};
+const SK = 'hs_prog_test_v1';
+function save(){ try{ localStorage.setItem(SK, JSON.stringify({exams:G.exams, lang:G.lang})); }catch(e){} }
+function load(){ try{ const d=JSON.parse(localStorage.getItem(SK)||'{}'); G.exams=d.exams||[]; if(d.lang) G.lang=d.lang; }catch(e){ G.exams=[]; } }
+
+/* ============ LANGUAGE PICKER ============ */
+function pickLang(l){
+  G.lang = l;
+  document.getElementById('lang-cpp').classList.toggle('on', l==='cpp');
+  document.getElementById('lang-py').classList.toggle('on', l==='python');
+  save();
+}
+
+/* ============ LOGIN ============ */
+document.getElementById('lname').addEventListener('input', e=>{
+  document.getElementById('lbtn').disabled = !e.target.value.trim();
+});
+function doLogin(){
+  const nm = document.getElementById('lname').value.trim();
+  if(!nm) return;
+  G.user = nm;
+  load();
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('user-chip').textContent = nm;
+  document.getElementById('hero-greet').textContent = `歡迎回來，${nm}！`;
+  // 同步語言 pill 的狀態
+  document.getElementById('lang-cpp').classList.toggle('on', G.lang==='cpp');
+  document.getElementById('lang-py').classList.toggle('on', G.lang==='python');
+  buildMasterBank();
+  buildSelects();
+  renderExamHome();
+  renderExamHist();
+  toast(`登入成功！`);
+}
+
+/* ============ NAV ============ */
+function navTo(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(x=>x.classList.remove('on'));
+  document.getElementById('page-'+p).classList.add('on');
+  document.getElementById('nav-'+p).classList.add('on');
+  if(p==='exam'){ renderExamHome(); renderExamHist(); }
+  if(p==='stats') renderStats();
+}
+
+/* ============ BUILD SELECTS ============ */
+function buildSelects(){
+  const opts = '<option value="all">全部章節</option>' + CHS.map(c=>`<option value="${c.id}">${c.icon} 第${c.id}章 ${c.name}</option>`).join('');
+  const el = document.getElementById('exam-ch');
+  if(el) el.innerHTML = opts;
+}
+
+/* ============ EXAM 首頁頂部統計 ============ */
+function renderExamHome(){
+  document.getElementById('hs-exam').textContent = G.exams.length;
+  if(G.exams.length){
+    const best = Math.max(...G.exams.map(e=>e.score));
+    const avg = Math.round(G.exams.reduce((s,e)=>s+e.score,0) / G.exams.length);
+    document.getElementById('hs-best').textContent = best;
+    document.getElementById('hs-avg').textContent = avg;
+  } else {
+    document.getElementById('hs-best').textContent = '—';
+    document.getElementById('hs-avg').textContent = '—';
   }
 }
 
-function updateProgress() {
-  const pct = Math.round((answersOpened / totalAnswers) * 100);
-  document.getElementById('progressPct').textContent = pct + '%';
-  document.getElementById('progressFill').style.width = pct + '%';
-}
+/* ============ CODE RENDERING（語法高亮） ============ */
+/* ============ C++ → Python 程式碼轉換器 ============ */
+// 輔助：把缺少 {} 的單敘述本體（for/while/if/else 後跟單一敘述）補上大括號，
+// 讓後續的「大括號→縮排」處理可以一致地進行。
+function addBracesToSingleStatements(code) {
+  let result = '';
+  let i = 0;
+  const N = code.length;
 
-// ─── EXPAND / COLLAPSE ALL ───
-function expandAll() {
-  document.querySelectorAll('.answer-box').forEach(b => {
-    b.classList.add('open');
-    const btn = b.previousElementSibling;
-    btn.classList.add('open');
-    btn.textContent = '🔒 隱藏解答';
-  });
-  document.querySelectorAll('.nav-sub').forEach(s => s.classList.add('open'));
-  document.querySelectorAll('.nav-arrow').forEach(a => a.style.transform = 'rotate(90deg)');
-  answersOpened = totalAnswers;
-  updateProgress();
-}
-
-function collapseAll() {
-  document.querySelectorAll('.answer-box').forEach(b => {
-    b.classList.remove('open');
-    const btn = b.previousElementSibling;
-    btn.classList.remove('open');
-    btn.textContent = '🔓 顯示解答';
-  });
-  document.querySelectorAll('.nav-sub').forEach(s => s.classList.remove('open'));
-  document.querySelectorAll('.nav-arrow').forEach(a => a.style.transform = '');
-}
-
-// ─── COPY CODE ───
-function copyCode(btn) {
-  const pre = btn.closest('.code-block').querySelector('pre');
-  const text = pre.innerText;
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = '✓ 已複製';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('copied'); }, 1800);
-  });
-}
-
-// ─── SCROLL SPY ───
-const allChapters = document.querySelectorAll('.chapter');
-const navBtns = navTree.querySelectorAll('.nav-chapter-btn');
-
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const id = entry.target.id;
-      navBtns.forEach(b => b.classList.remove('active'));
-      const idx = chapters.findIndex(c => c.id === id);
-      if (idx !== -1) navBtns[idx].classList.add('active');
+  function skipParenGroup(p) {
+    if (code[p] !== '(') return p;
+    let depth = 0;
+    while (p < N) {
+      if (code[p] === '(') depth++;
+      else if (code[p] === ')') { depth--; if (depth === 0) return p + 1; }
+      p++;
     }
+    return p;
+  }
+  function findStmtEnd(p) {
+    let depth = 0, inStr = false;
+    while (p < N) {
+      const ch = code[p];
+      if (inStr) { if (ch === '"' && code[p-1] !== '\\') inStr = false; }
+      else if (ch === '"') inStr = true;
+      else if (ch === '(' || ch === '[' || ch === '{') depth++;
+      else if (ch === ')' || ch === ']' || ch === '}') depth--;
+      else if (ch === ';' && depth === 0) return p + 1;
+      p++;
+    }
+    return p;
+  }
+
+  while (i < N) {
+    const rest = code.substring(i);
+    let kw = null, kwLen = 0;
+    if (/^for\b/.test(rest))                { kw = 'for';     kwLen = 3; }
+    else if (/^if\b/.test(rest))            { kw = 'if';      kwLen = 2; }
+    else if (/^else\s+if\b/.test(rest))     { kw = 'elseif';  kwLen = rest.match(/^else\s+if/)[0].length; }
+    else if (/^else\b/.test(rest))          { kw = 'else';    kwLen = 4; }
+    else if (/^while\b/.test(rest))         {
+      // do-while 的尾部 `}while(...)` 不視為新迴圈
+      const m = result.match(/}\s*$/);
+      if (m) { result += code[i]; i++; continue; }
+      kw = 'while'; kwLen = 5;
+    }
+
+    if (!kw)                                       { result += code[i]; i++; continue; }
+    // 詞邊界（避免 myfor 之類）
+    if (i > 0 && /\w/.test(code[i-1]))             { result += code[i]; i++; continue; }
+
+    result += code.substring(i, i + kwLen);
+    i += kwLen;
+    // 跳過空白
+    while (i < N && /\s/.test(code[i])) { result += code[i]; i++; }
+    // 跳過括號（else 沒有）
+    if (kw !== 'else') {
+      if (code[i] !== '(') continue;
+      const pe = skipParenGroup(i);
+      result += code.substring(i, pe);
+      i = pe;
+    }
+    // 找本體前的空白
+    let wsStart = i;
+    while (i < N && /\s/.test(code[i])) i++;
+
+    if (code[i] === '{') {
+      result += code.substring(wsStart, i + 1);
+      i++;
+    } else {
+      // 沒有 {} → 補上
+      result += code.substring(wsStart, i);
+      result += '{';
+      const stmtEnd = findStmtEnd(i);
+      // 遞迴處理本體（可能又是控制結構）
+      result += addBracesToSingleStatements(code.substring(i, stmtEnd));
+      result += '}';
+      i = stmtEnd;
+    }
+  }
+  return result;
+}
+
+function toPython(c){
+  if(!c) return '';
+  let py = c;
+
+  // 0) 註解 // → #
+  py = py.replace(/\/\/(.*)$/gm, '#$1');
+
+  // 0.5) 暫存 do-while 模式（避免 addBraces 把 `}while(...)` 誤判）
+  const dwStash = {};
+  let dwId = 0;
+  py = py.replace(/do\s*\{([\s\S]*?)\}\s*while\s*\(([^)]+)\)\s*;?/g, (_, body, cond) => {
+    const k = `__DW${dwId++}__`;
+    dwStash[k] = { body, cond };
+    return k;
   });
-}, { rootMargin: '-20% 0px -60% 0px' });
 
-allChapters.forEach(c => observer.observe(c));
+  // 1) 給單敘述本體補上大括號（讓後續 indent 處理一致）
+  py = addBracesToSingleStatements(py);
 
-// ─── SCROLL TOP BUTTON ───
-const scrollTopBtn = document.getElementById('scrollTop');
-window.addEventListener('scroll', () => {
-  scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
-});
+  // 2) 二維陣列
+  py = py.replace(/\b(?:int|char|double|float)\s+(\w+)\s*\[\d+\]\s*\[\d+\]\s*=\s*\{\{([\s\S]*?)\}\}\s*;?/g, (_, name, body) => {
+    const rows = body.split(/\}\s*,\s*\{/).map(r => '[' + r.replace(/[{}]/g, '').trim() + ']');
+    return `${name} = [${rows.join(', ')}]`;
+  });
 
-// ─── SEARCH ───
-const searchInput = document.getElementById('searchInput');
-searchInput.addEventListener('input', () => {
-  const q = searchInput.value.trim().toLowerCase();
-  if (!q) {
-    document.querySelectorAll('.highlight').forEach(el => {
-      el.outerHTML = el.innerHTML;
-    });
+  // 3) 一維陣列
+  py = py.replace(/\b(?:int|char|double|float)\s+(\w+)\s*\[\d*\]\s*=\s*\{([^}]*)\}\s*;?/g, (_, name, body) => `${name} = [${body.trim()}]`);
+
+  // 4) 字串宣告
+  py = py.replace(/\bchar\s+(\w+)\s*\[\d*\]\s*=\s*("([^"]*)")\s*;?/g, '$1 = $2');
+
+  // 5) 函式定義
+  py = py.replace(/\b(?:int|void|double|float|char|long|short)\s+(\w+)\s*\(([^)]*)\)\s*\{/g, (_, name, params) => {
+    const args = params.split(',').map(p => {
+      const m = p.trim().match(/(?:int|char|double|float|void|long|short)?\s*\*?\s*&?\s*(\w+)/);
+      return m ? m[1] : p.trim();
+    }).filter(Boolean).join(', ');
+    return `def ${name}(${args}):{`;
+  });
+
+  // 6) 變數宣告
+  py = py.replace(/\b(?:int|double|float|long|short|unsigned)\s+([^;{}]+);/g, (m, body) => {
+    const parts = [];
+    let depth = 0, cur = '';
+    for (const ch of body) {
+      if (ch === '(' || ch === '[') depth++;
+      else if (ch === ')' || ch === ']') depth--;
+      else if (ch === ',' && depth === 0) { parts.push(cur.trim()); cur = ''; continue; }
+      cur += ch;
+    }
+    if (cur.trim()) parts.push(cur.trim());
+    return parts.map(p => p.includes('=') ? p : p + ' = 0').join('; ') + ';';
+  });
+
+  // 7) for 迴圈：<= 必須先匹配，再 <（用 (?!=) 避免吃到 <=）
+  py = py.replace(/for\s*\(\s*(\w+)\s*=\s*([^;]+?)\s*;\s*\1\s*<=\s*([^;]+?)\s*;\s*\1\s*\+\+\s*\)/g, 'for $1 in range($2, ($3)+1):');
+  py = py.replace(/for\s*\(\s*(\w+)\s*=\s*([^;]+?)\s*;\s*\1\s*<=\s*([^;]+?)\s*;\s*\1\s*\+=\s*([^)]+)\)/g, 'for $1 in range($2, ($3)+1, $4):');
+  py = py.replace(/for\s*\(\s*(\w+)\s*=\s*([^;]+?)\s*;\s*\1\s*<(?!=)\s*([^;]+?)\s*;\s*\1\s*\+\+\s*\)/g, 'for $1 in range($2, $3):');
+  py = py.replace(/for\s*\(\s*(\w+)\s*=\s*([^;]+?)\s*;\s*\1\s*<(?!=)\s*([^;]+?)\s*;\s*\1\s*\+=\s*([^)]+)\)/g, 'for $1 in range($2, $3, $4):');
+  py = py.replace(/for\s*\(\s*(\w+)\s*=\s*([^;]+?)\s*;\s*\1\s*>=\s*([^;]+?)\s*;\s*\1--\s*\)/g, 'for $1 in range($2, ($3)-1, -1):');
+  py = py.replace(/for\s*\(\s*(\w+)\s*=\s*([^;]+?)\s*;\s*\1\s*>(?!=)\s*([^;]+?)\s*;\s*\1--\s*\)/g, 'for $1 in range($2, $3, -1):');
+  py = py.replace(/for\s*\(\s*(\w+)\s*=\s*([^;]+?)\s*;\s*\1\s*>(?!=)\s*([^;]+?)\s*;\s*\1\s*-=\s*([^)]+)\)/g, 'for $1 in range($2, $3, -($4)):');
+
+  // 8) while / if / else
+  py = py.replace(/while\s*\(([^)]+)\)/g, 'while $1:');
+  py = py.replace(/\}\s*else\s+if\s*\(([^)]+)\)/g, '} elif $1:');
+  py = py.replace(/else\s+if\s*\(([^)]+)\)/g, 'elif $1:');
+  py = py.replace(/if\s*\(([^)]+)\)/g, 'if $1:');
+  py = py.replace(/\}\s*else\s*\{/g, '} else:{');
+  py = py.replace(/\belse\s*\{/g, 'else:{');
+
+  // 9) 邏輯運算子
+  py = py.replace(/!=/g, '<<NEQ>>');
+  py = py.replace(/&&/g, ' and ');
+  py = py.replace(/\|\|/g, ' or ');
+  py = py.replace(/!\s*(\w|\()/g, 'not $1');
+  py = py.replace(/<<NEQ>>/g, '!=');
+
+  // 10) ++ / --
+  py = py.replace(/(\w+)\+\+/g, '$1 += 1');
+  py = py.replace(/\+\+(\w+)/g, '$1 += 1');
+  py = py.replace(/(\w+)--/g, '$1 -= 1');
+  py = py.replace(/--(\w+)/g, '$1 -= 1');
+
+  // 11) 整數除法 /= → //=
+  py = py.replace(/\/=/g, '//=');
+
+  // 11.5) 型別轉換 (int)x → int(x), (double)x → float(x)
+  py = py.replace(/\(int\)\s*(\w+|\([^)]*\))/g, 'int($1)');
+  py = py.replace(/\(double\)\s*(\w+|\([^)]*\))/g, 'float($1)');
+  py = py.replace(/\(float\)\s*(\w+|\([^)]*\))/g, 'float($1)');
+
+  // 12) strlen → len
+  py = py.replace(/\bstrlen\s*\(/g, 'len(');
+
+  // 13) printf → print（支援巢狀括號如 f(5)）
+  py = py.replace(/printf\s*\(\s*"([^"]*)"\s*\)\s*;?/g, (_, fmt) => `print("${fmt.replace(/\\n$/,'')}")`);
+  py = py.replace(/printf\s*\(\s*"([^"]*)"\s*,\s*((?:[^()]|\([^()]*\))+?)\s*\)\s*;?/g, (_, fmt, args) => {
+    // 以頂層逗號分割 args
+    const tokens = [];
+    let depth = 0, cur = '';
+    for (const ch of args) {
+      if (ch === '(' || ch === '[') depth++;
+      else if (ch === ')' || ch === ']') depth--;
+      else if (ch === ',' && depth === 0) { tokens.push(cur.trim()); cur = ''; continue; }
+      cur += ch;
+    }
+    if (cur.trim()) tokens.push(cur.trim());
+    let idx = 0;
+    const newFmt = fmt.replace(/\\n$/,'').replace(/%[+\-]?\d*\.?\d*[dfcs]/g, () => '{' + (tokens[idx++] || '') + '}');
+    return `print(f"${newFmt}")`;
+  });
+
+  // 14) return / break / continue
+  py = py.replace(/return\s+([^;]+?);/g, 'return $1');
+  py = py.replace(/return\s*;/g, 'return');
+  py = py.replace(/\bbreak\b\s*;/g, 'break');
+  py = py.replace(/\bcontinue\b\s*;/g, 'continue');
+
+  // 15) 分號 → 換行
+  py = py.replace(/;+/g, '\n');
+
+  // 16) 保護字串內容（避免 f-string 內的 {} 被 indent 處理切斷）
+  const strStash = {};
+  let strId = 0;
+  py = py.replace(/((?:\bf)?"[^"]*")/g, (m) => {
+    const k = `__STR${strId++}__`;
+    strStash[k] = m;
+    return k;
+  });
+
+  // 17) 大括號 → 縮排
+  const lines = [];
+  let indent = 0;
+  for (let raw of py.split('\n')) {
+    let line = raw.trim();
+    if (!line) continue;
+    let seg = '';
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '{') {
+        if (seg.trim()) lines.push('    '.repeat(indent) + seg.trim());
+        indent++; seg = '';
+      } else if (ch === '}') {
+        if (seg.trim()) lines.push('    '.repeat(indent) + seg.trim());
+        indent = Math.max(0, indent - 1); seg = '';
+      } else seg += ch;
+    }
+    if (seg.trim()) lines.push('    '.repeat(indent) + seg.trim());
+  }
+  let final = lines.filter(l => l.trim()).join('\n');
+
+  // 17.5) 若某個 `:` 結尾的行下方沒有任何縮排內容（空 body），補一個 pass
+  const ll = final.split('\n');
+  const out2 = [];
+  for (let i = 0; i < ll.length; i++) {
+    out2.push(ll[i]);
+    if (/:\s*$/.test(ll[i])) {
+      const curIndent = (ll[i].match(/^ */) || [''])[0].length;
+      const next = ll[i+1];
+      const nextIndent = next ? (next.match(/^ */) || [''])[0].length : -1;
+      if (!next || nextIndent <= curIndent) {
+        out2.push(' '.repeat(curIndent + 4) + 'pass');
+      }
+    }
+  }
+  final = out2.join('\n');
+
+  // 18) 還原字串
+  for (const k in strStash) final = final.split(k).join(strStash[k]);
+
+  // 19) 還原 do-while
+  for (const k in dwStash) {
+    const { body, cond } = dwStash[k];
+    const bodyPy = toPython(body);
+    const indented = bodyPy.split('\n').map(l => '    ' + l).join('\n');
+    const dwPy = `while True:\n${indented}\n    if not (${cond}): break`;
+    final = final.split(k).join(dwPy);
+  }
+
+  return final;
+}
+
+/* ============ CODE RENDERING（語法高亮，支援 C++/Python） ============ */
+function renderCode(code, lang){
+  if(!code) return '';
+  lang = lang || 'cpp';
+  let src = code;
+  if(lang === 'python') src = toPython(code);
+
+  const KW_CPP = ['int','char','double','float','void','bool','if','else','for','while','do','switch','case','default','break','continue','return','static','struct','typedef','const','sizeof','printf','scanf','main','include','using','namespace','std','cout','cin','endl','class','public','private','new','delete','true','false'];
+  const KW_PY  = ['def','return','if','elif','else','for','while','in','range','print','len','True','False','None','and','or','not','break','continue','pass','class','import','from','as','with','try','except','finally','raise','lambda','global','nonlocal','yield','is'];
+  const KW = lang === 'python' ? KW_PY : KW_CPP;
+
+  let h = src.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // 註解（Python 用 #，C++ 用 //）
+  if(lang === 'python'){
+    h = h.replace(/(#[^\n]*)/g, '<span class="cm">$1</span>');
+  } else {
+    h = h.replace(/(\/\/[^\n]*)/g, '<span class="cm">$1</span>');
+  }
+  // 字串（雙引號，含 f"..."）
+  h = h.replace(/((?:\bf)?"[^"]*")/g, '<span class="st">$1</span>');
+  // 關鍵字
+  h = h.replace(new RegExp('\\b(' + KW.join('|') + ')\\b','g'), '<span class="kw">$1</span>');
+  // 數字
+  h = h.replace(/\b(\d+)\b/g, '<span class="nm">$1</span>');
+
+  const langLabel = lang === 'python' ? '🐍 Python' : '⚙️ C++';
+  return `<div class="code-wrap"><div class="code-header"><span class="code-dots"><span class="r"></span><span class="y"></span><span class="g"></span></span><span class="code-lang">${langLabel}</span></div><pre class="code-block">${h}</pre></div>`;
+}
+
+/* ============ Q RENDER ============ */
+window._qmap = {};
+function renderQuestion(q, opts){
+  opts = opts || {};
+  window._qmap[q.id] = q;
+  const sel = opts.userAns;
+  const showAns = opts.showAns;
+  const num = opts.num || '';
+  const chT = `<span class="ch-tag" style="background:#fef3c7;color:#92400e">第 ${q.ch} 章</span>`;
+  let html = `<div class="qcard" id="qc-${q.id}">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+      <div>${num?`<strong>${num}.</strong> `:''}${chT}</div>
+    </div>
+    <div class="qtxt">${q.q}</div>
+    ${renderCode(q.code, q.lang || 'cpp')}
+    <div class="opts">`;
+  q.opts.forEach((o,i)=>{
+    let cls = 'opt';
+    if(showAns){
+      if(i===q.a) cls += ' correct';
+      else if(sel===i) cls += ' wrong';
+    } else if(sel===i){
+      cls += ' selected';
+    }
+    html += `<div class="${cls}" onclick="${opts.onclick?opts.onclick.replace('IDX',i):''}">
+      <span class="lt" style="font-weight:700;margin-right:8px">${String.fromCharCode(65+i)}:</span><span>${o}</span></div>`;
+  });
+  html += '</div>';
+  if(showAns){
+    const detailed = q.detailedExp || q.exp;
+    const safe = String(detailed).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const styled = safe
+      .replace(/^🎯 核心觀念$/m, '<div class="exp-sec exp-sec-blue">🎯 核心觀念</div>')
+      .replace(/^📝 詳細解題步驟$/m, '<div class="exp-sec exp-sec-green">📝 詳細解題步驟</div>')
+      .replace(/^🔑 關鍵技巧$/m, '<div class="exp-sec exp-sec-amber">🔑 關鍵技巧</div>')
+      .replace(/^⚠️ 常見陷阱$/m, '<div class="exp-sec exp-sec-red">⚠️ 常見陷阱</div>')
+      .replace(/^❌ 錯誤選項分析$/m, '<div class="exp-sec exp-sec-pink">❌ 錯誤選項分析</div>')
+      .replace(/^🚀 延伸知識$/m, '<div class="exp-sec exp-sec-purple">🚀 延伸知識</div>');
+    html += `<div class="exp-box">${styled.replace(/\n/g,'<br>')}</div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+/* ============ EXAM ============ */
+function startExam(){
+  let ch = document.getElementById('exam-ch').value;
+  const cnt = parseInt(document.getElementById('exam-cnt').value);
+  // Python 模式選了 Ch6 → 切回全部章節（指標題在 Python 不適用）
+  if(G.lang === 'python' && ch === '6'){
+    toast('Python 模式不含指標題，已自動切為全部章節');
+    ch = 'all';
+    document.getElementById('exam-ch').value = 'all';
+  }
+  const pool = generateDerived(cnt*3, ch==='all'?null:parseInt(ch), G.lang);
+  if(pool.length<cnt){ toast('題庫不足，請選擇其他章節'); return; }
+  G.examState = {
+    qs: shuf(pool).slice(0,cnt),
+    ans: new Array(cnt).fill(-1),
+    idx: 0,
+    lang: G.lang,
+    startTs: Date.now(),
+    limit: 90*60*1000
+  };
+  document.getElementById('exam-intro').classList.add('hidden');
+  document.getElementById('exam-run').classList.remove('hidden');
+  document.getElementById('exam-result').classList.add('hidden');
+  document.getElementById('exam-prog-txt').textContent = `0/${cnt}`;
+  startTimer();
+  renderExamQ();
+  renderQPalette();
+}
+function renderExamQ(){
+  const s = G.examState, q = s.qs[s.idx];
+  document.getElementById('exam-qn-lbl').textContent = `第 ${s.idx+1} 題 / 共 ${s.qs.length} 題`;
+  document.getElementById('exam-qwrap').innerHTML = renderQuestion(q, {num:s.idx+1, userAns:s.ans[s.idx], onclick:`examPick(IDX)`});
+  document.getElementById('eprev').disabled = s.idx===0;
+  document.getElementById('enext').textContent = s.idx===s.qs.length-1 ? '提交考卷 →' : '下一題 →';
+  const done = s.ans.filter(x=>x>=0).length;
+  document.getElementById('exam-prog-txt').textContent = `${done}/${s.qs.length}`;
+  document.getElementById('exam-pbar').style.width = (done/s.qs.length*100)+'%';
+  renderQPalette();
+}
+function renderQPalette(){
+  const s = G.examState;
+  document.getElementById('q-palette').innerHTML = s.qs.map((q,i)=>{
+    const cls = i===s.idx?'q-pal-btn cur':(s.ans[i]>=0?'q-pal-btn done':'q-pal-btn');
+    return `<div class="${cls}" onclick="jumpExam(${i})">${i+1}</div>`;
+  }).join('');
+}
+function examPick(idx){
+  G.examState.ans[G.examState.idx] = idx;
+  renderExamQ();
+}
+function examNav(d){
+  const s = G.examState;
+  if(d===1 && s.idx===s.qs.length-1){
+    if(confirm('確定提交考卷嗎？')) submitExam();
     return;
   }
-  // Simple highlight on paragraphs
-  document.querySelectorAll('p, h3, h4, td, .practice-q').forEach(el => {
-    if (!el.querySelector('.code-block')) {
-      el.innerHTML = el.textContent.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi'),
-        m => `<mark class="highlight">${m}</mark>`);
-    }
+  s.idx = Math.max(0, Math.min(s.qs.length-1, s.idx+d));
+  renderExamQ();
+}
+function jumpExam(i){ G.examState.idx=i; renderExamQ(); }
+let _timerInt=null;
+function startTimer(){
+  clearInterval(_timerInt);
+  _timerInt = setInterval(()=>{
+    const s = G.examState; if(!s) return;
+    const left = s.limit - (Date.now()-s.startTs);
+    if(left<=0){ clearInterval(_timerInt); toast('時間到，自動交卷'); submitExam(); return; }
+    const m = Math.floor(left/60000), sec = Math.floor((left%60000)/1000);
+    document.getElementById('timer').textContent = `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  }, 500);
+}
+function submitExam(){
+  clearInterval(_timerInt);
+  const s = G.examState;
+  let ok=0, chStat={};
+  s.qs.forEach((q,i)=>{
+    const right = s.ans[i]===q.a;
+    if(right) ok++;
+    chStat[q.ch] = chStat[q.ch]||{ok:0,tot:0};
+    chStat[q.ch].tot++;
+    if(right) chStat[q.ch].ok++;
   });
-});
-
-// ─── ANIMATE CHAPTERS ON SCROLL ───
-const chapterObserver = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) e.target.classList.add('visible');
+  const score = Math.round(ok/s.qs.length*100);
+  const rec = {ts:Date.now(), n:s.qs.length, ok, score, chStat, qs:s.qs, ans:s.ans, lang:s.lang||'cpp'};
+  G.exams.unshift(rec);
+  if(G.exams.length>20) G.exams = G.exams.slice(0,20);
+  save();
+  G.examState.result = rec;
+  renderExamResult(rec);
+}
+function renderExamResult(rec){
+  document.getElementById('exam-run').classList.add('hidden');
+  const r = document.getElementById('exam-result');
+  r.classList.remove('hidden');
+  let chBars = '';
+  Object.keys(rec.chStat).sort().forEach(ch=>{
+    const s = rec.chStat[ch];
+    const pct = Math.round(s.ok/s.tot*100);
+    const c = CHS.find(x=>x.id==ch);
+    chBars += `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>${c?c.icon:''} Ch${ch} ${c?c.name:''}</span><span><strong>${s.ok}/${s.tot}</strong> (${pct}%)</span></div><div class="pbar"><div class="pbar-fill" style="width:${pct}%;background:${pct>=80?'var(--green)':pct>=60?'var(--orange)':'var(--red)'}"></div></div></div>`;
   });
-}, { threshold: 0.05 });
+  let qList = '';
+  rec.qs.forEach((q,i)=>{
+    const right = rec.ans[i]===q.a;
+    qList += `<div class="qe-item ${right?'ok':'no'}">
+      <div class="qe-h" onclick="toggleQEI(${i})">
+        <div><strong>第 ${i+1} 題</strong> <span class="ch-tag" style="background:#fef3c7;color:#92400e">Ch${q.ch}</span> ${right?'<span style="color:var(--green);font-weight:700">✓ 答對</span>':'<span style="color:var(--red);font-weight:700">✗ 答錯</span>'}</div>
+        <div style="font-size:11px;color:var(--dim)">點擊展開 ▼</div>
+      </div>
+      <div class="qe-b hidden" id="qei-${i}">${renderQuestion(q, {userAns:rec.ans[i], showAns:true})}</div>
+    </div>`;
+  });
+  r.innerHTML = `<div class="result-hero">
+    <div class="score-c"><div class="score-n">${rec.score}</div><div class="score-l">分</div></div>
+    <div style="font-size:18px;font-weight:800;margin-bottom:6px">${rec.ok} / ${rec.n} 題答對</div>
+    <div style="font-size:13px;color:var(--dim)">${rec.score>=80?'🏆 優秀！繼續保持':rec.score>=60?'💪 通過！還有進步空間':'📚 加油！多多練習'}</div>
+  </div>
+  <div class="card" style="margin-bottom:16px"><div class="stitle" style="margin-bottom:14px">📊 各章節表現</div>${chBars}</div>
+  <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-size:16px;font-weight:800;color:#065f46">📋 完整解析報告已就緒</div>
+        <div style="font-size:12px;color:#047857;margin-top:2px">所有題目皆已附超詳細解析（含核心觀念、解題步驟、常見陷阱、錯誤選項分析）</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-green btn-sm" onclick="downloadWordReport()">📥 下載 Word 詳解</button>
+        <button class="btn btn-outline btn-sm" onclick="backToExamIntro()">🔄 重新考試</button>
+      </div>
+    </div>
+  </div>
+  <div class="card"><div class="stitle" style="margin-bottom:14px">📝 全部題目詳解</div>${qList}</div>`;
+}
+function toggleQEI(i){ document.getElementById('qei-'+i).classList.toggle('hidden'); }
+function backToExamIntro(){
+  document.getElementById('exam-result').classList.add('hidden');
+  document.getElementById('exam-intro').classList.remove('hidden');
+  renderExamHist();
+  renderExamHome();
+}
+function renderExamHist(){
+  // 已移除「近期考試紀錄」區塊；考試紀錄改至「📊 成績」分頁查看
+  const wrap = document.getElementById('exam-hist');
+  if(wrap) wrap.innerHTML = '';
+}
 
-allChapters.forEach(c => chapterObserver.observe(c));
+/* ============ Word 下載 ============ */
+function downloadWordReport(){
+  const rec = G.examState.result;
+  const d = new Date(rec.ts);
+  const ds = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  let chStatHtml = '<table border="1" cellpadding="6" style="border-collapse:collapse;width:100%"><tr style="background:#1d5c3a;color:white"><th>章節</th><th>題數</th><th>答對</th><th>正確率</th></tr>';
+  Object.keys(rec.chStat).sort().forEach(ch=>{
+    const s = rec.chStat[ch];
+    const c = CHS.find(x=>x.id==ch);
+    chStatHtml += `<tr><td>第${ch}章 ${c?c.name:''}</td><td align="center">${s.tot}</td><td align="center">${s.ok}</td><td align="center">${Math.round(s.ok/s.tot*100)}%</td></tr>`;
+  });
+  chStatHtml += '</table>';
 
-// ─── KEYBOARD SHORTCUT ───
-document.addEventListener('keydown', e => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-    e.preventDefault();
-    searchInput.focus();
+  // 把超詳解轉為 Word 美化版
+  function fmtDetailed(text){
+    if(!text) return '';
+    const sectStyles = {
+      '🎯 核心觀念': 'background:#eff6ff;color:#1e40af;border-left:4px solid #3b82f6',
+      '📝 詳細解題步驟': 'background:#ecfdf5;color:#065f46;border-left:4px solid #10b981',
+      '🔑 關鍵技巧': 'background:#fffbeb;color:#92400e;border-left:4px solid #f59e0b',
+      '⚠️ 常見陷阱': 'background:#fef2f2;color:#991b1b;border-left:4px solid #ef4444',
+      '❌ 錯誤選項分析': 'background:#fdf2f8;color:#9d174d;border-left:4px solid #ec4899',
+      '🚀 延伸知識': 'background:#f5f3ff;color:#5b21b6;border-left:4px solid #8b5cf6'
+    };
+    let safe = String(text).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    Object.entries(sectStyles).forEach(([k,v])=>{
+      const re = new RegExp('^'+k.replace(/([.*+?^=!:${}()|\[\]\/\\])/g,'\\$1')+'$','m');
+      safe = safe.replace(re, `</p><p style="margin:14px 0 6px;padding:8px 12px;font-weight:bold;font-size:14px;${v};border-radius:6px">${k}</p><p style="margin:0;padding:4px 10px;font-size:13px;line-height:1.85;white-space:pre-wrap">`);
+    });
+    return '<p style="margin:0;padding:4px 10px;font-size:13px;line-height:1.85;white-space:pre-wrap">' + safe + '</p>';
   }
-});
+
+  let qHtml = '';
+  rec.qs.forEach((q,i)=>{
+    const right = rec.ans[i]===q.a;
+    let optHtml = '';
+    q.opts.forEach((o,j)=>{
+      let style = 'padding:7px 12px;margin:4px 0;border:1px solid #ddd;border-radius:5px';
+      let prefix = '';
+      if(j===q.a){ style += ';background:#d1fae5;border-color:#10b981;font-weight:bold'; prefix='✓ '; }
+      if(rec.ans[i]===j && j!==q.a){ style += ';background:#fee2e2;border-color:#ef4444'; prefix='✗ '; }
+      optHtml += `<div style="${style}">${prefix}<strong>${String.fromCharCode(65+j)}:</strong> ${o}</div>`;
+    });
+    qHtml += `<div style="margin-bottom:28px;padding:16px;border-left:5px solid ${right?'#10b981':'#ef4444'};background:#fafbfc;border-radius:6px;page-break-inside:avoid">
+      <div style="font-size:13px;color:#6b7280;margin-bottom:8px">第 ${i+1} 題　第 ${q.ch} 章　${right?'<span style="color:#10b981;font-weight:bold">✓ 答對</span>':'<span style="color:#ef4444;font-weight:bold">✗ 答錯</span>'}<br>學生作答：${rec.ans[i]<0?'未作答':String.fromCharCode(65+rec.ans[i])+': '+q.opts[rec.ans[i]]}　正確答案：${String.fromCharCode(65+q.a)}: ${q.opts[q.a]}</div>
+      <div style="font-size:16px;font-weight:bold;margin-bottom:10px;color:#1f2937">${q.q.replace(/<[^>]+>/g,'')}</div>
+      ${q.code?(()=>{
+        const src = (q.lang==='python') ? toPython(q.code) : q.code;
+        const langTag = q.lang==='python' ? '🐍 Python' : '⚙️ C++';
+        return `<div style="margin:10px 0;border-radius:8px;overflow:hidden;border:1px solid #30363d"><div style="background:#161b22;color:#c9d1d9;padding:6px 12px;font-size:11px;font-family:Consolas,monospace;text-align:right">${langTag}</div><pre style="background:#0d1117;color:#c9d1d9;padding:14px;margin:0;font-family:'Consolas','Courier New',monospace;font-size:13px;white-space:pre;overflow-x:auto;line-height:1.6;tab-size:4">${src.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre></div>`;
+      })():''}
+      ${optHtml}
+      <div style="margin-top:14px;padding:14px;background:#fff;border:1px solid #e5e7eb;border-radius:8px">
+        <div style="font-weight:bold;font-size:14px;color:#1f2937;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #e5e7eb">📋 完整詳細解析</div>
+        ${fmtDetailed(q.detailedExp || q.exp)}
+      </div>
+    </div>`;
+  });
+
+  const examLangLabel = rec.lang === 'python' ? '🐍 Python' : '⚙️ C++';
+  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>高中生程式檢定模擬詳解報告</title></head><body style="font-family:'Microsoft JhengHei','Microsoft YaHei',sans-serif;padding:28px;line-height:1.6;color:#1f2937">
+    <h1 style="text-align:center;color:#1d5c3a;font-size:26px;margin-bottom:6px">高中生程式檢定模擬詳解報告</h1>
+    <div style="text-align:center;color:#6b7280;margin-bottom:24px;font-size:13px">考生：${G.user}　|　考試時間：${ds}　|　共 ${rec.n} 題　|　語言：${examLangLabel}</div>
+    <div style="text-align:center;padding:28px;background:linear-gradient(135deg,#1d5c3a,#2d8a5a);color:white;border-radius:14px;margin-bottom:28px">
+      <div style="font-size:56px;font-weight:bold;line-height:1">${rec.score}</div>
+      <div style="font-size:14px;margin-top:4px;opacity:.9">分</div>
+      <div style="font-size:18px;margin-top:10px">${rec.ok} / ${rec.n} 題答對</div>
+    </div>
+    <h2 style="color:#1f2937;border-bottom:2px solid #e5e7eb;padding-bottom:6px;font-size:18px">📊 章節表現</h2>
+    ${chStatHtml}
+    <h2 style="color:#1f2937;border-bottom:2px solid #e5e7eb;padding-bottom:6px;margin-top:30px;font-size:18px">📝 全部題目超詳細解析</h2>
+    <div style="font-size:12px;color:#6b7280;margin-bottom:16px">每題包含：🎯 核心觀念　📝 解題步驟　🔑 關鍵技巧　⚠️ 常見陷阱　❌ 錯誤選項分析　🚀 延伸知識</div>
+    ${qHtml}
+    <div style="text-align:center;color:#9ca3af;font-size:11px;margin-top:30px;border-top:1px solid #e5e7eb;padding-top:14px;line-height:1.7">
+      <div style="margin-bottom:4px">高中生程式檢定模擬　|　完整離線詳解</div>
+      <div>⚠️ 本報告為非官方學習工具產出，所有題目皆為程式生成的衍生題目，僅供自學參考。</div>
+    </div>
+  </body></html>`;
+  const blob = new Blob(['\ufeff'+html], {type:'application/msword'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const fileLang = rec.lang === 'python' ? 'Python' : 'Cpp';
+  a.download = `程式檢定模擬_${fileLang}_${G.user}_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.doc`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Word 報告已下載！');
+}
+
+/* ============ STATS ============ */
+function renderStats(){
+  const n = G.exams.length;
+  if(!n){
+    document.getElementById('stat-grid').innerHTML = `
+      <div class="stat-c"><div class="v" style="color:var(--blue)">0</div><div class="l">已完成模擬考</div></div>
+      <div class="stat-c"><div class="v" style="color:var(--green)">—</div><div class="l">最佳成績</div></div>
+      <div class="stat-c"><div class="v" style="color:var(--orange)">—</div><div class="l">平均成績</div></div>
+      <div class="stat-c"><div class="v" style="color:var(--violet)">—</div><div class="l">最近成績</div></div>`;
+    document.getElementById('ch-bars').innerHTML = '<div class="empty" style="padding:20px">尚無資料，先完成一次模擬考試！</div>';
+    document.getElementById('exam-hist-stats').innerHTML = '<div class="empty" style="padding:20px">尚無考試紀錄</div>';
+    return;
+  }
+  const scores = G.exams.map(e=>e.score);
+  const best = Math.max(...scores);
+  const avg = Math.round(scores.reduce((s,x)=>s+x,0) / n);
+  const latest = G.exams[0].score; // 最新一筆（G.exams 用 unshift 加入）
+  document.getElementById('stat-grid').innerHTML = `
+    <div class="stat-c"><div class="v" style="color:var(--blue)">${n}</div><div class="l">已完成模擬考</div></div>
+    <div class="stat-c"><div class="v" style="color:var(--green)">${best}</div><div class="l">最佳成績</div></div>
+    <div class="stat-c"><div class="v" style="color:var(--orange)">${avg}</div><div class="l">平均成績</div></div>
+    <div class="stat-c"><div class="v" style="color:var(--violet)">${latest}</div><div class="l">最近成績</div></div>`;
+
+  // 章節累積：跨歷次考試合計各章節答對 / 總數
+  const chAgg = {};
+  G.exams.forEach(e=>{
+    Object.keys(e.chStat||{}).forEach(ch=>{
+      chAgg[ch] = chAgg[ch] || {ok:0, tot:0};
+      chAgg[ch].ok += e.chStat[ch].ok;
+      chAgg[ch].tot += e.chStat[ch].tot;
+    });
+  });
+  let chHtml = '';
+  CHS.forEach(c=>{
+    const s = chAgg[c.id] || {ok:0, tot:0};
+    const pct = s.tot ? Math.round(s.ok / s.tot * 100) : 0;
+    chHtml += `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span>${c.icon} 第${c.id}章 ${c.name}</span><span><strong>${s.ok}/${s.tot}</strong> (${s.tot?pct+'%':'—'})</span></div><div class="pbar"><div class="pbar-fill" style="width:${pct}%;background:${pct>=80?'var(--green)':pct>=60?'var(--orange)':'var(--red)'}"></div></div></div>`;
+  });
+  document.getElementById('ch-bars').innerHTML = chHtml;
+
+  document.getElementById('exam-hist-stats').innerHTML = `<div class="card">` + G.exams.map((e,i)=>{
+    const d = new Date(e.ts);
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:10px;background:var(--bg);margin-bottom:6px"><div><div style="font-weight:700;font-size:14px">${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</div><div style="font-size:11px;color:var(--dim);margin-top:2px">${e.n} 題　答對 ${e.ok} 題</div></div><div style="font-size:24px;font-weight:800;color:${e.score>=80?'var(--green)':e.score>=60?'var(--orange)':'var(--red)'}">${e.score}<span style="font-size:11px;font-weight:600;color:var(--dim);margin-left:2px">分</span></div></div>`;
+  }).join('') + '</div>';
+}
+
+/* ============ TOAST ============ */
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2400);
+}
 </script>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     📊 訪客分析工具（任選其一或多選，把對應的 token/ID 填上即可）
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<!-- ─────────────────────────────────────────────────
+     【推薦】Cloudflare Web Analytics — 免費、不需 cookie、無流量上限
+     設定步驟：
+       1. 註冊 https://www.cloudflare.com/web-analytics/
+       2. 新增 site → 填上你的 GitHub Pages 網址
+       3. 把下面 PASTE_YOUR_CLOUDFLARE_TOKEN_HERE 替換成它給你的 token
+       4. 把這段註解 <!-- 移除（解除註解）
+     ───────────────────────────────────────────────── -->
+<!--
+<script defer src='https://static.cloudflareinsights.com/beacon.min.js'
+        data-cf-beacon='{"token": "PASTE_YOUR_CLOUDFLARE_TOKEN_HERE"}'></script>
+-->
+
+<!-- ─────────────────────────────────────────────────
+     【選用】Google Analytics 4 — 詳細資料、需訪客同意 cookie
+     設定步驟：
+       1. 註冊 https://analytics.google.com/
+       2. 建立資源 → 拿到 Measurement ID (G-XXXXXXXXXX)
+       3. 把下面兩處 G-XXXXXXXXXX 替換成你的 ID
+       4. 解除註解
+     ───────────────────────────────────────────────── -->
+<!--
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+-->
+
+<!-- ─────────────────────────────────────────────────
+     【超簡單】訪客計數徽章 — 顯示在頁尾，無需任何設定
+     直接顯示「累積瀏覽次數」，第一次有人訪問就會自動初始化
+     已預設啟用；不要的話可以把這段刪除
+     ───────────────────────────────────────────────── -->
+<script>
+(function(){
+  // 等 DOM 載入完成
+  function init(){
+    const footer = document.querySelector('footer');
+    if(!footer) return;
+    const counter = document.createElement('div');
+    counter.style.cssText = 'margin-top:10px;font-size:11px;color:#9ca3af';
+    counter.innerHTML = '👀 累積訪客：<img src="https://api.visitorbadge.io/api/visitors?path=hs-prog-test&label=&countColor=%231d5c3a&style=flat" alt="visitors" style="vertical-align:middle;margin-left:4px">';
+    footer.appendChild(counter);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
 </body>
 </html>
