@@ -230,7 +230,6 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
     <div class="logo">⌨️ 高中生程式能力測試</div>
     <div id="nav">
       <button class="ntab on" id="nav-exam" onclick="navTo('exam')">🎯 模擬考</button>
-      <button class="ntab" id="nav-apcs" onclick="navTo('apcs')">📚 APCS 真題</button>
       <button class="ntab" id="nav-stats" onclick="navTo('stats')">📊 成績</button>
     </div>
     <div class="user-wrap"></div>
@@ -315,22 +314,6 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
       <div class="card" style="margin-bottom:16px"><div class="stitle" style="margin-bottom:14px">📚 各章節答題正確率（歷次累積）</div><div id="ch-bars"></div></div>
       <div class="stitle">📜 全部考試紀錄</div>
       <div id="exam-hist-stats"></div>
-    </div>
-
-    <div class="page" id="page-apcs">
-      <div class="card" style="margin-bottom:16px">
-        <div class="stitle">📚 APCS 觀念題真題解析</div>
-        <div style="font-size:13px;color:var(--dim);line-height:1.7;margin-top:8px">
-          整理自網路公開資源的「APCS 大學程式設計先修檢測」歷屆觀念題，共 <strong>50 題</strong> 真題、依 <strong>8 個分類</strong> 整理（其中第 7 章「資料結構」收錄 <strong>19 題</strong>）。<br>
-          <span style="color:var(--green);font-weight:600">本區為學習參考資料，真題不會出現在「模擬考」題庫中</span> —— 模擬考另由 141 個產生器無限產出衍生題目（C++ 與 Python 雙語）。<br>
-          學習策略：先嘗試自己解出，再點開「查看詳解」對照分析。詳解採用 APCS 解題技巧（追蹤程式、找規律、反推法）。
-        </div>
-        <div style="margin-top:10px;padding:10px 12px;background:#fff7ed;border-left:3px solid #f59e0b;border-radius:6px;font-size:12px;color:#92400e;line-height:1.7">
-          <strong>📌 程式語言說明：</strong>APCS 官方觀念題以 C/C++ 語法為主，本區真題完整保留原 C/C++ 語法。模擬考的 <strong>衍生題目</strong> 支援 Python 與 C++ 切換（可在開始考試前選擇）；觀念題中若涉及 C 特有語法（指標、struct、sizeof），Python 模式會自動跳過該題改用其他題目。<br>
-          <strong>難度：</strong>本系統題目對齊 APCS 4-5 級分難度，以「程式碼追蹤、不可能輸出、debug 除錯、視域陷阱」為主要題型。
-        </div>
-      </div>
-      <div id="apcs-content"></div>
     </div>
 
     <footer style="margin-top:40px;padding:20px 16px;border-top:1px solid var(--line);text-align:center;font-size:11px;color:var(--muted);line-height:1.8">
@@ -1619,37 +1602,63 @@ ${ch.extend}`;
 /* ============ 生成衍生題庫 ============ */
 function generateDerived(count, chFilter, lang){
   lang = lang || 'cpp';
-  const out=[], seen=new Set();
-  let attempts=0, maxAttempts=count*40;
-  while(out.length<count && attempts<maxAttempts){
-    attempts++;
-    const gen = GEN[rnd(0, GEN.length-1)];
-    let q;
-    try { q = applyPostFix(gen()); } catch(e){ continue; }
-    if(chFilter && q.ch !== chFilter) continue;
-    if(q.a<0 || q.a>3) continue;
-    // Python 模式跳過 C++ 專屬題（指標、sizeof、傳址、static）
-    if(lang === 'python' && q.cppOnly) continue;
-    // 隨機打亂選項順序（讓同一題型能產生多種選項排列、提升題庫多樣性）
-    if(Array.isArray(q.opts) && q.opts.length===4){
-      const correctText = q.opts[q.a];
-      q.opts = shuf(q.opts);
-      q.a = q.opts.indexOf(correctText);
-    }
-    const fp = q.ch+'|'+q.q+'|'+(q.code||'')+'|'+q.opts.join(',');
-    if(seen.has(fp)) continue;
-    seen.add(fp);
-    const item = {...q, id:'D'+(out.length+1), derived:true, lang};
-    // 題目中「C 程式」改為對應語言
-    if(lang === 'python'){
-      item.q = item.q.replace(/下列\s*C\s*程式/g, '下列 Python 程式').replace(/下列\s*C\+\+\s*程式/g, '下列 Python 程式');
-    } else {
-      item.q = item.q.replace(/下列\s*C\s*程式/g, '下列 C++ 程式');
-    }
-    item.detailedExp = buildDetailedExp(item);
-    out.push(item);
+
+  // 將 generator 依章節分桶（取樣一次取得 ch 資訊；同一個 generator 的 ch 是固定的）
+  const byCh = {};
+  for(const g of GEN){
+    let sample;
+    try { sample = g(); } catch(e){ continue; }
+    if(!sample || typeof sample.ch !== 'number') continue;
+    if(chFilter && sample.ch !== chFilter) continue;
+    if(lang === 'python' && sample.cppOnly) continue;
+    if(!byCh[sample.ch]) byCh[sample.ch] = [];
+    byCh[sample.ch].push(g);
   }
-  return out;
+  const chapters = Object.keys(byCh).map(Number).sort((a,b)=>a-b);
+  if(chapters.length === 0) return [];
+
+  // 每章節平均配額（餘數分給前幾章）
+  const baseShare = Math.floor(count / chapters.length);
+  const remainder = count % chapters.length;
+
+  const out=[], seen=new Set();
+  for(let ci=0; ci<chapters.length; ci++){
+    const ch = chapters[ci];
+    const target = baseShare + (ci < remainder ? 1 : 0);
+    const gens = byCh[ch];
+    let added = 0, attempts = 0;
+    const maxAttempts = Math.max(target * 80, 500);
+    while(added < target && attempts < maxAttempts){
+      attempts++;
+      const gen = gens[rnd(0, gens.length-1)];
+      let q;
+      try { q = applyPostFix(gen()); } catch(e){ continue; }
+      if(q.ch !== ch) continue;
+      if(q.a<0 || q.a>3) continue;
+      if(lang === 'python' && q.cppOnly) continue;
+      // 隨機打亂選項順序（讓同一題型能產生多種選項排列、提升題庫多樣性）
+      if(Array.isArray(q.opts) && q.opts.length===4){
+        const correctText = q.opts[q.a];
+        q.opts = shuf(q.opts);
+        q.a = q.opts.indexOf(correctText);
+      }
+      const fp = q.ch+'|'+q.q+'|'+(q.code||'')+'|'+q.opts.join(',');
+      if(seen.has(fp)) continue;
+      seen.add(fp);
+      const item = {...q, id:'D'+(out.length+1), derived:true, lang};
+      // 題目中「C 程式」改為對應語言
+      if(lang === 'python'){
+        item.q = item.q.replace(/下列\s*C\s*程式/g, '下列 Python 程式').replace(/下列\s*C\+\+\s*程式/g, '下列 Python 程式');
+      } else {
+        item.q = item.q.replace(/下列\s*C\s*程式/g, '下列 C++ 程式');
+      }
+      item.detailedExp = buildDetailedExp(item);
+      out.push(item);
+      added++;
+    }
+  }
+  // 將各章節題目重新打散，避免依章節順序排列
+  return shuf(out);
 }
 
 /* 預生成題庫（首次載入時） */
@@ -2208,7 +2217,6 @@ function navTo(p){
   document.getElementById('nav-'+p).classList.add('on');
   if(p==='exam'){ renderExamHome(); renderExamHist(); }
   if(p==='stats') renderStats();
-  if(p==='apcs') renderApcsReal();
 }
 
 /* ============ BUILD SELECTS ============ */
