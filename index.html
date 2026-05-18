@@ -295,7 +295,7 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
         <div class="exam-bar" id="exam-bar">
           <div style="display:flex;align-items:center;gap:10px"><div>⏱️</div><div class="timer" id="timer">00:00</div></div>
           <div id="exam-prog-txt" style="font-size:13px;color:var(--dim);font-weight:600">0/25</div>
-          <button class="btn btn-red btn-sm" onclick="if(confirm('確定要交卷嗎？'))submitExam()">📝 交卷</button>
+          <button class="btn btn-red btn-sm" onclick="submitExam()">📝 交卷</button>
         </div>
         <div class="pbar" style="margin-bottom:10px"><div class="pbar-fill" id="exam-pbar" style="width:0%;background:var(--green)"></div></div>
         <div class="q-palette" id="q-palette"></div>
@@ -1365,7 +1365,7 @@ function examPick(idx){
 function examNav(d){
   const s = G.examState;
   if(d===1 && s.idx===s.qs.length-1){
-    if(confirm('確定提交考卷嗎？')) submitExam();
+    submitExam();
     return;
   }
   s.idx = Math.max(0, Math.min(s.qs.length-1, s.idx+d));
