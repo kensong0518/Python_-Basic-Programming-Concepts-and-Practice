@@ -230,6 +230,7 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
     <div class="logo">⌨️ 高中生程式能力測試</div>
     <div id="nav">
       <button class="ntab on" id="nav-exam" onclick="navTo('exam')">🎯 模擬考</button>
+      <button class="ntab" id="nav-apcs" onclick="navTo('apcs')">📚 APCS 真題</button>
       <button class="ntab" id="nav-stats" onclick="navTo('stats')">📊 成績</button>
     </div>
     <div class="user-wrap"></div>
@@ -316,6 +317,18 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
       <div id="exam-hist-stats"></div>
     </div>
 
+    <div class="page" id="page-apcs">
+      <div class="card" style="margin-bottom:16px">
+        <div class="stitle">📚 APCS 觀念題真題解析</div>
+        <div style="font-size:13px;color:var(--dim);line-height:1.7;margin-top:8px">
+          整理自網路公開資源的「APCS 大學程式設計先修檢測」歷屆觀念題，共 <strong>32 題</strong> 真題、依 <strong>8 個分類</strong> 整理。<br>
+          <span style="color:var(--green);font-weight:600">本區為學習參考資料，真題不會出現在左邊「模擬考」題庫中。</span><br>
+          學習策略：先嘗試自己解出，再點開「查看詳解」對照分析。詳解採用 APCS 解題技巧（追蹤程式、找規律、反推法）。
+        </div>
+      </div>
+      <div id="apcs-content"></div>
+    </div>
+
     <footer style="margin-top:40px;padding:20px 16px;border-top:1px solid var(--line);text-align:center;font-size:11px;color:var(--muted);line-height:1.8">
       <div style="margin-bottom:6px"><strong>⚠️ 非官方學習工具</strong></div>
       <div>本站為高中生程式能力測試學習輔助工具，與任何官方程式設計能力測試主辦單位均無隸屬或授權關係。</div>
@@ -333,10 +346,10 @@ const CHS = [
   {id:4, name:'陣列字串', icon:'📦', desc:'一維/二維陣列、字串處理'},
   {id:5, name:'函式範疇', icon:'🧩', desc:'函式、傳值/傳址、範疇'},
   {id:6, name:'指標',     icon:'🎯', desc:'指標、位址、解參考'},
-  {id:7, name:'遞迴搜尋', icon:'🌀', desc:'遞迴、搜尋、排序、複雜度'}
+  {id:7, name:'資料結構與演算法', icon:'🧠', desc:'堆疊/佇列/樹/圖、排序、複雜度、DP'}
 ];
 
-/* ============ DERIVED GENERATORS（衍生題產生器，40+ 種） ============ */
+/* ============ DERIVED GENERATORS（衍生題產生器，100+ 種，涵蓋資料結構與演算法）============ */
 const rnd = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const pick = arr => arr[rnd(0,arr.length-1)];
 const shuf = arr => { const r=[...arr]; for(let i=r.length-1;i>0;i--){const j=rnd(0,i);[r[i],r[j]]=[r[j],r[i]];} return r; };
@@ -761,7 +774,731 @@ const GEN = [
       code:`void hanoi(int n, char a, char b, char c){\n  if(n == 0) return;\n  hanoi(n - 1, a, c, b);\n  printf("Move %d: %c -> %c\\n", n, a, c);\n  hanoi(n - 1, b, a, c);\n}`,
       opts:o.opts, a:o.a,
       exp:`遞迴關係 T(n) = 2·T(n-1) + 1，T(0)=0，解得 T(n) = 2^n - 1 = 2^${n} - 1 = ${ans}`};
+  },
+
+  /* ============ Ch2 基礎概念 — 額外加強（中偏難）============ */
+  ()=>{ // 短路求值 + 賦值副作用
+    const c0 = rnd(3,6);
+    const out = `10 ${c0+1} 1`;
+    return {ch:2, q:'下列 C 程式輸出為何？',
+      code:`int a = 3, b = 0, c = ${c0};\nint r = (a > 1) && (b = 10) && (c++);\nprintf("%d %d %d", b, c, r);`,
+      opts:[out, `10 ${c0} 1`, `0 ${c0} 0`, `10 ${c0+1} 0`], a:0,
+      exp:`短路求值由左至右：(a>1) 為真 → 評估 (b=10)（賦值表示式值 10，視為真）→ 評估 (c++)（後置遞增回傳原值 ${c0}，非 0 為真）。最終 b=10、c=${c0+1}、整體邏輯運算結果 r=1`};
+  },
+  ()=>{ // 位元運算 x | (x>>1)
+    const arr = [
+      [0xA5, 0xAF],   // 1010 0101 | 0101 0010 = 1111 0111? Let me recompute
+      [0x3C, 0x3E],
+      [0x18, 0x1C],
+      [0x66, 0x77]
+    ];
+    // Recompute correctly: x | (x>>1)
+    // 0xA5 = 10100101, >>1 = 01010010, OR = 11110111 = 0xF7 = 247
+    // 0x3C = 00111100, >>1 = 00011110, OR = 00111110 = 0x3E = 62
+    // 0x18 = 00011000, >>1 = 00001100, OR = 00011100 = 0x1C = 28
+    // 0x66 = 01100110, >>1 = 00110011, OR = 01110111 = 0x77 = 119
+    const fixed = [
+      [0xA5, 0xF7],
+      [0x3C, 0x3E],
+      [0x18, 0x1C],
+      [0x66, 0x77]
+    ];
+    const p = pick(fixed);
+    const o = mk(p[1], [p[0], p[0]>>1, p[0]&(p[0]>>1)]);
+    return {ch:2, q:`設 <code>unsigned char x = 0x${p[0].toString(16).toUpperCase()}</code>，下列運算式 <code>x | (x &gt;&gt; 1)</code> 的值為何（以十進位回答）？`,
+      code:null, opts:o.opts, a:o.a,
+      exp:`x = ${p[0].toString(2).padStart(8,'0')}₂；x>>1 = ${(p[0]>>1).toString(2).padStart(8,'0')}₂；OR 後 = ${p[1].toString(2).padStart(8,'0')}₂ = ${p[1]}`};
+  },
+  ()=>{ // 條件運算子 ?: 嵌套
+    const a = rnd(5,9), b = rnd(1,3), c = a + rnd(2,5);
+    const ans = c;
+    const o = mk(ans, [a, b, a+b]);
+    return {ch:2, q:'下列 C 程式片段執行後 r 的值為何？',
+      code:`int a = ${a}, b = ${b}, c = ${c};\nint r = a > b ? (b > c ? a : c) : (a > c ? b : c);`,
+      opts:o.opts, a:o.a,
+      exp:`先看 a>b：${a}>${b} 為真 → 進入「(b>c ? a : c)」→ ${b}>${c} 為假 → 取 c = ${c}`};
+  },
+
+  /* ============ Ch3 流程控制 — 額外加強（中偏難）============ */
+  ()=>{ // switch fall-through
+    const cases = [
+      {x:1, s:6, t:'case 1: s=1 → case 2: s=3 → case 3: s=6 → break'},
+      {x:2, s:5, t:'case 2: s=2 → case 3: s=5 → break'},
+      {x:3, s:3, t:'case 3: s=3 → break'},
+      {x:4, s:9, t:'case 4: s=4 → default: s=9'}
+    ];
+    const p = pick(cases);
+    const o = mk(p.s, [p.s-1, p.s+1, 0]);
+    return {ch:3, q:'下列 C 程式片段執行後 s 的值為何？',
+      code:`int x = ${p.x}, s = 0;\nswitch(x){\n  case 1: s += 1;\n  case 2: s += 2;\n  case 3: s += 3; break;\n  case 4: s += 4;\n  default: s += 5;\n}`,
+      opts:o.opts, a:o.a,
+      exp:`switch 沒有 break 會 fall-through，繼續執行下一個 case。x=${p.x} 的執行軌跡：${p.t}，最終 s=${p.s}`};
+  },
+  ()=>{ // 巢狀迴圈 + break 計數
+    const n = pick([4,5,6]), t = pick([3,4,5]);
+    let c = 0;
+    for(let i=0;i<n;i++) for(let j=0;j<n;j++){ if(i+j>=t) break; c++; }
+    const o = mk(c, [c+1, c-1, n*n]);
+    return {ch:3, q:'下列 C 程式片段執行後 c 的值為何？',
+      code:`int c = 0;\nfor(int i = 0; i < ${n}; i++){\n  for(int j = 0; j < ${n}; j++){\n    if(i + j >= ${t}) break;\n    c++;\n  }\n}`,
+      opts:o.opts, a:o.a,
+      exp:`內層 break 只跳出最內層迴圈。對每個 i，j 在 0..${n}-1 跑直到 i+j>=${t} 為止。逐一累計 c = ${c}`};
+  },
+  ()=>{ // Collatz / 3n+1
+    const data = [[6,8],[5,5],[8,3],[10,6],[12,9],[4,2],[16,4]];
+    const p = pick(data);
+    const o = mk(p[1], [p[1]-1, p[1]+1, p[1]*2]);
+    return {ch:3, q:`下列 do-while 迴圈共執行幾次（Collatz：偶數除 2、奇數 ×3+1，直到 n=1 為止）？`,
+      code:`int n = ${p[0]}, c = 0;\ndo{\n  if(n % 2 == 0) n /= 2;\n  else n = 3 * n + 1;\n  c++;\n} while(n != 1);`,
+      opts:o.opts, a:o.a,
+      exp:`從 n=${p[0]} 開始按 Collatz 規則迭代到 1，共需 ${p[1]} 次迴圈`};
+  },
+
+  /* ============ Ch4 陣列字串 — 額外加強（中偏難）============ */
+  ()=>{ // 二維對角線總和
+    return {ch:4, q:'下列 C 程式執行後 s 的值為何？',
+      code:`int a[3][3] = {{1,2,3},{4,5,6},{7,8,9}};\nint s = 0;\nfor(int i = 0; i < 3; i++)\n  s += a[i][i] + a[i][2 - i];`,
+      opts:['30','25','45','24'], a:0,
+      exp:`主對角線 a[0][0]+a[1][1]+a[2][2] = 1+5+9 = 15；反對角線 a[0][2]+a[1][1]+a[2][0] = 3+5+7 = 15。注意 a[1][1]=5 被加兩次。總和 30`};
+  },
+  ()=>{ // 字串反轉
+    const strs = ['ABCDE','HELLO','CODES','SWAPS','RADAR'];
+    const s = pick(strs);
+    const rev = s.split('').reverse().join('');
+    const opts = shuf([rev, s, s.slice(1)+s[0], rev.slice(1)+rev[0]]);
+    return {ch:4, q:'下列 C 程式輸出為何？',
+      code:`char s[] = "${s}";\nint n = strlen(s);\nfor(int i = 0; i < n / 2; i++){\n  char t = s[i]; s[i] = s[n - 1 - i]; s[n - 1 - i] = t;\n}\nprintf("%s", s);`,
+      opts, a:opts.indexOf(rev),
+      exp:`使用雙指標就地反轉：i 由頭、n-1-i 由尾，互換到中間相遇。"${s}" 反轉為 "${rev}"`};
+  },
+  ()=>{ // 母音計數
+    const strs = ['HelloWorld','Programming','Algorithm','Computer','Database'];
+    const s = pick(strs);
+    let v = 0;
+    for(const c of s.toLowerCase()) if('aeiou'.includes(c)) v++;
+    const o = mk(v, [v-1, v+1, s.length-v]);
+    return {ch:4, q:`下列 C 程式片段執行後 v 的值為何（字串："${s}"）？`,
+      code:`char s[] = "${s}";\nint v = 0;\nfor(int i = 0; s[i]; i++){\n  char c = s[i];\n  if(c=='a'||c=='e'||c=='i'||c=='o'||c=='u' ||\n     c=='A'||c=='E'||c=='I'||c=='O'||c=='U')\n    v++;\n}`,
+      opts:o.opts, a:o.a,
+      exp:`逐字檢查是否為母音 (a/e/i/o/u，含大小寫)，"${s}" 共含 ${v} 個母音`};
+  },
+  ()=>{ // strcmp 概念
+    const pairs = [
+      ['apple','apricot','負數'],
+      ['banana','band','正數'],
+      ['hello','hellos','負數'],
+      ['xyz','xy','正數']
+    ];
+    const p = pick(pairs);
+    const opts = shuf([p[2], p[2]==='負數'?'正數':'負數', '0', '兩字串長度差']);
+    return {ch:4, q:`下列 strcmp 比較 <code>strcmp("${p[0]}", "${p[1]}")</code> 的回傳值通常為何？`,
+      code:null, opts, a:opts.indexOf(p[2]),
+      exp:`strcmp 由左至右比對 ASCII 值，第一個不同字元決定回傳值（若一字串為另一字串前綴，較短者為「小」）。本題結果為「${p[2]}」`};
+  },
+
+  /* ============ Ch5 函式範疇 — 額外加強（中偏難）============ */
+  ()=>{ // static 計數器加總
+    const data = [
+      {init:10, step:2, sum:42},   // 12+14+16
+      {init:5,  step:3, sum:33},   // 8+11+14
+      {init:0,  step:5, sum:45},   // 5+10+15 (Wait: 0+5=5, 5+5=10, 10+5=15 → 5+10+15=30. Let me recompute)
+      {init:20, step:1, sum:66}    // 21+22+23
+    ];
+    // recompute: init=0,step=5: c=0→5, c=5→10, c=10→15. sum = 5+10+15 = 30
+    const fixed = [
+      {init:10, step:2, sum:42},
+      {init:5,  step:3, sum:33},
+      {init:0,  step:5, sum:30},
+      {init:20, step:1, sum:66}
+    ];
+    const p = pick(fixed);
+    const o = mk(p.sum, [3*(p.init+p.step), p.init+3*p.step, p.sum-p.step]);
+    return {ch:5, q:'下列 C 程式輸出為何？',
+      code:`int next(){\n  static int c = ${p.init};\n  c += ${p.step};\n  return c;\n}\nint main(){\n  printf("%d", next() + next() + next());\n}`,
+      opts:o.opts, a:o.a,
+      exp:`static 變數 c 跨呼叫保留值。三次呼叫分別回傳 ${p.init+p.step}、${p.init+2*p.step}、${p.init+3*p.step}，總和 = ${p.sum}`};
+  },
+  ()=>{ // 傳指標 + 返回
+    const a0 = rnd(3,8);
+    const a1 = a0 * 2;
+    const b = a1 + 1;
+    const out = `${a1} ${b}`;
+    const opts = shuf([out, `${a0} ${b}`, `${a1} ${a0+1}`, `${a0} ${a0+1}`]);
+    return {ch:5, cppOnly:true, q:'下列 C 程式輸出為何？',
+      code:`int f(int *p){\n  *p = *p * 2;\n  return (*p) + 1;\n}\nint main(){\n  int a = ${a0};\n  int b = f(&a);\n  printf("%d %d", a, b);\n}`,
+      opts, a:opts.indexOf(out),
+      exp:`f() 內 *p = *p * 2 將呼叫端 a 從 ${a0} 改為 ${a1}；接著回傳 (*p)+1 = ${b}。輸出 "${out}"`};
+  },
+  ()=>{ // 互遞迴 mutual recursion
+    // f(n) = g(n-1) + 1; g(n) = f(n-1) + 1; f(0)=1, g(0)=0
+    // f(2)=3, f(3)=3, f(4)=5, f(5)=5
+    const map = { 2:3, 3:3, 4:5, 5:5 };
+    const n = pick([2,3,4,5]);
+    const ans = map[n];
+    const o = mk(ans, [n, n+1, 2*n]);
+    return {ch:5, q:`下列互遞迴函式 f(${n}) 的回傳值為何？`,
+      code:`int g(int);\nint f(int n){\n  if(n <= 0) return 1;\n  return g(n - 1) + 1;\n}\nint g(int n){\n  if(n <= 0) return 0;\n  return f(n - 1) + 1;\n}`,
+      opts:o.opts, a:o.a,
+      exp:`兩個函式交互呼叫：f(${n}) → g(${n-1})+1 → f(${n-2})+2 → ... 逐層展開計算得 ${ans}`};
+  },
+
+  /* ============ Ch6 指標 — 額外加強（中偏難）============ */
+  ()=>{ // 雙重指標修改值
+    const a0 = rnd(2,8), b0 = a0 + rnd(2,5);
+    const opts = shuf(['100 200', `${a0} ${b0}`, `100 ${b0}`, `${a0} 200`]);
+    return {ch:6, cppOnly:true, q:'下列 C 程式輸出為何？',
+      code:`int a = ${a0}, b = ${b0};\nint *p = &a;\nint **pp = &p;\n**pp = 100;\np = &b;\n**pp = 200;\nprintf("%d %d", a, b);`,
+      opts, a:opts.indexOf('100 200'),
+      exp:`**pp 透過 p 修改其指向的變數：起初 p 指向 a → **pp=100 使 a=100；接著 p 改指向 b → **pp=200 使 b=200。輸出 "100 200"`};
+  },
+  ()=>{ // 指標相減
+    const lo = rnd(2,4), hi = lo + rnd(3,6);
+    const ans = hi - lo;
+    const o = mk(ans, [ans*4, hi+lo, ans+1]);
+    return {ch:6, cppOnly:true, q:'下列 C 程式輸出為何？',
+      code:`int a[10];\nint *p = &a[${lo}], *q = &a[${hi}];\nprintf("%d", (int)(q - p));`,
+      opts:o.opts, a:o.a,
+      exp:`同型別指標相減回傳「元素數」差，並非 byte 數。q - p = ${hi} - ${lo} = ${ans}`};
+  },
+  ()=>{ // 函式指標
+    return {ch:6, cppOnly:true, q:'下列 C 程式輸出為何？',
+      code:`int add(int a, int b){ return a + b; }\nint main(){\n  int (*fp)(int, int) = add;\n  printf("%d", fp(3, 4));\n}`,
+      opts:['7','編譯錯誤','3','12'], a:0,
+      exp:`int (*fp)(int,int) 宣告為「指向 (int,int)→int 的函式指標」，賦值 fp = add 後，fp(3,4) 等同呼叫 add(3,4) = 7`};
+  },
+  ()=>{ // sizeof 陣列名 vs 指標
+    return {ch:6, cppOnly:true, q:'下列 C 程式於 64 位元系統的輸出為何？',
+      code:`int a[5];\nint *p = a;\nprintf("%d %d", (int)sizeof(a), (int)sizeof(p));`,
+      opts:['20 8','20 4','4 8','5 8'], a:0,
+      exp:`sizeof(a) 為整個陣列大小：5 個 int × 4 byte = 20。sizeof(p) 為指標本身大小：64 位元系統為 8 byte`};
+  },
+
+  /* ============ Ch7 資料結構與演算法 — 大量擴充 ============ */
+
+  /* --- 堆疊 Stack --- */
+  ()=>{
+    const seqs = [
+      ['依序 push 1,2,3，然後 pop、push 4、pop、pop、push 5、pop、pop', '3 4 2 5 1'],
+      ['依序 push A,B、pop、push C,D,E、pop、pop', 'B E D'],
+      ['依序 push 1,2,3,4，連續 pop 兩次，push 5，pop', '4 3 5']
+    ];
+    const p = pick(seqs);
+    const opts = shuf([p[1], p[1].split(' ').reverse().join(' '), '1 2 3 4 5', '無法判斷']);
+    return {ch:7, q:`對一個堆疊 (Stack)：${p[0]}，pop 出來的元素依序為何？`,
+      code:null, opts, a:opts.indexOf(p[1]),
+      exp:`Stack 是 LIFO（後進先出）：最後 push 的元素最先被 pop。依序模擬可得 pop 順序為「${p[1]}」`};
+  },
+  ()=>{
+    const exprs = [
+      ['3 4 + 2 *', 14],
+      ['5 1 2 + 4 * + 3 -', 14],
+      ['6 2 / 3 *', 9],
+      ['7 8 + 3 *', 45],
+      ['2 3 1 * + 9 -', -4]
+    ];
+    const p = pick(exprs);
+    const o = mk(p[1], [p[1]-1, p[1]+1, p[1]*2]);
+    return {ch:7, q:`下列後序表示式 (postfix) <code>${p[0]}</code> 計算後的值為何？`,
+      code:null, opts:o.opts, a:o.a,
+      exp:`後序表示式以堆疊計算：見數字 push，見運算子取出上面兩個（先彈出者為右運算元）再運算後 push 結果。最終結果 = ${p[1]}`};
+  },
+  ()=>{
+    return {ch:7, q:'將中序運算式 (infix) 轉成後序 (postfix) 時，最常使用下列哪一種資料結構暫存運算子？',
+      code:null,
+      opts:['Queue (佇列)','Stack (堆疊)','Linked List','Binary Tree'],
+      a:1,exp:'Shunting-yard 演算法使用堆疊暫存運算子，依優先序決定何時彈出輸出。'};
+  },
+
+  /* --- 佇列 Queue --- */
+  ()=>{
+    const ops = [
+      ['Enqueue 1,2,3，Dequeue 一次，Enqueue 4，Dequeue 一次', '3 4'],
+      ['Enqueue A,B,C,D，Dequeue 兩次，Enqueue E', 'C D E'],
+      ['Enqueue 10,20,30，Dequeue，Dequeue，Enqueue 40,50', '30 40 50']
+    ];
+    const p = pick(ops);
+    const opts = shuf([p[1], p[1].split(' ').reverse().join(' '), '空佇列', '無法判斷']);
+    return {ch:7, q:`對一個佇列 (Queue)：${p[0]} 後，由 front 到 rear 元素依序為何？`,
+      code:null, opts, a:opts.indexOf(p[1]),
+      exp:`Queue 是 FIFO（先進先出）：dequeue 從 front 移除、enqueue 從 rear 加入。模擬後得「${p[1]}」`};
+  },
+  ()=>{
+    return {ch:7, q:'廣度優先搜尋 (BFS) 為了依「先進先出」順序探索節點，通常使用哪種資料結構？',
+      code:null,
+      opts:['Stack','Queue','Heap','Hash Table'],
+      a:1,exp:'BFS 利用 Queue 維持「先發現先處理」的層序順序；DFS 則用 Stack（或遞迴）。'};
+  },
+  ()=>{
+    return {ch:7, q:'若以大小為 N 的陣列實作環形佇列 (circular queue)，使用「保留一格判滿」的傳統作法，最多可儲存幾個元素？',
+      code:null,
+      opts:['N','N - 1','N + 1','N / 2'],
+      a:1,exp:'傳統環形佇列保留一格用於區分「空」與「滿」（front==rear 為空、(rear+1)%N==front 為滿），故最多儲存 N-1 個元素。'};
+  },
+
+  /* --- 二元樹與走訪 --- */
+  ()=>{
+    const k = rnd(3,6);
+    const n = Math.pow(2, k+1) - 1;
+    const o = mk(n, [Math.pow(2,k), n-1, 2*k+1]);
+    return {ch:7, q:`一棵高度為 ${k}（根的高度為 0、葉節點高度為 ${k}）的完美二元樹 (perfect binary tree) 共有幾個節點？`,
+      code:null, opts:o.opts, a:o.a,
+      exp:`完美二元樹高度 h 共 2^(h+1) - 1 個節點。h=${k} → 2^${k+1} - 1 = ${n}`};
+  },
+  ()=>{
+    const k = rnd(3,6);
+    const leaves = Math.pow(2, k);
+    const o = mk(leaves, [leaves-1, leaves/2, Math.pow(2,k+1)-1]);
+    return {ch:7, q:`一棵高度為 ${k}（根的高度為 0）的完美二元樹共有幾個葉節點？`,
+      code:null, opts:o.opts, a:o.a,
+      exp:`完美二元樹的葉節點全在最底層（第 ${k} 層），數量為 2^${k} = ${leaves}`};
+  },
+  ()=>{
+    return {ch:7, q:'已知某二元樹的中序 (inorder) 走訪為 D B E A F C G，前序 (preorder) 為 A B D E C F G，則此樹的後序 (postorder) 為？',
+      code:null,
+      opts:['D E B F G C A','D B E F C G A','A B D E C F G','D E F G B C A'],
+      a:0,exp:'由前序得知根為 A → 中序中 A 左側 [D B E] 為左子樹、右側 [F C G] 為右子樹。對應前序 [B D E] 知 B 為左子樹根，且其左/右為 D/E；[C F G] 知 C 為右子樹根，左 F、右 G。後序左→右→根：D E B、F G C、A → D E B F G C A'};
+  },
+  ()=>{
+    return {ch:7, q:'若以陣列存放完全二元樹 (complete binary tree)、根放於索引 1，則索引 i 之左子節點與父節點的索引分別為？',
+      code:null,
+      opts:['2i 與 ⌊i/2⌋','i+1 與 i-1','2i+1 與 ⌊(i-1)/2⌋','i*2-1 與 ⌊i/2⌋'],
+      a:0,exp:'1-indexed 完全二元樹陣列表示法：索引 i 的左子為 2i、右子為 2i+1、父為 ⌊i/2⌋。若 0-indexed 則父為 ⌊(i-1)/2⌋'};
+  },
+
+  /* --- BST 二元搜尋樹 --- */
+  ()=>{
+    return {ch:7, q:'對一棵正確建立的二元搜尋樹 (BST) 執行下列哪種走訪，可得到「由小到大」排序好的序列？',
+      code:null,
+      opts:['前序 Preorder','中序 Inorder','後序 Postorder','層序 Level-order'],
+      a:1,exp:'BST 的中序走訪（左→根→右）正好依鍵值由小到大輸出，這是 BST 的核心性質之一。'};
+  },
+  ()=>{
+    return {ch:7, q:'依序插入 50, 30, 70, 20, 40, 60, 80 至原本空的 BST，最終樹的高度（根的高度為 0）為何？',
+      code:null,
+      opts:['2','3','4','6'],
+      a:0,exp:'插入後：50 為根；30、70 為第 1 層；20、40、60、80 為第 2 層。樹完美平衡，高度為 2'};
+  },
+  ()=>{
+    return {ch:7, q:'平衡 BST (例如 AVL) 在搜尋、插入、刪除三種操作的平均時間複雜度為何？',
+      code:null,
+      opts:['O(1)','O(log n)','O(n)','O(n log n)'],
+      a:1,exp:'平衡 BST 高度約 log n，三大操作平均皆 O(log n)；若退化成鏈狀則最壞 O(n)。'};
+  },
+
+  /* --- 堆積 Heap --- */
+  ()=>{
+    return {ch:7, q:'下列關於最大堆積 (Max-Heap) 的敘述，何者「錯誤」？',
+      code:null,
+      opts:['根節點為整棵樹中最大值','左子樹必大於右子樹','是一棵完全二元樹 (complete binary tree)','以陣列實作時可省去左右子指標'],
+      a:1,exp:'Max-Heap 僅要求「每個節點 ≥ 其子節點」，並不規範左右子樹之間的大小關係。其餘三項皆正確。'};
+  },
+  ()=>{
+    return {ch:7, q:'對 n 個元素的二元堆積，執行一次 insert 與一次 deleteMax 的時間複雜度分別為何？',
+      code:null,
+      opts:['O(1), O(1)','O(log n), O(log n)','O(n), O(n)','O(n), O(log n)'],
+      a:1,exp:'兩個操作都需沿樹高 (log n) 上浮/下沉：insert 上浮、deleteMax 取根後將末尾元素置頂並下沉，皆 O(log n)。'};
+  },
+  ()=>{
+    return {ch:7, q:'將 n 個元素「由下而上 heapify」建堆的時間複雜度為？',
+      code:null,
+      opts:['O(n)','O(n log n)','O(log n)','O(n²)'],
+      a:0,exp:'雖然每次 sink 為 O(log n)，但越靠葉層的元素越多但需下沉距離越短，加總級數可證明為 O(n)；逐一 insert 才是 O(n log n)。'};
+  },
+  ()=>{
+    return {ch:7, q:'對原本空的 Max-Heap 依序插入 3, 1, 5, 7, 2, 4，最後堆積的根節點為何？',
+      code:null,
+      opts:['3','5','7','4'],
+      a:2,exp:'每次插入後上浮維護 heap 性質，最大值最終位於根。本題最大值為 7。'};
+  },
+
+  /* --- Hash 雜湊 --- */
+  ()=>{
+    return {ch:7, q:'雜湊表大小為 10、雜湊函式 h(k) = k mod 10。依序插入 12, 22, 32 並以「線性探測 (linear probing)」處理碰撞，則 22 最終落在哪個索引？',
+      code:null,
+      opts:['0','2','3','4'],
+      a:2,exp:'12 → 索引 2；22 → 索引 2 已被佔用，往下找到索引 3；故 22 落在 3。32 則再往下找到 4。'};
+  },
+  ()=>{
+    return {ch:7, q:'在「分離鏈結 (separate chaining)」的雜湊表中，若負載因子 α 不太大且雜湊函式均勻，平均查找的時間複雜度為？',
+      code:null,
+      opts:['O(1)','O(log n)','O(n)','O(α²)'],
+      a:0,exp:'分離鏈結平均鏈長為 α，搜尋平均 O(1 + α)；α 為小常數時即 O(1)。最壞情況（雜湊極不平均）會退化為 O(n)。'};
+  },
+
+  /* --- 鏈結串列 --- */
+  ()=>{
+    return {ch:7, q:'下列關於單向鏈結串列 (singly linked list) 的敘述，何者正確？',
+      code:null,
+      opts:['可隨機存取第 k 個節點，時間 O(1)','在「已知尾節點」時，於尾部插入為 O(1)','可直接做二元搜尋','對 n 個節點走訪一遍需 O(log n)'],
+      a:1,exp:'鏈結串列無法隨機存取（要從頭走訪 O(n)），故不能直接二元搜尋、走訪一遍為 O(n)；若維護尾指標則尾插入 O(1)，否則 O(n)。'};
+  },
+  ()=>{
+    return {ch:7, q:'相較於陣列，鏈結串列在下列哪個操作上具有明顯優勢？',
+      code:null,
+      opts:['隨機讀取第 i 個元素','於已知節點之後插入新節點','二元搜尋','快取友善 (cache-friendly)'],
+      a:1,exp:'已知前驅節點時，鏈結串列只需修改 next 指標即可插入/刪除（O(1)），而陣列需平移 O(n)。其它三項皆為陣列的優勢。'};
+  },
+  ()=>{
+    return {ch:7, q:'雙向鏈結串列 (doubly linked list) 相較於單向，最主要的優勢為？',
+      code:null,
+      opts:['節省記憶體','從任一已知節點 O(1) 取得其前驅','可二元搜尋','支援更快的中段隨機存取'],
+      a:1,exp:'每個節點多存一份「前驅指標」可 O(1) 反向走訪，這是雙向最重要的好處（代價是多一份指標空間）。'};
+  },
+
+  /* --- 圖 Graph --- */
+  ()=>{
+    return {ch:7, q:'以「鄰接矩陣 (adjacency matrix)」表示 n 個節點的圖，空間複雜度為何？',
+      code:null,
+      opts:['O(n)','O(n + e)','O(n²)','O(e²)'],
+      a:2,exp:'鄰接矩陣為 n×n 二維陣列，空間 O(n²)。當邊很稀疏時鄰接串列 O(n+e) 更省空間。'};
+  },
+  ()=>{
+    return {ch:7, q:'一棵包含 n 個節點的樹 (tree)，其邊 (edge) 數為？',
+      code:null,
+      opts:['n - 1','n','n + 1','log n'],
+      a:0,exp:'樹的定義性質：n 節點且連通無環，邊數恰為 n - 1。少一條邊則不連通、多一條邊則形成環。'};
+  },
+  ()=>{
+    return {ch:7, q:'下圖以鄰接表表示（內部依編號遞增排列）：<br>0: 1, 2<br>1: 0, 3, 4<br>2: 0, 4<br>3: 1<br>4: 1, 2<br>由節點 0 開始 BFS，走訪順序為？',
+      code:null,
+      opts:['0 1 2 3 4','0 1 3 4 2','0 2 1 4 3','0 1 2 4 3'],
+      a:0,exp:'BFS 使用佇列：訪問 0 → 加入 1,2 → 拿 1 加入 3,4 → 拿 2（鄰居皆已訪）→ 拿 3 → 拿 4。順序：0 1 2 3 4'};
+  },
+  ()=>{
+    return {ch:7, q:'同上圖（0:1,2 / 1:0,3,4 / 2:0,4 / 3:1 / 4:1,2），由節點 0 開始 DFS（總是先選編號較小的鄰居），走訪順序為？',
+      code:null,
+      opts:['0 1 3 4 2','0 1 2 3 4','0 2 4 1 3','0 1 4 2 3'],
+      a:0,exp:'DFS 遞迴：訪 0 → 進入 1 → 進入 3（鄰居 1 已訪、回退）→ 回 1 進入 4 → 進入 2（鄰居皆已訪、回退）→ 全部走完。順序：0 1 3 4 2'};
+  },
+
+  /* --- 排序演算法 --- */
+  ()=>{
+    return {ch:7, q:'下列排序演算法中，何者「不穩定 (unstable)」？',
+      code:null,
+      opts:['Bubble Sort','Insertion Sort','Merge Sort','Quick Sort'],
+      a:3,exp:'Quick Sort、Selection Sort、Heap Sort 皆為不穩定（相等元素的相對順序可能被打亂）；Bubble、Insertion、Merge Sort 為穩定。'};
+  },
+  ()=>{
+    return {ch:7, q:'對「幾乎已排序」的陣列，下列哪個排序演算法的最佳情況時間複雜度為 O(n)？',
+      code:null,
+      opts:['Selection Sort','Merge Sort','Insertion Sort','Heap Sort'],
+      a:2,exp:'Insertion Sort 在資料已近乎排序時內層幾乎不需位移，最佳情況 O(n)。Selection 與 Heap 不論輸入皆為 O(n²)/O(n log n)；Merge 永遠 O(n log n)。'};
+  },
+  ()=>{
+    return {ch:7, q:'Quick Sort 的最壞時間複雜度發生於下列何種情況、且複雜度為何？',
+      code:null,
+      opts:['資料隨機 → O(n log n)','資料已排序且固定取首/尾為 pivot → O(n²)','所有元素互異 → O(n log n)','資料反向排序 → O(log n)'],
+      a:1,exp:'若 pivot 每次都取到極端值（如已排序陣列固定取首位），分割極不平衡，遞迴深度退化為 n，總複雜度 O(n²)。採用隨機 pivot 或「三數取中」可避免。'};
+  },
+  ()=>{
+    return {ch:7, q:'下列哪個排序演算法可達 O(n + k) 時間複雜度（k 為數值範圍），且「不基於比較」？',
+      code:null,
+      opts:['Counting Sort','Insertion Sort','Quick Sort','Heap Sort'],
+      a:0,exp:'Counting Sort 統計每個值的出現次數後直接擺位，不做兩兩比較。比較排序下界 Ω(n log n) 不適用於 Counting/Radix/Bucket Sort。'};
+  },
+  ()=>{
+    return {ch:7, q:'任何「比較排序 (comparison sort)」最壞情況下的時間複雜度下界為？',
+      code:null,
+      opts:['Ω(n)','Ω(n log n)','Ω(n²)','Ω(log n)'],
+      a:1,exp:'比較排序對應「決策樹」模型，n! 種可能排列需至少 log₂(n!) ≈ n log n 次比較才能區分，故下界為 Ω(n log n)。'};
+  },
+  ()=>{
+    return {ch:7, q:'下列排序中，何者「不是」就地排序 (in-place)，需要 O(n) 額外空間？',
+      code:null,
+      opts:['Bubble Sort','Insertion Sort','Quick Sort','Merge Sort'],
+      a:3,exp:'Merge Sort 合併時需要與輸入等大的暫存陣列，空間 O(n)。Bubble、Insertion、Quick（遞迴堆疊 O(log n)）均視為就地。'};
+  },
+
+  /* --- 時間複雜度分析 --- */
+  ()=>{
+    return {ch:7, q:'下列程式片段的時間複雜度為何？<br><code>for(i = 1; i &lt;= n; i++)<br>&nbsp;&nbsp;for(j = 1; j &lt;= i * i; j++) ...</code>',
+      code:null,
+      opts:['O(n)','O(n²)','O(n³)','O(n² log n)'],
+      a:2,exp:'內層執行 i² 次，加總 1²+2²+...+n² = n(n+1)(2n+1)/6 ≈ n³/3 = O(n³)'};
+  },
+  ()=>{
+    return {ch:7, q:'下列程式片段的時間複雜度為何？<br><code>for(i = 1; i &lt;= n; i++)<br>&nbsp;&nbsp;for(j = 1; j &lt;= n; j *= 2) ...</code>',
+      code:null,
+      opts:['O(n)','O(n log n)','O(n²)','O(log² n)'],
+      a:1,exp:'外層 n 次，內層 j 每輪倍增，共 log₂ n 次，故總和 n × log n = O(n log n)'};
+  },
+  ()=>{
+    return {ch:7, q:'解遞迴關係式 T(n) = 2 T(n/2) + n，T(1) = 1：',
+      code:null,
+      opts:['T(n) = O(n)','T(n) = O(n log n)','T(n) = O(n²)','T(n) = O(2^n)'],
+      a:1,exp:'此即 Merge Sort 的遞迴式：每層工作量 n、總層數 log₂ n，T(n) = O(n log n)。屬主定理 (Master Theorem) Case 2。'};
+  },
+  ()=>{
+    return {ch:7, q:'解遞迴關係式 T(n) = T(n/2) + 1，T(1) = 1：',
+      code:null,
+      opts:['T(n) = O(1)','T(n) = O(log n)','T(n) = O(n)','T(n) = O(n log n)'],
+      a:1,exp:'此為二元搜尋的遞迴式：每層 O(1) 工作、共 log₂ n 層，T(n) = O(log n)'};
+  },
+  ()=>{
+    return {ch:7, q:'若 T(n) = 3n² + 5n log n + 100n + 1000，則其 Big-O 表示為？',
+      code:null,
+      opts:['O(n)','O(n log n)','O(n²)','O(n² log n)'],
+      a:2,exp:'Big-O 只看最高次項並忽略常數係數：最高為 3n²，故為 O(n²)。'};
+  },
+
+  /* --- 動態規劃 / 貪婪 --- */
+  ()=>{
+    return {ch:7, q:'計算第 n 個費氏數 fib(n)，使用「記憶化遞迴 (memoization)」相較於「樸素遞迴」的時間複雜度由何變何？',
+      code:null,
+      opts:['O(n) → O(log n)','O(2^n) → O(n)','O(n²) → O(n)','O(n log n) → O(n)'],
+      a:1,exp:'樸素遞迴 fib(n) = fib(n-1) + fib(n-2) 重複計算同一子問題，呼叫樹指數展開 O(2^n)。以陣列/字典記住結果後每個 fib(k) 只算一次，整體 O(n)。'};
+  },
+  ()=>{
+    return {ch:7, q:'下列哪一組是「動態規劃」適用的兩大必要性質？',
+      code:null,
+      opts:['遞迴 & 貪婪選擇','重疊子問題 & 最佳子結構','分而治之 & 排序','回溯 & 剪枝'],
+      a:1,exp:'DP 必須滿足「重疊子問題」（同一子問題會被求解多次）與「最佳子結構」（局部最佳能組合成整體最佳）。'};
+  },
+  ()=>{
+    return {ch:7, q:'貨幣面額為 {1, 5, 10, 50, 100}，要找 165 元最少枚數時，貪婪法 (greedy) 求得幾枚？',
+      code:null,
+      opts:['3','4','5','6'],
+      a:1,exp:'貪婪：100 + 50 + 10 + 5 = 165，共 4 枚。此幣制是「規範性貨幣系統」，貪婪等於 DP 最佳解。'};
+  },
+  ()=>{
+    return {ch:7, q:'0/1 背包問題（n 個物品、背包容量 W）標準二維 DP 的時間複雜度為？',
+      code:null,
+      opts:['O(n + W)','O(n × W)','O(2^n)','O(n²)'],
+      a:1,exp:'狀態 dp[i][w]：前 i 個物品、容量 w 下最大價值，共 n×W 個狀態，O(1) 轉移，整體 O(nW)。注意這是「假多項式」(pseudo-polynomial) 演算法。'};
+  },
+  ()=>{
+    return {ch:7, q:'求兩字串（長度 m, n）的最長共同子序列 (LCS) 標準 DP 時間複雜度為？',
+      code:null,
+      opts:['O(m + n)','O(mn)','O(m² + n²)','O(2^(m+n))'],
+      a:1,exp:'狀態 dp[i][j] 表示 X[0..i] 與 Y[0..j] 的 LCS 長度，共 m×n 個狀態，O(1) 轉移，整體 O(mn)。'};
+  },
+
+  /* --- 進階：分治、回溯、圖演算法 --- */
+  ()=>{
+    return {ch:7, q:'下列何者「不是」分而治之 (Divide-and-Conquer) 策略的演算法？',
+      code:null,
+      opts:['Merge Sort','Quick Sort','Binary Search','Dijkstra Shortest Path'],
+      a:3,exp:'Dijkstra 屬「貪婪演算法」（每次選擇目前距離最近未確定的節點）。其餘三者皆把問題分割成更小的子問題再合併。'};
+  },
+  ()=>{
+    return {ch:7, q:'八皇后 (8-Queens) 問題最自然的解法為下列何者？',
+      code:null,
+      opts:['動態規劃','貪婪法','回溯 (Backtracking)','貝氏推論'],
+      a:2,exp:'八皇后逐列嘗試放皇后，若與既有放置衝突則回退（剪枝），是回溯法的經典範例。'};
+  },
+  ()=>{
+    return {ch:7, q:'欲求單一起點到所有節點的最短路徑（所有邊權皆為非負），最有效率的演算法為？',
+      code:null,
+      opts:['Bellman-Ford','Dijkstra','Floyd-Warshall','Kruskal'],
+      a:1,exp:'非負邊權單源最短路徑首選 Dijkstra（搭配優先佇列為 O((n+e) log n)）。Bellman-Ford 容許負邊權但較慢；Floyd 是全點對最短路徑；Kruskal 是 MST 演算法。'};
+  },
+  ()=>{
+    return {ch:7, q:'下列哪些演算法可用於求出無向加權圖的「最小生成樹 (MST)」？',
+      code:null,
+      opts:['Dijkstra 與 Bellman-Ford','Kruskal 與 Prim','Floyd-Warshall 與 BFS','DFS 與 Topological Sort'],
+      a:1,exp:'Kruskal（依邊權遞增、用 Union-Find 避免成環）與 Prim（從一點開始貪婪擴張）是兩大 MST 演算法。Dijkstra/Bellman-Ford 是最短路徑；Floyd 是全點對最短路徑。'};
+  },
+
+  /* --- 搜尋與其他 --- */
+  ()=>{
+    return {ch:7, q:'下列何者「不是」對陣列直接執行二元搜尋的必要條件？',
+      code:null,
+      opts:['資料已排序','可由索引隨機存取','資料量為 2 的次方','元素可比較大小'],
+      a:2,exp:'二元搜尋需要：已排序、可隨機存取、可比較。資料筆數不需是 2 的次方，只是寫成 2^k 較方便分析次數。'};
+  },
+  ()=>{
+    return {ch:7, q:'對已排序陣列大小 N，比較線性搜尋與二元搜尋「平均」時間複雜度：',
+      code:null,
+      opts:['線性 O(N)，二分 O(log N)','線性 O(N/2)，二分 O(N log N)','兩者皆 O(N)','兩者皆 O(log N)'],
+      a:0,exp:'線性搜尋平均比較 N/2 次（Big-O 為 O(N)）；二元搜尋每次砍半，O(log N)。'};
+  },
+  ()=>{
+    return {ch:7, q:'若要支援「平均 O(1) 的查找」但「不需要有序走訪」，最適合的資料結構為？',
+      code:null,
+      opts:['雙向鏈結串列','二元搜尋樹 (BST)','雜湊表 (Hash Table)','堆積 (Heap)'],
+      a:2,exp:'Hash Table 查找平均 O(1)，但無法依鍵值順序走訪；BST 雖有序但查找平均 O(log n)；Heap 不支援任意鍵查找。'};
+  },
+  ()=>{
+    return {ch:7, q:'下列程式片段的時間複雜度為何？<br><code>for(i = n; i &gt; 0; i /= 2)<br>&nbsp;&nbsp;for(j = 0; j &lt; i; j++) ...</code>',
+      code:null,
+      opts:['O(log n)','O(n)','O(n log n)','O(n²)'],
+      a:1,exp:'外層 i 從 n 依次除 2 直到 0，內層做 i 次。總和 ≈ n + n/2 + n/4 + ... ≈ 2n = O(n)（幾何級數收斂）。常見陷阱：誤認為 O(n log n)。'};
+  },
+  ()=>{
+    return {ch:7, q:'欲在 O(n log n) 內計算陣列中所有「逆序對 (inversion)」數量，最常見的修改自下列哪個演算法？',
+      code:null,
+      opts:['Bubble Sort','Quick Sort','Merge Sort','Counting Sort'],
+      a:2,exp:'修改 Merge Sort 的合併步驟：當右半元素比左半剩下元素小時，逆序對數量加上左半「剩餘元素數」，整體仍為 O(n log n)。'};
+  },
+
+  /* ============ APCS 風格題目（程式碼追蹤、不可能輸出、debug、視域陷阱）============ */
+
+  /* --- Ch2 APCS 風格 --- */
+  ()=>{ // 型別運算（APCS 經典）
+    return {ch:2, q:'下列 C 程式片段中，<code>w, x, y, z</code> 何者的值與其他三者「不同」？',
+      code:`int a = 7, b = 3;\nfloat w = a / 2 / b * 1.0;\nfloat x = a / b / 2.0;\nfloat y = a / 2 / b;\nfloat z = 1.0 * a / 2 / b;`,
+      opts:['w','x','y','z'], a:3,
+      exp:'整數除法會截斷小數。\n  w = (7/2)/3 × 1.0 = 1×1.0 = 1.0\n  x = (7/3)/2.0 = 2/2.0 = 1.0\n  y = 7/2/3 = 1（仍為 int，存入 float 得 1.0）\n  z = 1.0×7/2/3 = 7.0/2/3 ≈ 1.167（前面已轉 float）\n  z 異於其他三者。技巧：判斷「何時轉成浮點數」是這類題的關鍵。'};
+  },
+  ()=>{ // 變數視域（APCS 經典 scope 陷阱）
+    return {ch:2, q:'下列 C 程式輸出為何？',
+      code:`int a = 5, b = 3;\nvoid f(int a, int b) {\n  int c = a + b;\n}\nint g(int a, int b) {\n  a = a + b;\n  b = a - b;\n  int c = a + b;\n  return c;\n}\nint main() {\n  int b = 7;\n  int c = g(a, b);\n  f(a, b);\n  int a = 3;\n  printf("%d %d %d", a, b, c);\n}`,
+      opts:['3 7 17','5 7 17','3 3 17','3 7 8'], a:0,
+      exp:'視域優先序：local > global，且程式由上到下執行。\n  第 12 行 main 中 b 是 local = 7。\n  第 13 行 c = g(a, b) = g(5, 7)：g 內 a 變為 12、b 變為 5、c = 17，回傳 17。\n  第 14 行 f(5, 7) 沒回傳值，不影響 main。\n  第 15 行 main 新增 local a = 3。\n  print 時 a=3 (local)、b=7 (local)、c=17。輸出 "3 7 17"'};
+  },
+  ()=>{ // 巨集 #define 陷阱（APCS 經典）
+    return {ch:2, q:'下列 C 程式輸出為何？',
+      code:`#define add(a, b) a + b\nint main() {\n  printf("%d", add(3, 5) * add(3, 5));\n  return 0;\n}`,
+      opts:['23','64','34','30'], a:0,
+      exp:'#define 是「文字替換」，沒有括號保護。\n  add(3, 5) * add(3, 5) 展開為 3 + 5 * 3 + 5\n  依運算優先序：先做 5 * 3 = 15，再 3 + 15 + 5 = 23。\n  常見陷阱：以為結果是 8 × 8 = 64。\n  正確寫法應為 #define add(a, b) ((a) + (b))'};
+  },
+  ()=>{ // bool 邏輯運算（APCS 經典）
+    return {ch:2, q:'已知 <code>x1 = true, x2 = false, x3 = true</code>。下列何者與 <code>x1 &amp;&amp; (!(x1 &amp;&amp; x2) || x3)</code> 結果相同？',
+      code:null,
+      opts:['x2','(!(x1 && x3) && (x1 || x2))','!x1 || !(x2 || x3)','((!(x1 && x3) || x2) && x3) || x1'], a:3,
+      exp:'原式 = T && (!(T && F) || T) = T && (T || T) = T && T = T（真）。\n  A) x2 = F\n  B) !(T&&T) && (T||F) = F && T = F\n  C) !T || !(F||T) = F || F = F\n  D) ((!T || F) && T) || T = (F || F || T) → 後段 OR 上 x1=T，結果為 T ✓\n  技巧：先看題目給的結果是 T 還是 F，再對選項做 OR/AND 快速判斷。'};
+  },
+
+  /* --- Ch3 APCS 風格 --- */
+  ()=>{ // for 迴圈次數遞推（APCS 經典）
+    return {ch:3, q:'下列 C 程式片段中，<code>for</code> 迴圈共執行幾次？',
+      code:`int j = 0;\nfor (int i = 0; i < 128; i = i + j + 1)\n  j = i + 1;`,
+      opts:['3','5','7','9'], a:2,
+      exp:'追蹤 i 的變化：\n  第1次：i=0、j=1，更新 i = 0+1+1 = 2\n  第2次：i=2、j=3，更新 i = 2+3+1 = 6\n  第3次：i=6、j=7，更新 i = 6+7+1 = 14\n  第4次：i=14、j=15，更新 i = 14+15+1 = 30\n  第5次：i=30、j=31，更新 i = 30+31+1 = 62\n  第6次：i=62、j=63，更新 i = 62+63+1 = 126\n  第7次：i=126、j=127，更新 i = 126+127+1 = 254（≥128，跳出）\n  共 7 次。技巧：發現 i_new = 2·i_old + 2，序列為 0,2,6,14,30,62,126…'};
+  },
+  ()=>{ // 三層迴圈計數（APCS 經典）
+    return {ch:3, q:'下列 C 程式片段輸出為何？',
+      code:`int x = -100;\nfor (int i = 1; i <= 8; i++)\n  for (int j = 1; j <= i; j++)\n    for (int k = 1; k <= j; k++)\n      x += 1;\nprintf("%d", x);`,
+      opts:['19','20','21','22'], a:1,
+      exp:'三層迴圈總執行次數＝Σᵢ₌₁⁸ Σⱼ₌₁ⁱ j = Σᵢ₌₁⁸ i(i+1)/2 = n(n+1)(n+2)/6 = 8·9·10/6 = 120。\n  x = -100 + 120 = 20。\n  公式記憶：Σᵢ₌₁ⁿ i(i+1)/2 = n(n+1)(n+2)/6（APCS 常考公式）'};
+  },
+  ()=>{ // 不可能的輸出（APCS 經典反推題）
+    return {ch:3, q:'下列 C 函式中，何者「不可能」是 <code>f</code> 的回傳值？',
+      code:`int f(int n) {\n  if (n > 17) n += 5;\n  while (n >= 23) n -= 6;\n  if (n > 17) n += 2;\n  return n;\n}`,
+      opts:['17','19','22','24'], a:1,
+      exp:'反推：while 結束時 n 必落在 [n<23] 範圍內，且若進入則 n 來自 ≥23 持續減 6。\n  while 結束時 n ∈ {17, 18, 19, 20, 21, 22}（可能值）\n  接著第二個 if (n>17) 觸發 n+=2：\n    17 → 17（不變）\n    18 → 20\n    19 → 21\n    20 → 22\n    21 → 23\n    22 → 24\n  所有可能回傳值：{17, 20, 21, 22, 23, 24}。19 不在其中。'};
+  },
+  ()=>{ // dangling else 縮排陷阱（APCS 經典）
+    return {ch:3, q:'下列 C 程式片段執行後 <code>a</code> 的值為何？',
+      code:`int x = 4, a = 0;\nif (x >= 2)\n  if (x < 6)\n    a = 1;\n  else\n    a = 2;\nelse\n  a = 3;`,
+      opts:['0','1','2','3'], a:1,
+      exp:'C 語法中 else 永遠配對「最近未配對的 if」，與縮排無關。\n  x=4：外層 if (4>=2) 為真 → 進入內層\n  內層 if (4<6) 為真 → a = 1\n  最終 a = 1。\n  常見陷阱：誤以為 else 配外層 if、答案是 3。'};
+  },
+  ()=>{ // do-while 程式應用（APCS 經典）
+    return {ch:3, q:'下列 C 程式片段中，當填入哪個起始值時，輸出為對應結果？',
+      code:`int f(int x) {\n  int ans = 0;\n  do {\n    ans += x;\n  } while (ans >= 0 && ans <= 10);\n  return ans;\n}\nint main() {\n  int x = ____;\n  while (x <= 40)\n    x = x + f(x);\n  cout << x << endl;\n}`,
+      opts:['填 2、輸出 58','填 1、輸出 50','填 5、輸出 80','填 4、輸出 62'], a:2,
+      exp:'分析 f(x)：do-while 至少跑一次，迭代累加 x 直到 ans 超出 [0, 10]。\n  若 x>10：第一次 ans=x 即超出，回傳 x。即 f(x) 把 x 翻倍貢獻給 main 中的 x。\n  若 x≤10：累加 x 直到首次大於 10，回傳該值。\n  從 x=5：5 → 5+15(=三倍 5)=20 → 20+40=60 → 60+? 等等仔細算：\n    f(5): ans 跑 5,10,15 → 回傳 15。x = 5+15 = 20\n    f(20): ans=20 → 回傳 20。x = 20+20 = 40\n    f(40): ans=40 → 回傳 40。x = 40+40 = 80（>40，跳出）\n  輸出 80。'};
+  },
+  ()=>{ // switch fall-through 進階（APCS 經典）
+    return {ch:3, q:'下列 C 程式輸出為何？',
+      code:`int main() {\n  int a = 2;\n  switch(a) {\n    case 1 + 1:\n      printf("A");\n    case 1 + 2:\n      printf("B");\n      break;\n    default:\n      printf("??");\n  }\n  return 0;\n}`,
+      opts:['A','B','AB','??'], a:2,
+      exp:'case 標籤可以是常數運算式：case 1+1 = case 2、case 1+2 = case 3。\n  a=2 進入 case 2 → 印 "A"。\n  case 2 沒有 break → fall-through 到 case 3 → 印 "B"。\n  case 3 有 break → 跳出。\n  輸出 "AB"'};
+  },
+
+  /* --- Ch4 APCS 風格 --- */
+  ()=>{ // 陣列 index 對應（APCS 經典）
+    return {ch:4, q:'下列 C 程式片段中，輸入依序為 10, 9, 8, 7, …, 1，執行結束後 <code>num</code> 陣列由 index 0 到 9 的內容為何？',
+      code:`int num[10];\nfor (int i = 0; i < 10; i++)\n  scanf("%d", &num[(i + 6) % 10]);`,
+      opts:['6, 5, 4, 3, 2, 1, 10, 9, 8, 7','5, 6, 7, 8, 9, 10, 1, 2, 3, 4','10, 9, 8, 7, 6, 5, 4, 3, 2, 1','4, 5, 6, 7, 8, 9, 10, 1, 2, 3'], a:0,
+      exp:'每次將輸入值放到 index (i+6)%10：\n  i=0 把 10 放 index 6；i=1 把 9 放 index 7；i=2 把 8 放 index 8；i=3 把 7 放 index 9；\n  i=4 把 6 放 index 0；i=5 把 5 放 index 1；…依此類推。\n  最終 num = [6, 5, 4, 3, 2, 1, 10, 9, 8, 7]'};
+  },
+  ()=>{ // 字串 ASCII 算術（APCS 經典）
+    return {ch:4, q:'下列 C 程式片段執行後，下列敘述何者「正確」？',
+      code:`char a[] = {'a','b','c','d','e','f','g','h','i'};\nfor (int i = 0; i < 9; i++)\n  a[i] = a[i] + i * 2;`,
+      opts:["a[0] == 'c'","a[3] == 'm'","a[5] == 'p'","a[1] == 'g'"], a:2,
+      exp:'每個字元被加上 i×2：\n  a[0] = \'a\'+0 = \'a\'\n  a[1] = \'b\'+2 = \'d\'\n  a[2] = \'c\'+4 = \'g\'\n  a[3] = \'d\'+6 = \'j\'\n  a[4] = \'e\'+8 = \'m\'\n  a[5] = \'f\'+10 = \'p\' ✓\n  a[6] = \'g\'+12 = \'s\'\n  a[7] = \'h\'+14 = \'v\'\n  a[8] = \'i\'+16 = \'y\''};
+  },
+  ()=>{ // 二維陣列乘法（APCS 經典）
+    return {ch:4, q:'下列 C 程式輸出為何？',
+      code:`int s1[2][2] = {{0, 1}, {2, 3}};\nint s2[2][2] = {{4, 3}, {2, 1}};\nfor (int i = 0; i < 2; i++)\n  for (int j = 0; j < 2; j++)\n    printf("%d ", s1[i][j] * s2[j][i]);`,
+      opts:['0 2 3 6','2 0 6 3','2 0 3 6','0 2 6 3'], a:3,
+      exp:'注意 s2 用 [j][i] 而非 [i][j]！\n  i=0, j=0：s1[0][0]×s2[0][0] = 0×4 = 0\n  i=0, j=1：s1[0][1]×s2[1][0] = 1×2 = 2\n  i=1, j=0：s1[1][0]×s2[0][1] = 2×3 = 6\n  i=1, j=1：s1[1][1]×s2[1][1] = 3×1 = 3\n  輸出 "0 2 6 3"'};
+  },
+  ()=>{ // 凱薩加密反查（APCS 經典字串題）
+    return {ch:4, q:'下列 C 程式片段中，已知執行 <code>func(s)</code> 後輸出為 "FIHVIU"，則 <code>s</code> 內容為何？',
+      code:`void func(char *s) {\n  char mp[] = "IEFGHDJKLMNOPCRSTUVWXYZABQ";\n  int len = strlen(s);\n  for (int i = 0; i < len; i++) {\n    int c = s[i] - 'A';\n    printf("%c", mp[c]);\n  }\n}`,
+      opts:['DBFTBS','CBESBR','FIHVIU','CAESAR'], a:3,
+      exp:'此函式用 mp 表把 s[i] 替換為 mp[s[i]-\'A\']。\n  反查表（mp 中的字元對應到原字元）：\n    F 在 mp 中位置 2 → 原字元 \'A\'+2 = \'C\'\n    I 在 mp 中位置 0 → \'A\'\n    H 在 mp 中位置 4 → \'E\'\n    V 在 mp 中位置 18 → \'S\'\n    I → \'A\'\n    U 在 mp 中位置 17 → \'R\'\n  輸入字串為 "CAESAR"'};
+  },
+  ()=>{ // 迴文判斷 debug（APCS 經典）
+    return {ch:4, q:'下列函式想要判斷字串是否為迴文，但目前有 bug。應修改哪一行使函式正確？',
+      code:`bool isPal(const char *s) {\n  int p = 1;\n  int len = strlen(s);\n  for (int i = 0; i < len/2 - 1; i++) {\n    if (s[i] != s[len - i - 1])\n      p = 0;\n  }\n  return p;\n}`,
+      opts:['第 4 行改 for (i=0; i<len/2; i++)','第 4 行改 for (i=0; i<len/2+1; i++)','程式沒有錯誤','第 6 行改成 p = 1;'], a:0,
+      exp:'迴文需檢查 s[i] 與 s[len-1-i] 是否相等，i 應跑到 len/2-1（含）。\n  目前迴圈條件 i < len/2-1 少跑一輪，會漏掉中間檢查。\n  例如 "112111" (len=6)：應檢查 i=0,1,2 三組；現在只跑 i=0,1，漏掉 s[2]=\'2\' vs s[3]=\'1\'。\n  修正：i < len/2'};
+  },
+
+  /* --- Ch5 APCS 風格 --- */
+  ()=>{ // 多函式呼叫簡化（APCS 經典）
+    return {ch:5, q:'已知函式定義：<br><code>int op3(int i, int j) { return i * j; }</code><br><code>int op2(int g, int h) { return g * op3(g, h); }</code><br><code>int op1(int e, int f) { return op2(e, f); }</code><br>且 <code>a = 1, b = 2, c = 1, d = 2</code>，則下列四個運算式共有幾個「不同」的值？<br>① <code>op1(op2(op3(b, d), c), a)</code><br>② <code>op2(op3(op1(d, c), a), b)</code><br>③ <code>op3(op1(op2(c, a), d), b)</code><br>④ <code>op3(1, op1(op2(b, c), d))</code>',
+      code:null,
+      opts:['1','2','3','4'], a:2,
+      exp:'先簡化邏輯（APCS 經典技巧）：\n  op2(g, h) = g × g × h\n  op1(e, f) = e × e × f\n  代入計算：\n  ① op3(b,d)=4 → op2(4,c)=16 → op1(16,a)=256\n  ② op1(d,c)=4 → op3(4,a)=4 → op2(4,b)=32\n  ③ op2(c,a)=1 → op1(1,d)=2 → op3(2,b)=4\n  ④ op2(b,c)=4 → op1(4,d)=32 → op3(1,32)=32\n  值：256, 32, 4, 32 → 共 3 個不同'};
+  },
+  ()=>{ // 互遞迴執行順序（APCS 經典）
+    return {ch:5, q:'下列 C 程式輸出為何？',
+      code:`void f1(int);\nvoid f2(int);\nvoid f1(int i) {\n  if (i < 10) {\n    f2(i - 2);\n    printf("%d ", i);\n  }\n}\nvoid f2(int i) {\n  if (i > 0) {\n    printf("%d ", i);\n    f1(i - 1);\n  }\n}\nint main() {\n  f2(9);\n}`,
+      opts:['9 8 6 5 3 2','2 3 5 6 8 9','3 2 5 6 8 9','9 6 3 2 5 8'], a:3,
+      exp:'關鍵：f2 是「先印再呼叫」，f1 是「先呼叫再印」。\n  展開呼叫樹：\n    f2(9): 印 9 → f1(8)\n      f1(8): f2(6) → 印 8\n        f2(6): 印 6 → f1(5)\n          f1(5): f2(3) → 印 5\n            f2(3): 印 3 → f1(2)\n              f1(2): f2(0)[終止] → 印 2\n  輸出順序：9 6 3 2 5 8。技巧：畫呼叫樹找出印的時機。'};
+  },
+  ()=>{ // 帕斯卡三角形遞迴（APCS 經典）
+    return {ch:5, q:'下列遞迴函式呼叫 <code>p(5, 4)</code> 的回傳值為何？',
+      code:`int p(int n, int k) {\n  if (k == 0) return 1;\n  else if (k == 1) return n;\n  else return n * p(n - 1, k - 1);\n}`,
+      opts:['10','30','120','125'], a:2,
+      exp:'追蹤遞迴展開：\n  p(5, 4) = 5 × p(4, 3)\n         = 5 × 4 × p(3, 2)\n         = 5 × 4 × 3 × p(2, 1)\n         = 5 × 4 × 3 × 2（base case k=1，回傳 n=2）\n         = 120'};
+  },
+  ()=>{ // GCD 多種實作辨錯（APCS 經典）
+    return {ch:5, q:'下列為四個 GCD 函式實作。對測資 <code>(42, 18)</code>，哪一個函式的回傳值與其他三者「不同」？',
+      code:`int f1(int a, int b) { // 標準遞迴\n  if (b == 0) return a;\n  return f1(b, a % b);\n}\nint f2(int a, int b) { // 變數操作後遞迴\n  if (b == 0) return a;\n  int c = a % b; a = b; b = c;\n  return f2(a, b);\n}\nint f3(int a, int b) { // 迴圈版本\n  int t = 1;\n  while (t != 0) { t = a % b; a = b; b = t; }\n  return a;\n}\nint f4(int a, int b) { // 可疑實作\n  if (a <= 0 && b <= 0) return b - a;\n  return f4(a - b, a);\n}`,
+      opts:['f1','f2','f3','f4'], a:3,
+      exp:'f1、f2、f3 都是正確 GCD 實作，gcd(42, 18) = 6。\n  f4 使用「相減」而非「取模」，且終止條件詭異。\n  追蹤 f4(42, 18)：\n    → f4(24, 42) → f4(-18, 24) → f4(-42, -18) → 終止，回傳 -18-(-42) = 24\n  f4 回傳 24，與 6 不同。技巧：直接代入測資比較快。'};
+  },
+  ()=>{ // 遞迴 debug（APCS 經典）
+    return {ch:5, q:'下列遞迴想計算 1×2 + 2×3 + 3×4 + … + 9×10，但目前有錯。應如何修改？',
+      code:`int sum(int n) {\n  if (n == 1)\n    return 1;\n  return n * (n - 1) + sum(n - 1);\n}\nint main() {\n  printf("%d", sum(10));\n}`,
+      opts:['第 3 行改成 return 0;','第 4 行改成 return (n-1) * n + sum(n - 1);','第 2 行改成 if (n == 2)','程式沒有錯誤'], a:0,
+      exp:'目標：1×2 + 2×3 + … + 9×10。\n  遞迴式 n×(n-1) + sum(n-1) 對 n≥2 正確。\n  問題在 base case：n=1 時應回傳 0（不該加入 1×0=0 但目前 base 回傳 1），多算了一個 1。\n  正確修改：n=1 時回傳 0，或 base case 用 n<=1。'};
+  },
+
+  /* --- Ch7 APCS 風格（程式碼追蹤資料結構）--- */
+  ()=>{ // 陣列模擬 queue（APCS 經典題組）
+    return {ch:7, q:'下列 C 程式片段以陣列模擬佇列。執行結束後輸出為何？',
+      code:`int Q[30];\nint count = 0, front = 0, back = 0;\nfor (int i = 1; i <= 15; i++) {\n  Q[back] = i;\n  back++;\n}\nwhile (front < back - 1) {\n  int v = Q[front];\n  front++;\n  count++;\n  if (count == 3) {\n    count = 0;\n    Q[back] = v;\n    back++;\n  }\n}\nprintf("%d", Q[front]);`,
+      opts:['6','9','12','15'], a:1,
+      exp:'初始放入 1..15 至 Q[0..14]，back=15。\n  while 邏輯：每 dequeue 3 個元素，把第 3 個重新 enqueue 到尾端。\n  追蹤新增到 Q 的元素：{3, 6, 9, 12, 15}（第一輪）→ Q[15..19] 為 3,6,9,12,15\n  第二輪 dequeue 5 個（front 從 15 → 20），依規則每 3 個 enqueue 一個：把 9 重新放入 Q[20]\n  最終 front=20、back=21，Q[20]=9，輸出 9。'};
+  },
+  ()=>{ // 用 stack 計算 postfix（APCS 風格但實際追蹤）
+    return {ch:7, q:'下列 C 程式以陣列模擬堆疊計算後序表示式 "5 3 + 2 *"，最後 stk[0] 的值為何？',
+      code:`int stk[10], top = 0;\nchar *expr[] = {"5", "3", "+", "2", "*"};\nfor (int i = 0; i < 5; i++) {\n  char *t = expr[i];\n  if (t[0] >= '0' && t[0] <= '9') {\n    stk[top++] = t[0] - '0';\n  } else {\n    int b = stk[--top];\n    int a = stk[--top];\n    if (t[0] == '+') stk[top++] = a + b;\n    else if (t[0] == '*') stk[top++] = a * b;\n  }\n}\nprintf("%d", stk[0]);`,
+      opts:['10','13','16','30'], a:2,
+      exp:'追蹤堆疊變化（top 為下一個空位）：\n  push 5: stk=[5], top=1\n  push 3: stk=[5,3], top=2\n  讀 \'+\': b=3, a=5, push 5+3=8: stk=[8], top=1\n  push 2: stk=[8,2], top=2\n  讀 \'*\': b=2, a=8, push 8*2=16: stk=[16], top=1\n  最終 stk[0] = 16'};
+  },
+  ()=>{ // 二元搜尋程式碼追蹤（APCS 風格）
+    return {ch:7, q:'下列二元搜尋程式碼對陣列 <code>{3, 7, 11, 15, 19, 23, 27, 31}</code> 搜尋 23，<code>while</code> 迴圈共執行幾次？',
+      code:`int a[] = {3, 7, 11, 15, 19, 23, 27, 31};\nint target = 23;\nint lo = 0, hi = 7, mid;\nwhile (lo <= hi) {\n  mid = (lo + hi) / 2;\n  if (a[mid] == target) break;\n  else if (a[mid] < target) lo = mid + 1;\n  else hi = mid - 1;\n}`,
+      opts:['1','2','3','4'], a:1,
+      exp:'追蹤：\n  第1次：lo=0, hi=7, mid=3, a[3]=15 < 23 → lo=4\n  第2次：lo=4, hi=7, mid=5, a[5]=23 == target → break\n  共執行 2 次。\n  雖然 N=8 最壞需要 ⌈log₂8⌉ = 3 次，本題目標剛好落在第 2 次的 mid。'};
+  },
+  ()=>{ // 氣泡排序 pass 數（APCS 風格）
+    return {ch:7, q:'下列氣泡排序對 <code>{5, 1, 4, 2, 8}</code> 排序，最外層 <code>for</code> 迴圈會將內層執行幾次完整的 pass，使資料完全排序？',
+      code:`int a[] = {5, 1, 4, 2, 8};\nint n = 5;\nfor (int i = 0; i < n - 1; i++)\n  for (int j = 0; j < n - 1 - i; j++)\n    if (a[j] > a[j+1]) {\n      int t = a[j]; a[j] = a[j+1]; a[j+1] = t;\n    }`,
+      opts:['1','2','3','4'], a:3,
+      exp:'氣泡排序對 n=5 個元素，外層 for 跑 n-1=4 次（i 從 0 到 3），不論資料是否已排序都會跑完全部 4 個 pass。\n  追蹤排序過程：\n    Pass i=0: [1,4,2,5,8]（最大值 8 沉底）\n    Pass i=1: [1,2,4,5,8]（4、5 排好）\n    Pass i=2: [1,2,4,5,8]（已排序但仍跑）\n    Pass i=3: [1,2,4,5,8]\n  共執行 4 次完整 pass。'};
+  },
+  ()=>{ // 樹的前序走訪程式碼追蹤
+    return {ch:7, q:'下列為某二元樹的前序走訪。陣列 <code>L</code> 是左子節點索引、<code>R</code> 是右子節點索引（-1 表示無子節點）。輸出為何？',
+      code:`int val[7] = {10, 20, 30, 40, 50, 60, 70};\nint L[7] = {1, 3, 5, -1, -1, -1, -1};\nint R[7] = {2, 4, 6, -1, -1, -1, -1};\nvoid preorder(int u) {\n  if (u == -1) return;\n  printf("%d ", val[u]);\n  preorder(L[u]);\n  preorder(R[u]);\n}\nint main() { preorder(0); }`,
+      opts:['10 20 40 50 30 60 70','40 20 50 10 60 30 70','40 50 20 60 70 30 10','10 20 30 40 50 60 70'], a:0,
+      exp:'前序走訪：根→左子樹→右子樹。\n  樹結構（節點索引 + 值）：\n    0(10)\n    ├─ L: 1(20)\n    │   ├─ L: 3(40)\n    │   └─ R: 4(50)\n    └─ R: 2(30)\n        ├─ L: 5(60)\n        └─ R: 6(70)\n  前序：10 → 20 → 40 → 50 → 30 → 60 → 70'};
+  },
+  ()=>{ // 程式碼複雜度估算（APCS 風格）
+    return {ch:7, q:'下列 C 程式片段，<code>cnt</code> 累計多少次？（給定 n = 8）',
+      code:`int cnt = 0;\nfor (int i = 1; i < n; i *= 2)\n  for (int j = 0; j < i; j++)\n    cnt++;`,
+      opts:['3','7','8','15'], a:1,
+      exp:'外層 i 從 1 倍增：1, 2, 4（下一輪 i=8 不再進入）\n  內層 j 跑 i 次。\n  總和 = 1 + 2 + 4 = 7\n  一般式：1+2+4+…+2^(k-1) = 2^k - 1，其中 2^k ≥ n。本題 n=8，2^k = 8 → cnt = 8-1 = 7。\n  時間複雜度為 O(n)（幾何級數收斂），常被誤認為 O(n log n)。'};
   }
+
 ];
 
 /* 套用 _setAns 後處理 */
@@ -806,11 +1543,11 @@ const CH_INFO = {
     extend: '延伸知識：指標核心用途——函式傳址（修改實參）、動態記憶體配置（malloc/free）、函式指標（callback）、資料結構（鏈結串列、樹）。記憶體管理：malloc 配置後必須 free，否則 memory leak。'
   },
   7: {
-    name: '遞迴搜尋',
-    concept: '本章重點：遞迴函式（特別是分而治之）、線性搜尋 vs 二元搜尋、排序演算法（氣泡、選擇、插入、快排、合併、堆積）、時間/空間複雜度（Big-O 表示法）、河內塔等經典遞迴問題。',
-    tips: '解題訣竅：\n  1. 二元搜尋必須先排序：每次砍半，時間 O(log n)。N=1024 最多 log₂(1024)=10 次。\n  2. 線性搜尋無需排序，最壞 O(n)；平均比較次數約 n/2。\n  3. 河內塔 N 盤需 T(N) = 2^N - 1 步；遞迴關係 T(N) = 2·T(N-1) + 1。\n  4. 排序複雜度：氣泡/插入/選擇 O(n²)；快排/合併/堆積 O(n log n)；快排最壞 O(n²)。',
-    pitfall: '常見陷阱：\n  ⚠️ 二元搜尋對未排序資料完全錯誤——必須先排序。\n  ⚠️ 快排「平均」O(n log n) 但「最壞」O(n²)（已排序或全相同元素）。\n  ⚠️ 大 O 只看最高次項：O(n² + n + 1) = O(n²)。\n  ⚠️ 遞迴的空間複雜度＝呼叫深度（佔用 stack）。',
-    extend: '延伸知識：排序穩定性——氣泡、插入、合併「穩定」（相等元素保持原順序）；快排、選擇、堆積「不穩定」。動態規劃（DP）以陣列記憶子問題結果，把指數時間降為多項式時間，是費氏數列、最長共同子序列、背包問題的解法。'
+    name: '資料結構與演算法',
+    concept: '本章重點：資料結構（堆疊 Stack、佇列 Queue、鏈結串列 Linked List、二元樹/BST、堆積 Heap、雜湊表 Hash Table、圖 Graph 的鄰接矩陣/鄰接串列）、演算法（線性/二元搜尋、排序：氣泡/選擇/插入/快排/合併/堆積/計數、遞迴與分治、動態規劃 DP、貪婪、回溯、BFS/DFS、最短路徑、最小生成樹 MST）、時間/空間複雜度（Big-O、Big-Ω、Big-Θ）。',
+    tips: '解題訣竅：\n  1. 堆疊 LIFO、佇列 FIFO；DFS 用堆疊（或遞迴），BFS 用佇列。\n  2. 完美二元樹高度 h（根為 0）共有 2^(h+1)-1 個節點、2^h 個葉節點；完全二元樹陣列表示：父=⌊i/2⌋、左=2i、右=2i+1。\n  3. 二元搜尋必須先排序：每次砍半，時間 O(log n)。比較排序最壞下界 Ω(n log n)（決策樹證明）。\n  4. 排序複雜度：氣泡/插入/選擇 O(n²)；快排/合併/堆積 O(n log n)；快排最壞 O(n²)；計數/基數可 O(n+k) 但屬非比較排序。\n  5. 河內塔 N 盤需 2^N - 1 步；DP 將指數遞迴降為多項式（如費氏 O(2^n) → O(n)）。\n  6. 常見主定理結果：T(n)=2T(n/2)+n → O(n log n)；T(n)=T(n/2)+1 → O(log n)。',
+    pitfall: '常見陷阱：\n  ⚠️ 二元搜尋對未排序資料完全錯誤——必須先排序。\n  ⚠️ 快排「平均」O(n log n) 但「最壞」O(n²)（已排序且固定取首/尾為 pivot、或元素全相同）。\n  ⚠️ Max-Heap 只保證「父≥子」，並不規定左右子樹大小關係，也不是 BST。\n  ⚠️ 鏈結串列無法隨機存取（要 O(n) 走訪），因此不能直接二元搜尋。\n  ⚠️ Big-O 只看最高次項並忽略係數：O(3n² + 5n log n + 100n) = O(n²)。\n  ⚠️ 遞迴的空間複雜度＝呼叫深度（佔用 stack）；C 不保證尾遞迴優化。',
+    extend: '延伸知識：排序穩定性——氣泡、插入、合併「穩定」；快排、選擇、堆積「不穩定」。動態規劃兩大必要條件：重疊子問題 + 最佳子結構（背包、LCS、編輯距離）。圖演算法：BFS/DFS 走訪、Dijkstra 單源最短路徑（非負邊）、Bellman-Ford（允許負邊）、Floyd-Warshall 全點對最短路徑、Kruskal/Prim 最小生成樹。比較排序下界 Ω(n log n) 用決策樹證明；非比較排序如 Counting/Radix/Bucket Sort 可達 O(n+k)。'
   }
 };
 
@@ -876,6 +1613,12 @@ function generateDerived(count, chFilter, lang){
     if(q.a<0 || q.a>3) continue;
     // Python 模式跳過 C++ 專屬題（指標、sizeof、傳址、static）
     if(lang === 'python' && q.cppOnly) continue;
+    // 隨機打亂選項順序（讓同一題型能產生多種選項排列、提升題庫多樣性）
+    if(Array.isArray(q.opts) && q.opts.length===4){
+      const correctText = q.opts[q.a];
+      q.opts = shuf(q.opts);
+      q.a = q.opts.indexOf(correctText);
+    }
     const fp = q.ch+'|'+q.q+'|'+(q.code||'')+'|'+q.opts.join(',');
     if(seen.has(fp)) continue;
     seen.add(fp);
@@ -933,6 +1676,369 @@ function autoInit(){
 function doLogin(){ autoInit(); }
 
 /* ============ NAV ============ */
+/* ============ APCS 觀念題真題資料庫（8 章節）============ */
+/* 真題來源：APCS 大學程式設計先修檢測歷屆觀念題（公開資源整理）
+   注意：真題僅供學習解析，不會出現在「模擬考」題庫中 */
+const APCS_REAL = [
+  {
+    id: 1, title: '變數、型別與運算',
+    desc: '整數除法、運算優先序、視域 scope、巨集 #define、bool 邏輯運算',
+    questions: [
+      {
+        year: '105 年 3 月 第 4 題',
+        q: '經過運算後，下列程式的輸出為何？',
+        code: `int a[101], b[101];\nfor (i = 1; i <= 100; i = i + 1) {\n  b[i] = i;\n}\na[0] = 0;\nfor (i = 1; i <= 100; i = i + 1) {\n  a[i] = b[i] + a[i - 1];\n}\nprintf("%d\\n", a[50] - a[30]);`,
+        opts: ['1275','20','1000','810'], a: 3,
+        exp: '此題涉及等差級數。\n  第一個迴圈把 b[i] = i，即 b[1]=1, b[2]=2, ..., b[100]=100。\n  第二個迴圈計算 a[i] = b[i] + a[i-1]，即 a[i] = 1+2+...+i = i(i+1)/2。\n  a[50] = 50×51/2 = 1275\n  a[30] = 30×31/2 = 465\n  a[50] - a[30] = 1275 - 465 = 810。\n  也可直接用等差級數和：a[50]-a[30] = 31+32+...+50 = (31+50)×20/2 = 810。'
+      },
+      {
+        year: '105 年 10 月 第 4 題',
+        q: '下列程式碼執行後輸出結果為何？',
+        code: `int a = 2, b = 3;\nint c = 4, d = 5;\nint val;\nval = b / a + c / b + d / b;\nprintf("%d\\n", val);`,
+        opts: ['3','4','5','6'], a: 0,
+        exp: 'C 語言整數除法為無條件捨去：\n  b/a = 3/2 = 1\n  c/b = 4/3 = 1\n  d/b = 5/3 = 1\n  val = 1 + 1 + 1 = 3'
+      },
+      {
+        year: '改編自 APCS 經典題型',
+        q: '下列 C 程式輸出為何？（巨集 #define 的常見陷阱）',
+        code: `#define add(a, b) a + b\nint main() {\n  printf("%d", add(3, 5) * add(3, 5));\n  return 0;\n}`,
+        opts: ['23','64','34','30'], a: 0,
+        exp: '#define 是「文字替換」，不會自動加括號。\n  add(3, 5) * add(3, 5) 展開為 3 + 5 * 3 + 5\n  依運算優先序：先做 5 × 3 = 15，再 3 + 15 + 5 = 23。\n  常見錯誤：以為結果是 8×8 = 64。\n  正確寫法：#define add(a, b) ((a) + (b))。'
+      },
+      {
+        year: '105 年 3 月 第 19 題',
+        q: '大部分程式語言以「列為主 (row-major)」方式儲存陣列。在 8×4 的陣列 A 中，若每個元素需要 2 個記憶體單位，且 A[0][0] 的位址為 108 (十進制)，則 A[1][2] 的位址為何？',
+        code: null,
+        opts: ['120','124','128','以上皆非'], a: 0,
+        exp: '列為主儲存：A[i][j] 的相對位移為 (i × 行數 + j) × 元素大小。\n  A[1][2] 距離 A[0][0] 為 (1 × 4 + 2) × 2 = 12 個記憶體單位。\n  位址 = 108 + 12 = 120。'
+      }
+    ]
+  },
+  {
+    id: 2, title: '控制結構（條件判斷）',
+    desc: 'if/else 巢狀、switch fall-through、dangling else 縮排陷阱',
+    questions: [
+      {
+        year: '105 年 3 月 第 16 題',
+        q: '下列程式執行過後所輸出數值為何？',
+        code: `void main () {\n  int count = 10;\n  if (count > 0) {\n    count = 11;\n  }\n  if (count > 10) {\n    count = 12;\n    if (count % 3 == 4) {\n      count = 1;\n    }\n    else {\n      count = 0;\n    }\n  }\n  else if (count > 11) {\n    count = 13;\n  }\n  else {\n    count = 14;\n  }\n  if (count) {\n    count = 15;\n  }\n  else {\n    count = 16;\n  }\n  printf("%d\\n", count);\n}`,
+        opts: ['11','13','15','16'], a: 3,
+        exp: '逐步追蹤：\n  初始 count = 10\n  第一個 if (count > 0)：成立 → count = 11\n  第二個 if (count > 10)：成立 → count = 12\n    內層 if (count % 3 == 4)：12 % 3 = 0 ≠ 4 → else 分支 → count = 0\n  最後 if (count)：count 為 0 (false) → else 分支 → count = 16\n  輸出 16。'
+      },
+      {
+        year: '105 年 10 月 第 2 題',
+        q: '下列 switch 敘述程式碼可以如何以 if-else 改寫？',
+        code: `switch (x) {\n  case 10: y = 'a'; break;\n  case 20:\n  case 30: y = 'b'; break;\n  default: y = 'c';\n}`,
+        opts: [
+          "if(x==10) y='a'; if(x==20||x==30) y='b'; y='c';",
+          "if(x==10) y='a'; else if(x==20||x==30) y='b'; else y='c';",
+          "if(x==10) y='a'; if(x>=20&&x<=30) y='b'; y='c';",
+          "if(x==10) y='a'; else if(x>=20&&x<=30) y='b'; else y='c';"
+        ], a: 1,
+        exp: 'switch-case 相當於 if-else if-else 串接結構，不是 if-if-if 並列。\n  (A)、(C) 排除（用了多個 if 而非 else if，邏輯不等價）。\n  剩 (B) 與 (D) 比較：case 20 沒有 break 會 fall-through 到 case 30，所以 x=20 或 x=30 都會執行 y=\'b\'，是 OR 關係。\n  (D) 用 x>=20 && x<=30 包含 21~29，與原 switch 不同（只匹配 20 或 30）。\n  答案 (B)。'
+      },
+      {
+        year: '改編自 APCS 經典題型',
+        q: 'C 語言的 else 與哪個 if 配對？下列程式 x = 4 時 a 的值為何？',
+        code: `int x = 4, a = 0;\nif (x >= 2)\n  if (x < 6)\n    a = 1;\n  else\n    a = 2;\nelse\n  a = 3;`,
+        opts: ['0','1','2','3'], a: 1,
+        exp: 'C 的 else 永遠配對「最近且未配對的 if」，與縮排無關。\n  外層 if (x >= 2) → 4>=2 為真 → 進入內層\n  內層 if (x < 6) → 4<6 為真 → a = 1\n  外層的 else (a=3) 配對外層 if，因外層為真所以不執行。\n  最終 a = 1。\n  常見陷阱：以為 else 配對外層、答案是 3。'
+      }
+    ]
+  },
+  {
+    id: 3, title: '迴圈控制',
+    desc: 'for/while/do-while、巢狀迴圈、迴圈次數遞推、不可能的輸出',
+    questions: [
+      {
+        year: '105 年 3 月 第 15 題',
+        q: '若以 f(22) 呼叫下列 f() 函式，總共會印出多少數字？（Collatz 數列）',
+        code: `void f(int n) {\n  printf("%d\\n", n);\n  while (n != 1) {\n    if ((n % 2) == 1) {\n      n = 3 * n + 1;\n    }\n    else {\n      n = n / 2;\n    }\n    printf("%d\\n", n);\n  }\n}`,
+        opts: ['16','22','11','15'], a: 0,
+        exp: 'Collatz 序列：奇數 ×3+1、偶數 ÷2，直到 1 為止。\n  追蹤 f(22)：先印 22，進入 while。\n  22→11→34→17→52→26→13→40→20→10→5→16→8→4→2→1\n  迴圈跑了 15 圈、印 15 個數字，加上一開始的 22，共 16 個。'
+      },
+      {
+        year: '105 年 3 月 第 21 題',
+        q: '下列程式碼，執行時的輸出為何？',
+        code: `void main() {\n  for (int i = 0; i <= 10; i = i + 1) {\n    printf("%d ", i);\n    i = i + 1;\n  }\n  printf("\\n");\n}`,
+        opts: ['0 2 4 6 8 10','0 1 2 3 4 5 6 7 8 9 10','0 1 3 5 7 9','0 1 3 5 7 9 11'], a: 0,
+        exp: '迴圈內有額外的 i = i + 1，加上 for 結尾的 i++，每圈共增量 2。\n  i 序列：0, 2, 4, 6, 8, 10（下一次 i=12 > 10 跳出）\n  輸出：「0 2 4 6 8 10」'
+      },
+      {
+        year: '105 年 3 月 第 22 題',
+        q: '下列 f() 函式執行後所回傳的值為何？',
+        code: `int f() {\n  int p = 2;\n  while (p < 2000) {\n    p = 2 * p;\n  }\n  return p;\n}`,
+        opts: ['1023','1024','2047','2048'], a: 3,
+        exp: 'p 從 2 開始持續加倍：2 → 4 → 8 → 16 → 32 → 64 → 128 → 256 → 512 → 1024 → 2048\n  1024 < 2000 仍會進入迴圈，更新為 2048。\n  此時 2048 >= 2000，跳出迴圈，回傳 2048。'
+      },
+      {
+        year: '105 年 10 月 第 7 題',
+        q: '若 n 為正整數，下列程式三個迴圈執行完畢後，a 增加多少？',
+        code: `for (int i = 1; i <= n; i = i + 1)\n  for (int j = i; j <= n; j = j + 1)\n    for (int k = 1; k <= n; k = k + 1)\n      a = a + 1;`,
+        opts: ['n(n+1)/2','n³/2','n(n-1)/2','n²(n+1)/2'], a: 3,
+        exp: '逐層分析迴圈次數：\n  最內層 k：跑 n 次\n  中層 j：從 i 跑到 n，共 (n-i+1) 次\n  外層 i：1 到 n\n  總次數 = n × Σᵢ₌₁ⁿ (n-i+1) = n × Σₖ₌₁ⁿ k = n × n(n+1)/2 = n²(n+1)/2'
+      }
+    ]
+  },
+  {
+    id: 4, title: '陣列與字串',
+    desc: '一維/二維陣列、字串處理、陣列搬移、index 對應計算',
+    questions: [
+      {
+        year: '105 年 3 月 第 2 題',
+        q: '給定陣列 a[10] = {1, 3, 9, 2, 5, 8, 4, 9, 6, 7}，以 f(a, 10) 呼叫下列函式，回傳值為何？',
+        code: `int f(int a[], int n) {\n  int index = 0;\n  for (int i = 1; i <= n - 1; i = i + 1) {\n    if (a[i] >= a[index]) {\n      index = i;\n    }\n  }\n  return index;\n}`,
+        opts: ['1','2','7','9'], a: 2,
+        exp: '此函式找最後一個「最大值」的索引（因條件是 >=）。\n  追蹤 index：\n    初始 index=0 (a[0]=1)\n    i=1: a[1]=3 >= 1，index=1\n    i=2: a[2]=9 >= 3，index=2\n    i=3~6: 都 < 9，不變\n    i=7: a[7]=9 >= 9，index=7（注意是 >=，所以再次更新）\n    i=8,9: 都 < 9，不變\n  最終 index = 7。'
+      },
+      {
+        year: '105 年 3 月 第 11 題',
+        q: '若要將陣列中 a[0] 的元素移到 a[n-1]（其他元素相對位置不論），下列空白處該填入何運算式？',
+        code: `int i, hold, n;\nfor (i = 0; i <= _____; i = i + 1) {\n  hold = a[i];\n  a[i] = a[i + 1];\n  a[i + 1] = hold;\n}`,
+        opts: ['n + 1','n','n - 1','n - 2'], a: 3,
+        exp: '逐次將 a[0] 與下一個元素交換，把它推到尾端。\n  迴圈第 i 圈：a[i] 與 a[i+1] 交換。\n  目標：將 a[0] 推到 a[n-1]。\n  當 i = n-2 時，做 a[n-2] 與 a[n-1] 交換，原本 a[0] 就到了 a[n-1]。\n  因此 i 的上限是 n-2。'
+      },
+      {
+        year: '105 年 10 月 第 5 題',
+        q: '下列程式碼執行後輸出結果為何？',
+        code: `int a[9] = {1, 3, 5, 7, 9, 8, 6, 4, 2};\nint n = 9, tmp;\nfor (int i = 0; i < n; i = i + 1) {\n  tmp = a[i];\n  a[i] = a[n - i - 1];\n  a[n - i - 1] = tmp;\n}\nfor (int i = 0; i <= n / 2; i = i + 1)\n  printf("%d %d ", a[i], a[n - i - 1]);`,
+        opts: ['2 4 6 8 9 7 5 3 1 9','1 3 5 7 9 2 4 6 8 9','1 2 3 4 5 6 7 8 9 9','2 4 6 8 5 1 3 7 9 9'], a: 2,
+        exp: '第一個迴圈是「虛晃一招」：i 從 0 跑到 8，每次交換 a[i] 與 a[n-i-1]。\n  i=0~3 反轉一次；i=4 自己跟自己交換不變；i=5~8 又反轉回去。\n  最終陣列維持原始 {1,3,5,7,9,8,6,4,2}... 但等等，原陣列中央 a[4]=9，反轉後 a 變為 {2,4,6,8,9,7,5,3,1} 再反轉回 {1,3,5,7,9,8,6,4,2}。\n  第二個迴圈印出每對 a[i], a[n-i-1]：(1,2)(3,4)(5,6)(7,8)(9,9)\n  輸出「1 2 3 4 5 6 7 8 9 9 」。'
+      },
+      {
+        year: '105 年 3 月 第 9 題',
+        q: '下列程式輸出 c 的值為何？',
+        code: `int A[5], B[5], i, c;\nfor (i = 1; i <= 4; i = i + 1) {\n  A[i] = 2 + i * 4;\n  B[i] = i * 5;\n}\nc = 0;\nfor (i = 1; i <= 4; i = i + 1) {\n  if (B[i] > A[i]) {\n    c = c + (B[i] % A[i]);\n  }\n  else {\n    c = 1;\n  }\n}\nprintf("%d\\n", c);`,
+        opts: ['1','4','3','33'], a: 1,
+        exp: '建立陣列：A = {_, 6, 10, 14, 18}，B = {_, 5, 10, 15, 20}（index 0 不用）\n  逐圈計算 c：\n    i=1: B[1]=5 < A[1]=6 → else → c = 1\n    i=2: B[2]=10 = A[2]=10（不 >）→ else → c = 1\n    i=3: B[3]=15 > A[3]=14 → c = 1 + (15%14) = 1+1 = 2\n    i=4: B[4]=20 > A[4]=18 → c = 2 + (20%18) = 2+2 = 4\n  輸出 4。'
+      }
+    ]
+  },
+  {
+    id: 5, title: '函式與單一遞迴',
+    desc: '基本遞迴、終止條件設計、遞迴展開追蹤、含陣列參數的遞迴',
+    questions: [
+      {
+        year: '105 年 3 月 第 10 題',
+        q: '呼叫下列 g() 函式，g(13) 回傳值為何？',
+        code: `int g(int a) {\n  if (a > 1) {\n    return g(a - 2) + 3;\n  }\n  return a;\n}`,
+        opts: ['16','18','19','22'], a: 2,
+        exp: '遞迴展開：每次 a 減 2，每層加 3，終止條件 a ≤ 1。\n  g(13) = g(11) + 3\n  g(11) = g(9) + 3\n  g(9) = g(7) + 3\n  g(7) = g(5) + 3\n  g(5) = g(3) + 3\n  g(3) = g(1) + 3\n  g(1) = 1（終止）\n  合計 = 1 + 3×6 = 19。'
+      },
+      {
+        year: '105 年 10 月 第 3 題',
+        q: '給定下列函式，執行 G(3) 後回傳值為何？',
+        code: `int K(int a[], int n) {\n  if (n >= 0)\n    return (K(a, n - 1) + a[n]);\n  else\n    return 0;\n}\nint G(int n) {\n  int a[] = {5, 4, 3, 2, 1};\n  return K(a, n);\n}`,
+        opts: ['5','12','14','15'], a: 2,
+        exp: 'K(a, n) 等於 a[0] + a[1] + ... + a[n]。\n  G(3) → K(a, 3)\n  K(a, 3) = K(a, 2) + a[3] = K(a, 2) + 2\n  K(a, 2) = K(a, 1) + a[2] = K(a, 1) + 3\n  K(a, 1) = K(a, 0) + a[1] = K(a, 0) + 4\n  K(a, 0) = K(a, -1) + a[0] = 0 + 5 = 5\n  合計 = 5 + 4 + 3 + 2 = 14。'
+      },
+      {
+        year: '105 年 10 月 第 6 題',
+        q: '右側函式以 F(7) 呼叫後回傳值為 12，則「條件」應為何？',
+        code: `int F(int a) {\n  if ( <條件> )\n    return 1;\n  else\n    return F(a - 2) + F(a - 3);\n}`,
+        opts: ['a < 3','a < 2','a < 1','a < 0'], a: 3,
+        exp: '試代各選項計算 F(7)：\n  若 a<0：F(7)=F(5)+F(4)=...層層展開最終 = 12 ✓\n  若 a<1：F(7) = 9\n  若 a<2：F(7) = 7\n  若 a<3：F(7) = 5\n  詳算 a<0 時：F(0)=F(-2)+F(-3)=1+1=2、F(1)=F(-1)+F(-2)=2、F(2)=F(0)+F(-1)=2+1=3、F(3)=F(1)+F(0)=4、F(4)=F(2)+F(1)=5、F(5)=F(3)+F(2)=7、F(7)=F(5)+F(4)=7+5=12 ✓'
+      },
+      {
+        year: '105 年 3 月 第 7 題',
+        q: '請問以 a(13, 15) 呼叫下列 a() 函式，回傳值為何？',
+        code: `int a(int n, int m) {\n  if (n < 10) {\n    if (m < 10) {\n      return n + m;\n    }\n    else {\n      return a(n, m - 2) + m;\n    }\n  }\n  else {\n    return a(n - 1, m) + n;\n  }\n}`,
+        opts: ['90','103','93','60'], a: 1,
+        exp: '兩維遞迴。當 n>=10 先把 n 減到 9；當 n<10 但 m>=10，把 m 減到 9。\n  a(13,15) → 一直 a(n-1, 15) 直到 a(9, 15)，累加 13+12+11+10\n  a(9, 15) → 一直 a(9, m-2) 直到 a(9, 9)，累加 15+13+11\n  a(9, 9) = 9 + 9 = 18\n  總和 = 18 + (15+13+11) + (10+11+12+13) = 18 + 39 + 46 = 103。'
+      },
+      {
+        year: '105 年 3 月 第 25 題',
+        q: '下列 Mystery() 函式 else 部分運算式應為何，才能使 Mystery(9) 回傳 34？',
+        code: `int Mystery(int x) {\n  if (x <= 1) {\n    return x;\n  }\n  else {\n    return _____ ;\n  }\n}`,
+        opts: ['x + Mystery(x - 1)','x * Mystery(x - 1)','Mystery(x - 2) + Mystery(x + 2)','Mystery(x - 2) + Mystery(x - 1)'], a: 3,
+        exp: '此為費式數列 (Fibonacci) 的變形。\n  (D) Mystery(x-2) + Mystery(x-1)，且 Mystery(0)=0, Mystery(1)=1。\n  序列：0, 1, 1, 2, 3, 5, 8, 13, 21, 34\n  Mystery(9) = 34 ✓\n  (A) 是累加 = 9+8+...+1 = 45；(B) 是階乘類；(C) 包含 x+2 不會收斂。'
+      }
+    ]
+  },
+  {
+    id: 6, title: '互遞迴與多函式呼叫',
+    desc: '兩個或多個函式相互呼叫、執行順序追蹤、用餘數推測大數值',
+    questions: [
+      {
+        year: '105 年 3 月 第 12 題',
+        q: '給定下列函式 f1() 及 f2()。f1(1) 運算過程中，以下敘述何者「錯」？',
+        code: `void f1(int m) {\n  if (m > 3) {\n    printf("%d\\n", m);\n    return;\n  }\n  else {\n    printf("%d\\n", m);\n    f2(m + 2);\n    printf("%d\\n", m);\n  }\n}\nvoid f2(int n) {\n  if (n > 3) {\n    printf("%d\\n", n);\n    return;\n  }\n  else {\n    printf("%d\\n", n);\n    f1(n - 1);\n    printf("%d\\n", n);\n  }\n}`,
+        opts: ['印出的數字最大的是 4','f1 一共被呼叫二次','f2 一共被呼叫三次','數字 2 被印出兩次'], a: 2,
+        exp: '追蹤 f1(1)：\n  f1(1) 印 1 → f2(3) 印 3 → f1(2) 印 2 → f2(4) 印 4（>3, return）→ 回 f1(2) 印 2 → 回 f2(3) 印 3 → 回 f1(1) 印 1\n  共印：1 3 2 4 2 3 1（最大 4 ✓）\n  f1 被呼叫 2 次（f1(1), f1(2) ✓）\n  f2 被呼叫 2 次（f2(3), f2(4)，不是 3 次 ✗）\n  數字 2 被印 2 次 ✓\n  答案：(C) 錯誤。'
+      },
+      {
+        year: '105 年 3 月 第 14 題',
+        q: '下列程式輸出為何？（互遞迴的大數值技巧）',
+        code: `void foo(int i) {\n  if (i <= 5)\n    printf("foo: %d\\n", i);\n  else\n    bar(i - 10);\n}\nvoid bar(int i) {\n  if (i <= 10)\n    printf("bar: %d\\n", i);\n  else\n    foo(i - 5);\n}\nvoid main() {\n  foo(15106);\n  bar(3091);\n  foo(6693);\n}`,
+        opts: ['bar:6 / bar:1 / bar:8','bar:6 / foo:1 / bar:3','bar:1 / foo:1 / bar:8','bar:6 / foo:1 / foo:3'], a: 0,
+        exp: '技巧：互遞迴中每 15 個單位會循環一次（10+5）。將大數除以 15 取餘數推測結果，但要讓餘數 > 15，採「除不盡」方式。\n  foo(15106)：15106 = 1006×15 + 16 → 模擬 foo(16)：>5 → bar(6)：≤10 → 印 "bar: 6"\n  bar(3091)：3091 = 205×15 + 16 → 模擬 bar(16)：>10 → foo(11)：>5 → bar(1)：≤10 → 印 "bar: 1"\n  foo(6693)：6693 = 445×15 + 18 → 模擬 foo(18)：>5 → bar(8)：≤10 → 印 "bar: 8"'
+      },
+      {
+        year: '105 年 3 月 第 24 題',
+        q: '右側 g(4) 函式呼叫執行後，回傳值為何？',
+        code: `int f(int n) {\n  if (n > 3) {\n    return 1;\n  }\n  else if (n == 2) {\n    return (3 + f(n + 1));\n  }\n  else {\n    return (1 + f(n + 1));\n  }\n}\nint g(int n) {\n  int j = 0;\n  for (int i = 1; i <= n - 1; i = i + 1) {\n    j = j + f(i);\n  }\n  return j;\n}`,
+        opts: ['6','11','13','14'], a: 2,
+        exp: '先算 f 的各值：\n  f(4) = 1\n  f(3) = 1 + f(4) = 2\n  f(2) = 3 + f(3) = 5\n  f(1) = 1 + f(2) = 6\n  g(4) = f(1) + f(2) + f(3) = 6 + 5 + 2 = 13。'
+      }
+    ]
+  },
+  {
+    id: 7, title: '資料結構（堆疊、佇列、鏈結串列）',
+    desc: '★ 此章節為 APCS 資料結構核心：陣列模擬 Stack/Queue、Linked List 操作',
+    questions: [
+      {
+        year: '105 年 3 月 第 6 題（鏈結串列）',
+        q: 'List 是陣列，元素有 data 與 next（記錄下一個元素索引，-1 表結尾）。已知 list 內：list[1] = (\'a\', next=2)、list[2] = (\'b\', next=-1)、list[3] = (\'c\', next=1)。串列順序為 c → a → b。<br>RemoveNextElement 程序用來移除 current 所指向的下一個元素，但保持原本串列順序。空白處該填入何運算式？',
+        code: `void RemoveNextElement(int current) {\n  if (list[current].next != -1) {\n    /* 移除 current 指向之下一節點 */\n    _____;\n  }\n}`,
+        opts: [
+          'list[current].next = current;',
+          'list[current].next = list[list[current].next].next;',
+          'current = list[list[current].next].next;',
+          'list[list[current].next].next = list[current].next;'
+        ], a: 1,
+        exp: '鏈結串列刪除「current 之後的節點」的標準作法：\n  把「current 指向的下一個節點的 next」（即下下一個節點索引）抓出來，設為 current 的 next。\n  即：list[current].next = list[list[current].next].next;\n  例：current=3 (c)，list[3].next=1 (指向 a)，list[1].next=2 (指向 b)。\n  執行後 list[3].next = 2，串列變成 c → b（a 被跳過）。'
+      },
+      {
+        year: '改編自 APCS 風格',
+        q: '下列 C 程式以陣列模擬佇列。執行結束後輸出為何？（典型 APCS 第二節題組風格）',
+        code: `int Q[30];\nint count = 0, front = 0, back = 0;\nfor (int i = 1; i <= 15; i++) {\n  Q[back] = i;\n  back++;\n}\nwhile (front < back - 1) {\n  int v = Q[front];\n  front++;\n  count++;\n  if (count == 3) {\n    count = 0;\n    Q[back] = v;\n    back++;\n  }\n}\nprintf("%d", Q[front]);`,
+        opts: ['6','9','12','15'], a: 1,
+        exp: '初始放入 1..15 到 Q[0..14]。\n  while 邏輯：dequeue 三個元素，將第 3 個重新 enqueue 到尾端。\n  第一輪 dequeue：{1,2,3} → 3 重入到 Q[15]；{4,5,6} → 6 重入到 Q[16]；…\n  共重入 5 個值（3,6,9,12,15）到 Q[15..19]，back=20。\n  接著繼續：dequeue 3,6,9... 每 3 個又把第 3 個重入。\n  最終 front=20、back=21，Q[20] = 9。'
+      },
+      {
+        year: '改編自 APCS 風格',
+        q: '下列 C 程式以陣列模擬堆疊計算後序表示式 "5 3 + 2 *"。最後 stk[0] 的值為何？',
+        code: `int stk[10], top = 0;\nchar *expr[] = {"5", "3", "+", "2", "*"};\nfor (int i = 0; i < 5; i++) {\n  char *t = expr[i];\n  if (t[0] >= '0' && t[0] <= '9') {\n    stk[top++] = t[0] - '0';\n  } else {\n    int b = stk[--top];\n    int a = stk[--top];\n    if (t[0] == '+') stk[top++] = a + b;\n    else if (t[0] == '*') stk[top++] = a * b;\n  }\n}\nprintf("%d", stk[0]);`,
+        opts: ['10','13','16','30'], a: 2,
+        exp: '後序表示式用堆疊計算：見數字 push、見運算子彈出兩個運算後 push 結果。\n  push 5 → stk=[5], top=1\n  push 3 → stk=[5,3], top=2\n  讀 \'+\'：b=3、a=5，push 8 → stk=[8], top=1\n  push 2 → stk=[8,2], top=2\n  讀 \'*\'：b=2、a=8，push 16 → stk=[16], top=1\n  最終 stk[0] = 16。即原式 (5+3)×2 = 16。'
+      },
+      {
+        year: '改編自 APCS 風格',
+        q: '下列為某二元樹的前序走訪程式碼，輸出為何？',
+        code: `int val[7] = {10, 20, 30, 40, 50, 60, 70};\nint L[7] = {1, 3, 5, -1, -1, -1, -1};\nint R[7] = {2, 4, 6, -1, -1, -1, -1};\nvoid preorder(int u) {\n  if (u == -1) return;\n  printf("%d ", val[u]);\n  preorder(L[u]);\n  preorder(R[u]);\n}\nint main() { preorder(0); }`,
+        opts: ['10 20 40 50 30 60 70','40 20 50 10 60 30 70','40 50 20 60 70 30 10','10 20 30 40 50 60 70'], a: 0,
+        exp: '從 L、R 陣列建出二元樹：\n  0(10)\n  ├ 左 1(20)\n  │  ├ 左 3(40)\n  │  └ 右 4(50)\n  └ 右 2(30)\n     ├ 左 5(60)\n     └ 右 6(70)\n  前序走訪：根→左→右\n  10 → 20 → 40 → 50 → 30 → 60 → 70'
+      }
+    ]
+  },
+  {
+    id: 8, title: '排序、搜尋與程式除錯',
+    desc: '線性/二元搜尋、各種排序、找錯誤的 debug 題、效能分析',
+    questions: [
+      {
+        year: '105 年 3 月 第 3 題',
+        q: '已知 a[k] = 3k+1。以 value=100 呼叫下列兩函式，假設 f1 與 f2 之 while 主體分別執行 n1 與 n2 次。n1 與 n2 各為何？',
+        code: `int f1(int a[], int value) {  /* 線性搜尋 */\n  int r = -1, i = 0;\n  while (i < 100) {\n    if (a[i] == value) { r = i; break; }\n    i = i + 1;\n  }\n  return r;\n}\nint f2(int a[], int value) {  /* 二元搜尋 */\n  int r = -1, lo = 0, hi = 99, mid;\n  while (lo <= hi) {\n    mid = (lo + hi) / 2;\n    if (a[mid] == value) { r = mid; break; }\n    else if (a[mid] < value) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return r;\n}`,
+        opts: ['n1=33, n2=4','n1=33, n2=5','n1=34, n2=4','n1=34, n2=5'], a: 3,
+        exp: '陣列：a[0]=1, a[1]=4, ..., a[33]=100。\n  f1（線性）：i 從 0 跑到 33 才找到 100，迴圈本體執行 34 次。\n  f2（二元搜尋）：\n    第1次 mid=49, a[49]=148 > 100, hi=48\n    第2次 mid=24, a[24]=73 < 100, lo=25\n    第3次 mid=36, a[36]=109 > 100, hi=35\n    第4次 mid=30, a[30]=91 < 100, lo=31\n    第5次 mid=33, a[33]=100 ✓ break\n  n1 = 34, n2 = 5。'
+      },
+      {
+        year: '105 年 10 月 第 1 題（選擇排序追蹤）',
+        q: '下列 F() 函式執行後，輸出為何？',
+        code: `void F() {\n  char t, item[] = {'2', '8', '3', '1', '9'};\n  int a, b, c, count = 5;\n  for (a = 0; a < count - 1; a = a + 1) {\n    c = a;\n    t = item[a];\n    for (b = a + 1; b < count; b = b + 1) {\n      if (item[b] < t) {\n        c = b;\n        t = item[b];\n      }\n      if ((a == 2) && (b == 3)) {\n        printf("%c %d\\n", t, c);\n      }\n    }\n  }\n}`,
+        opts: ['1 2','1 3','3 2','3 3'], a: 1,
+        exp: '關鍵：唯一的 printf 只在 (a==2, b==3) 執行。只需追蹤該點：\n  進入 a=2 外圈時：c = 2, t = item[2] = \'3\'。\n  內圈 b=3：item[3]=\'1\' < \'3\' (t)，所以 c = 3, t = \'1\'。\n  接著 a==2 && b==3 都滿足，印 "1 3"。'
+      },
+      {
+        year: '105 年 3 月 第 17 題（debug）',
+        q: '下列程式輸入六個整數，檢測「最後一個是否為最小」。然而程式有錯，哪組測資能測出錯誤？',
+        code: `for (int i = 1; i <= 5; i++)\n  scanf("%d", &d[i]);\nscanf("%d", &val);\nallBig = TRUE;\nfor (int i = 1; i <= 5; i++) {\n  if (d[i] > val) {\n    allBig = TRUE;\n  } else {\n    allBig = FALSE;\n  }\n}\nif (allBig == TRUE)\n  printf("%d is the smallest.\\n", val);\nelse\n  printf("%d is not the smallest.\\n", val);`,
+        opts: ['11 12 13 14 15 3','11 12 13 14 25 20','23 15 18 20 11 12','18 17 19 24 15 16'], a: 1,
+        exp: 'bug：allBig 在迴圈中被覆寫，最終值只取決於 d[5] 與 val 的關係。\n  正確的寫法應是「只要有任何一個 d[i] <= val，就 allBig = FALSE」。\n  (A) val=3 真的最小，d[5]=15>3 → allBig=TRUE，程式答對 ✗（檢測不出 bug）\n  (B) val=20 不是最小（25>20，11<20...），d[5]=25>20 → allBig=TRUE，但 20 不是最小，程式答錯 ✓（測出 bug）\n  (C)(D) val 不是最小但 d[5]≤val → allBig=FALSE → 程式說「不是最小」剛好正確，測不出 bug。'
+      },
+      {
+        year: '105 年 3 月 第 20 題（debug）',
+        q: '下列為計算 n 階層的函式，請問如何修改才正確？',
+        code: `int fun(int n) {\n  int fac = 1;\n  if (n >= 0) {\n    fac = n * fun(n - 1);\n  }\n  return fac;\n}`,
+        opts: [
+          '第 2 行改為 int fac = n;',
+          '第 3 行改為 if (n > 0) {',
+          '第 4 行改為 fac = n * fun(n + 1);',
+          '第 4 行改為 fac = fac * fun(n - 1);'
+        ], a: 1,
+        exp: '原程式 bug：當 n=0 時，因 n>=0 仍進入遞迴，fac = 0 × fun(-1) = 0，導致層層回傳都是 0。\n  修正：將條件改為 if (n > 0)，讓 n=0 時不再遞迴而直接回傳初始 fac=1（即 0! = 1）。\n  (C) n+1 不收斂；(D) 不改判斷條件仍會傳回 0。'
+      },
+      {
+        year: '105 年 3 月 第 1 題（debug）',
+        q: '下列程式想輸出 5 行星號（每行星號數 1,3,5,7,9，前方空格 4,3,2,1,0）。在不修改第 4 行及第 7 行的前提下，最少需修改幾行才能得到正確輸出？',
+        code: `int k = 4;\nint m = 1;\nfor (int i = 1; i <= 5; i = i + 1) {\n  for (int j = 1; j <= k; j = j + 1) {\n    printf(" ");\n  }\n  for (int j = 1; j <= m; j = j + 1) {\n    printf("*");\n  }\n  printf("\\n");\n  k = k - 1;\n  m = m + 1;\n}`,
+        opts: ['1','2','3','4'], a: 0,
+        exp: '目標：每列空格數 4,3,2,1,0（遞減 1），星號數 1,3,5,7,9（遞增 2）。\n  k 控制空格、m 控制星號。\n  第 11 行 k=k-1（正確）；第 12 行 m=m+1（錯誤，應為 m+2）\n  只需改第 12 行為 m = m + 2，1 行修改完成。'
+      }
+    ]
+  }
+];
+
+
+/* ============ APCS 真題解析渲染 ============ */
+function renderApcsReal(){
+  const root = document.getElementById('apcs-content');
+  if(!root) return;
+  if(root.dataset.rendered === '1') return; // 只渲染一次
+  let html = '';
+  APCS_REAL.forEach(ch => {
+    html += `<div class="card" style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none" onclick="toggleApcsCh(${ch.id})">
+        <div>
+          <div style="font-size:16px;font-weight:700;color:var(--green)">📖 第 ${ch.id} 章　${ch.title}</div>
+          <div style="font-size:12px;color:var(--dim);margin-top:4px">${ch.desc}　・　共 ${ch.questions.length} 題</div>
+        </div>
+        <div id="apcs-arrow-${ch.id}" style="font-size:20px;color:var(--dim)">▶</div>
+      </div>
+      <div id="apcs-ch-${ch.id}" style="display:none;margin-top:14px;border-top:1px solid var(--line);padding-top:14px">`;
+    ch.questions.forEach((q, qi) => {
+      const qid = `${ch.id}-${qi}`;
+      const optsHtml = q.opts.map((o, oi) => 
+        `<div style="padding:8px 12px;margin:4px 0;border-radius:7px;background:#f9fafb;border:1px solid #e5e7eb;font-size:13px">
+          <span style="font-weight:700;color:#6b7280;margin-right:8px">(${String.fromCharCode(65+oi)})</span>${escapeHtml(o)}
+        </div>`).join('');
+      const codeBlock = q.code ? 
+        `<pre style="background:#0d1117;color:#c9d1d9;padding:14px;margin:10px 0;font-family:Consolas,Monaco,monospace;font-size:13px;line-height:1.6;border-radius:8px;overflow-x:auto;tab-size:2">${escapeHtml(q.code)}</pre>` : '';
+      html += `<div style="margin-bottom:18px;padding-bottom:18px;border-bottom:1px dashed #e5e7eb">
+        <div style="font-size:11px;color:#9ca3af;margin-bottom:4px">${q.year}</div>
+        <div style="font-size:14px;font-weight:600;line-height:1.7;margin-bottom:8px">${q.q}</div>
+        ${codeBlock}
+        ${optsHtml}
+        <button onclick="toggleApcsAns('${qid}')" id="apcs-btn-${qid}" style="margin-top:10px;padding:7px 14px;border:none;border-radius:7px;background:var(--green);color:white;font-size:13px;font-weight:600;cursor:pointer">顯示答案與詳解</button>
+        <div id="apcs-ans-${qid}" style="display:none;margin-top:10px;padding:12px 14px;background:var(--greenll);border-left:4px solid var(--green);border-radius:6px">
+          <div style="font-weight:700;color:var(--green);margin-bottom:6px">✓ 正解：(${String.fromCharCode(65+q.a)}) ${escapeHtml(q.opts[q.a])}</div>
+          <div style="font-size:13px;line-height:1.8;white-space:pre-wrap;color:#1f2937">${escapeHtml(q.exp)}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  root.innerHTML = html;
+  root.dataset.rendered = '1';
+}
+function toggleApcsCh(id){
+  const box = document.getElementById('apcs-ch-'+id);
+  const arrow = document.getElementById('apcs-arrow-'+id);
+  if(box.style.display === 'none'){
+    box.style.display = 'block';
+    arrow.textContent = '▼';
+  } else {
+    box.style.display = 'none';
+    arrow.textContent = '▶';
+  }
+}
+function toggleApcsAns(qid){
+  const ans = document.getElementById('apcs-ans-'+qid);
+  const btn = document.getElementById('apcs-btn-'+qid);
+  if(ans.style.display === 'none'){
+    ans.style.display = 'block';
+    btn.textContent = '隱藏答案';
+    btn.style.background = '#9ca3af';
+  } else {
+    ans.style.display = 'none';
+    btn.textContent = '顯示答案與詳解';
+    btn.style.background = 'var(--green)';
+  }
+}
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 function navTo(p){
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
   document.querySelectorAll('.ntab').forEach(x=>x.classList.remove('on'));
@@ -940,6 +2046,7 @@ function navTo(p){
   document.getElementById('nav-'+p).classList.add('on');
   if(p==='exam'){ renderExamHome(); renderExamHist(); }
   if(p==='stats') renderStats();
+  if(p==='apcs') renderApcsReal();
 }
 
 /* ============ BUILD SELECTS ============ */
@@ -1313,7 +2420,7 @@ function startExam(){
     ch = 'all';
     document.getElementById('exam-ch').value = 'all';
   }
-  const pool = generateDerived(cnt*3, ch==='all'?null:parseInt(ch), G.lang);
+  const pool = generateDerived(1000, ch==='all'?null:parseInt(ch), G.lang);
   if(pool.length<cnt){ toast('題庫不足，請選擇其他章節'); return; }
   G.examState = {
     qs: shuf(pool).slice(0,cnt),
@@ -1650,27 +2757,6 @@ if(document.readyState === 'loading'){
   gtag('config', 'G-XXXXXXXXXX');
 </script>
 -->
-
-<!-- ─────────────────────────────────────────────────
-     【超簡單】訪客計數徽章 — 顯示在頁尾，無需任何設定
-     直接顯示「累積瀏覽次數」，第一次有人訪問就會自動初始化
-     已預設啟用；不要的話可以把這段刪除
-     ───────────────────────────────────────────────── -->
-<script>
-(function(){
-  // 等 DOM 載入完成
-  function init(){
-    const footer = document.querySelector('footer');
-    if(!footer) return;
-    const counter = document.createElement('div');
-    counter.style.cssText = 'margin-top:10px;font-size:11px;color:#9ca3af';
-    counter.innerHTML = '👀 累積訪客：<img src="https://api.visitorbadge.io/api/visitors?path=hs-prog-test&label=&countColor=%231d5c3a&style=flat" alt="visitors" style="vertical-align:middle;margin-left:4px">';
-    footer.appendChild(counter);
-  }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-  else init();
-})();
-</script>
 
 </body>
 </html>
