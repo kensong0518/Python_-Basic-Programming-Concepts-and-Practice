@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>高中生程式檢定模擬（非官方）</title>
+<title>高中生程式能力測試（非官方）</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--ink:#1a1a2e;--dim:#4a4a6a;--muted:#8a8aaa;--line:#e0e0f0;--bg:#f5f4f0;--green:#1d5c3a;--greenl:#2d8a5a;--greenll:#e8f5ee;--blue:#1a3f7a;--bluell:#e5edf8;--red:#b52a2a;--redl:#fce8e8;--code-bg:#0d1117;--code-text:#c9d1d9;--shadow:0 2px 16px rgba(0,0,0,.08);--radius:14px}
+:root{--ink:#1a1a2e;--dim:#4a4a6a;--muted:#8a8aaa;--line:#e0e0f0;--bg:#f5f4f0;--green:#1d5c3a;--greenl:#2d8a5a;--greenll:#e8f5ee;--blue:#1a3f7a;--bluell:#e5edf8;--red:#b52a2a;--redl:#fce8e8;--orange:#c47800;--violet:#7c3aed;--code-bg:#0d1117;--code-text:#c9d1d9;--shadow:0 2px 16px rgba(0,0,0,.08);--radius:14px}
 body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px}
 button{cursor:pointer;font-family:inherit}
 .hidden{display:none!important}
@@ -24,7 +24,10 @@ button{cursor:pointer;font-family:inherit}
 .chip.t{background:var(--bluell);color:var(--blue)}
 #wrap{max-width:1060px;margin:0 auto;padding:22px 20px 90px}
 .page{display:none}.page.on{display:block}
-#login-screen{min-height:100vh;background:linear-gradient(160deg,#0a0f1e,#162435,#1a3a2a);display:flex;align-items:center;justify-content:center;padding:20px}
+#login-screen{position:relative;min-height:100vh;background:linear-gradient(160deg,#0a0f1e,#162435,#1a3a2a);display:flex;align-items:center;justify-content:center;padding:20px}
+.cover-views{position:absolute;top:18px;right:20px;display:flex;align-items:center;gap:8px;padding:7px 13px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;font-size:11px;font-weight:600;color:rgba(255,255,255,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:10}
+.cover-views img{display:block;height:18px}
+@media(max-width:600px){.cover-views{top:12px;right:12px;padding:5px 10px;font-size:10px}.cover-views img{height:16px}}
 .lbox{width:100%;max-width:460px}
 .licon{font-size:56px;text-align:center;margin-bottom:10px}
 .ltitle{font-family:'Noto Serif TC',serif;font-size:26px;color:#e8f4f0;text-align:center;margin-bottom:4px}
@@ -97,17 +100,24 @@ pre.code-block .kw{color:#d2a8ff}
 pre.code-block .nm{color:#e3b341}
 pre.code-block .st{color:#a5d6ff}
 pre.code-block .cm{color:#8b949e;font-style:italic}
-.qcard{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:14px;border:1.5px solid transparent}
+.qcard{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:14px;border:1.5px solid transparent;scroll-margin-top:80px}
+.qcard.q-answered{border-color:var(--greenl)}
 .qtags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
 .qnum{font-size:13px;font-weight:700;color:var(--muted)}
-.qtext{font-size:14.5px;font-weight:600;color:var(--ink);line-height:1.9;margin:8px 0 14px}
+.qtext,.qtxt{font-size:14.5px;font-weight:600;color:var(--ink);line-height:1.9;margin:8px 0 14px}
+.qtxt code{background:#f0f0f0;padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:13px;color:#b52a2a}
 .opts{display:flex;flex-direction:column;gap:8px}
-.opt-btn{display:flex;align-items:flex-start;gap:11px;padding:13px 16px;border-radius:11px;border:1.5px solid var(--line);background:#fafafa;cursor:pointer;width:100%;text-align:left;font-family:inherit;font-size:13.5px;transition:all .15s;color:var(--ink);line-height:1.6}
-.opt-btn:hover:not(:disabled){border-color:var(--greenl);background:var(--greenll)}
-.opt-btn.correct{border-color:var(--green)!important;background:var(--greenll)}
-.opt-btn.wrong{border-color:var(--red)!important;background:var(--redl)}
+.opt,.opt-btn{display:flex;align-items:flex-start;gap:11px;padding:13px 16px;border-radius:11px;border:1.5px solid var(--line);background:#fafafa;cursor:pointer;width:100%;text-align:left;font-family:inherit;font-size:13.5px;transition:all .15s;color:var(--ink);line-height:1.6;user-select:none}
+.opt:hover,.opt-btn:hover:not(:disabled){border-color:var(--greenl);background:var(--greenll)}
+.opt.selected{border-color:var(--green)!important;background:var(--greenll)!important;box-shadow:0 0 0 3px rgba(45,138,90,.15)}
+.opt.selected .lt{color:var(--green)}
+.opt.correct,.opt-btn.correct{border-color:var(--green)!important;background:var(--greenll)}
+.opt.wrong,.opt-btn.wrong{border-color:var(--red)!important;background:var(--redl)}
 .opt-btn.neutral{opacity:.45}
 .opt-btn:disabled{cursor:not-allowed}
+.opt .lt{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#e8e8f0;color:var(--dim);font-size:12px;flex-shrink:0;margin-right:0!important}
+.opt.selected .lt{background:var(--green);color:#fff}
+.ch-tag{display:inline-block;font-size:11px;font-weight:700;border-radius:5px;padding:2px 8px;margin-right:4px}
 .oc{min-width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;background:#e8e8f0;color:var(--dim)}
 .oc.c{background:var(--green);color:#fff}
 .oc.w{background:var(--red);color:#fff}
@@ -129,9 +139,10 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
 .timer.urg{color:var(--red);animation:pulse .8s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .q-palette{display:flex;flex-wrap:wrap;gap:5px;margin:14px 0}
-.q-dot{width:32px;height:32px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
-.q-dot.done{background:var(--greenll);color:var(--green)}
-.q-dot.cur{background:var(--green);color:#fff}
+.q-dot,.q-pal-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;background:#f0f0f0;color:var(--muted);user-select:none}
+.q-dot:hover,.q-pal-btn:hover{transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.1)}
+.q-dot.done,.q-pal-btn.done{background:var(--greenll);color:var(--green)}
+.q-dot.cur,.q-pal-btn.cur{background:var(--green);color:#fff}
 .q-dot.und{background:#f0f0f0;color:var(--muted)}
 .exam-nav{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;margin-top:16px;align-items:center}
 .exam-qn{font-size:13px;color:var(--muted);text-align:center;font-weight:600}
@@ -199,47 +210,36 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
 .diff-3{background:#fce8e8;color:#b52a2a}
 .word-download-area{background:linear-gradient(135deg,#1a3f7a11,#1d5c3a11);border:1.5px dashed var(--greenl);border-radius:12px;padding:18px;text-align:center;margin-bottom:16px}
 @media(max-width:600px){.hero-stats,.result-grid{grid-template-columns:repeat(2,1fr)}.ch-grid{grid-template-columns:1fr}.exam-nav{grid-template-columns:1fr 1fr;gap:8px}.exam-nav .exam-qn{display:none}#nav .ntab{font-size:12px;padding:6px 9px}}
+/* === 新增：考試結果頁面相關 CSS === */
+.score-c{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.1);border:4px solid #4ade80;margin:0 auto 14px}
+.score-n{font-size:40px;font-weight:800;line-height:1}
+.score-l{font-size:12px;opacity:.75;margin-top:4px}
+.qe-item{border:1.5px solid var(--line);border-radius:11px;margin-bottom:12px;overflow:hidden}
+.qe-item.ok{border-left:4px solid var(--green)}
+.qe-item.no{border-left:4px solid var(--red)}
+.qe-h{padding:12px 16px;background:#f8f8fc;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;user-select:none}
+.qe-h:hover{background:#f0f0f8}
+.qe-b{padding:14px 16px;border-top:1px solid var(--line)}
+.qe-b.hidden{display:none}
 </style>
 </head>
 <body>
 
-<div id="login-screen">
-  <div class="lbox">
-    <div class="licon">⌨️</div>
-    <div class="ltitle">高中生程式檢定模擬</div>
-    <div style="text-align:center;margin-bottom:6px"><span style="display:inline-block;font-size:11px;background:rgba(255,200,100,.18);color:#ffc857;border:1px solid rgba(255,200,100,.4);padding:3px 10px;border-radius:12px;font-weight:600">⚠️ 非官方學習工具</span></div>
-    <div class="lsub">標準考試格式 · 完整詳解 · Word 下載</div>
-    <div class="lcard">
-      <span class="llbl">姓名</span>
-      <input class="linp" id="lname" placeholder="請輸入姓名" onkeydown="if(event.key==='Enter')doLogin()">
-      <button class="lgo" id="lbtn" onclick="doLogin()" disabled>開始考試 →</button>
-      <div class="lstats">
-        <div class="lstat"><span class="v">📝</span><div class="l">標準考試</div></div>
-        <div class="lstat"><span class="v">💡</span><div class="l">完整詳解</div></div>
-        <div class="lstat"><span class="v">6</span><div class="l">章節</div></div>
-      </div>
-    </div>
-    <div style="margin-top:18px;padding:12px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;font-size:11px;line-height:1.7;color:rgba(255,255,255,.5);text-align:left">
-      <strong style="color:rgba(255,255,255,.7)">⚠️ 免責聲明：</strong>本工具為<strong>非官方</strong>學習輔助，與任何官方程式設計檢定主辦單位<strong>無任何隸屬或授權關係</strong>。所有題目皆由程式即時生成，僅供教學與自學練習參考，不代表任何官方真題。
-    </div>
-  </div>
-</div>
-
-<div id="app" class="hidden">
+<div id="app">
   <div id="topbar"><div id="topbar-inner">
-    <div class="logo">⌨️ 高中生程式檢定模擬</div>
+    <div class="logo">⌨️ 高中生程式能力測試</div>
     <div id="nav">
       <button class="ntab on" id="nav-exam" onclick="navTo('exam')">🎯 模擬考</button>
       <button class="ntab" id="nav-stats" onclick="navTo('stats')">📊 成績</button>
     </div>
-    <div class="user-wrap"><span class="chip" id="user-chip">—</span></div>
+    <div class="user-wrap"></div>
   </div></div>
 
   <div id="wrap">
     <div class="page on" id="page-exam">
       <div class="hero" style="text-align:center">
-        <h2 id="hero-greet">歡迎！</h2>
-        <p>高中生程式檢定模擬考・完整解析・Word 報告下載</p>
+        <h2 id="hero-greet">⌨️ 高中生程式能力測試</h2>
+        <p>高中生程式能力測試考・完整解析・Word 報告下載</p>
         <div class="hero-stats">
           <div class="hs"><div class="v" id="hs-exam">0</div><div class="l">已完成模擬考</div></div>
           <div class="hs"><div class="v" id="hs-best">—</div><div class="l">最佳成績</div></div>
@@ -249,7 +249,7 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
       <div id="exam-intro">
         <div class="card" style="text-align:center;padding:2rem;margin-bottom:16px">
           <div style="font-size:50px;margin-bottom:12px">🎯</div>
-          <div style="font-size:22px;font-weight:700;margin-bottom:8px">程式檢定模擬考</div>
+          <div style="font-size:22px;font-weight:700;margin-bottom:8px">程式能力測試模擬考</div>
           <p style="color:var(--muted);font-size:13px;margin-bottom:22px">標準考試格式・程式碼縮排顯示・考完直接顯示完整解析 + Word 下載</p>
           <div style="background:var(--greenll);border-radius:11px;padding:14px;margin-bottom:18px;text-align:left">
             <div style="font-weight:700;color:var(--green);margin-bottom:6px">📋 標準考試規則</div>
@@ -300,10 +300,8 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
         <div class="pbar" style="margin-bottom:10px"><div class="pbar-fill" id="exam-pbar" style="width:0%;background:var(--green)"></div></div>
         <div class="q-palette" id="q-palette"></div>
         <div id="exam-qwrap"></div>
-        <div class="exam-nav">
-          <button class="btn btn-outline btn-sm" id="eprev" onclick="examNav(-1)" disabled>← 上一題</button>
-          <div class="exam-qn" id="exam-qn-lbl">第 1 題</div>
-          <button class="btn btn-outline btn-sm" id="enext" onclick="examNav(1)">下一題 →</button>
+        <div class="exam-nav" style="grid-template-columns:1fr">
+          <button class="btn btn-green full" style="font-size:15px;padding:14px" onclick="submitExam()">📝 提交考卷</button>
         </div>
       </div>
 
@@ -320,7 +318,7 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
 
     <footer style="margin-top:40px;padding:20px 16px;border-top:1px solid var(--line);text-align:center;font-size:11px;color:var(--muted);line-height:1.8">
       <div style="margin-bottom:6px"><strong>⚠️ 非官方學習工具</strong></div>
-      <div>本站為高中生程式檢定學習輔助工具，與任何官方程式設計檢定主辦單位均無隸屬或授權關係。</div>
+      <div>本站為高中生程式能力測試學習輔助工具，與任何官方程式設計能力測試主辦單位均無隸屬或授權關係。</div>
       <div>所有題目皆為程式即時生成的衍生題目，僅供教學與自學參考；正式考試請以各官方考試網站公告為準。</div>
     </footer>
   </div>
@@ -919,19 +917,10 @@ function pickLang(l){
   save();
 }
 
-/* ============ LOGIN ============ */
-document.getElementById('lname').addEventListener('input', e=>{
-  document.getElementById('lbtn').disabled = !e.target.value.trim();
-});
-function doLogin(){
-  const nm = document.getElementById('lname').value.trim();
-  if(!nm) return;
-  G.user = nm;
+/* ============ AUTO INIT（已移除登入流程，直接進入考試） ============ */
+function autoInit(){
+  G.user = '考生';
   load();
-  document.getElementById('login-screen').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  document.getElementById('user-chip').textContent = nm;
-  document.getElementById('hero-greet').textContent = `歡迎回來，${nm}！`;
   // 同步語言 pill 的狀態
   document.getElementById('lang-cpp').classList.toggle('on', G.lang==='cpp');
   document.getElementById('lang-py').classList.toggle('on', G.lang==='python');
@@ -939,8 +928,9 @@ function doLogin(){
   buildSelects();
   renderExamHome();
   renderExamHist();
-  toast(`登入成功！`);
 }
+// 保留 doLogin 名稱以避免其他地方意外引用，但實際無作用
+function doLogin(){ autoInit(); }
 
 /* ============ NAV ============ */
 function navTo(p){
@@ -1277,7 +1267,8 @@ function renderQuestion(q, opts){
   const showAns = opts.showAns;
   const num = opts.num || '';
   const chT = `<span class="ch-tag" style="background:#fef3c7;color:#92400e">第 ${q.ch} 章</span>`;
-  let html = `<div class="qcard" id="qc-${q.id}">
+  const cardCls = (!showAns && sel >= 0) ? 'qcard q-answered' : 'qcard';
+  let html = `<div class="${cardCls}" id="qc-${q.id}">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px">
       <div>${num?`<strong>${num}.</strong> `:''}${chT}</div>
     </div>
@@ -1341,11 +1332,13 @@ function startExam(){
   renderQPalette();
 }
 function renderExamQ(){
-  const s = G.examState, q = s.qs[s.idx];
-  document.getElementById('exam-qn-lbl').textContent = `第 ${s.idx+1} 題 / 共 ${s.qs.length} 題`;
-  document.getElementById('exam-qwrap').innerHTML = renderQuestion(q, {num:s.idx+1, userAns:s.ans[s.idx], onclick:`examPick(IDX)`});
-  document.getElementById('eprev').disabled = s.idx===0;
-  document.getElementById('enext').textContent = s.idx===s.qs.length-1 ? '提交考卷 →' : '下一題 →';
+  const s = G.examState;
+  // 一次顯示全部題目
+  let html = '';
+  s.qs.forEach((q,qi)=>{
+    html += renderQuestion(q, {num:qi+1, qIdx:qi, userAns:s.ans[qi], onclick:`examPick(${qi},IDX)`});
+  });
+  document.getElementById('exam-qwrap').innerHTML = html;
   const done = s.ans.filter(x=>x>=0).length;
   document.getElementById('exam-prog-txt').textContent = `${done}/${s.qs.length}`;
   document.getElementById('exam-pbar').style.width = (done/s.qs.length*100)+'%';
@@ -1354,24 +1347,39 @@ function renderExamQ(){
 function renderQPalette(){
   const s = G.examState;
   document.getElementById('q-palette').innerHTML = s.qs.map((q,i)=>{
-    const cls = i===s.idx?'q-pal-btn cur':(s.ans[i]>=0?'q-pal-btn done':'q-pal-btn');
+    const cls = (s.ans[i]>=0?'q-pal-btn done':'q-pal-btn');
     return `<div class="${cls}" onclick="jumpExam(${i})">${i+1}</div>`;
   }).join('');
 }
-function examPick(idx){
-  G.examState.ans[G.examState.idx] = idx;
-  renderExamQ();
+function examPick(qIdx, optIdx){
+  G.examState.ans[qIdx] = optIdx;
+  // 局部更新：只更新該題卡片內的選項樣式，避免整頁重繪導致捲動位置跳掉
+  const q = G.examState.qs[qIdx];
+  const card = document.getElementById('qc-'+q.id);
+  if(card){
+    card.classList.add('q-answered');
+    const optEls = card.querySelectorAll('.opt');
+    optEls.forEach((el,i)=>{
+      el.classList.toggle('selected', i===optIdx);
+    });
+  }
+  // 更新進度條 & 題號面板（不重繪題目）
+  const s = G.examState;
+  const done = s.ans.filter(x=>x>=0).length;
+  document.getElementById('exam-prog-txt').textContent = `${done}/${s.qs.length}`;
+  document.getElementById('exam-pbar').style.width = (done/s.qs.length*100)+'%';
+  renderQPalette();
 }
 function examNav(d){
-  const s = G.examState;
-  if(d===1 && s.idx===s.qs.length-1){
-    submitExam();
-    return;
-  }
-  s.idx = Math.max(0, Math.min(s.qs.length-1, s.idx+d));
-  renderExamQ();
+  // 已改為一次顯示全部題目，不需要上一題/下一題
+  return;
 }
-function jumpExam(i){ G.examState.idx=i; renderExamQ(); }
+function jumpExam(i){
+  // 滾動到指定題目
+  const q = G.examState.qs[i];
+  const card = document.getElementById('qc-'+q.id);
+  if(card) card.scrollIntoView({behavior:'smooth', block:'start'});
+}
 let _timerInt=null;
 function startTimer(){
   clearInterval(_timerInt);
@@ -1517,8 +1525,8 @@ function downloadWordReport(){
   });
 
   const examLangLabel = rec.lang === 'python' ? '🐍 Python' : '⚙️ C++';
-  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>高中生程式檢定模擬詳解報告</title></head><body style="font-family:'Microsoft JhengHei','Microsoft YaHei',sans-serif;padding:28px;line-height:1.6;color:#1f2937">
-    <h1 style="text-align:center;color:#1d5c3a;font-size:26px;margin-bottom:6px">高中生程式檢定模擬詳解報告</h1>
+  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>高中生程式能力測試詳解報告</title></head><body style="font-family:'Microsoft JhengHei','Microsoft YaHei',sans-serif;padding:28px;line-height:1.6;color:#1f2937">
+    <h1 style="text-align:center;color:#1d5c3a;font-size:26px;margin-bottom:6px">高中生程式能力測試詳解報告</h1>
     <div style="text-align:center;color:#6b7280;margin-bottom:24px;font-size:13px">考生：${G.user}　|　考試時間：${ds}　|　共 ${rec.n} 題　|　語言：${examLangLabel}</div>
     <div style="text-align:center;padding:28px;background:linear-gradient(135deg,#1d5c3a,#2d8a5a);color:white;border-radius:14px;margin-bottom:28px">
       <div style="font-size:56px;font-weight:bold;line-height:1">${rec.score}</div>
@@ -1531,7 +1539,7 @@ function downloadWordReport(){
     <div style="font-size:12px;color:#6b7280;margin-bottom:16px">每題包含：🎯 核心觀念　📝 解題步驟　🔑 關鍵技巧　⚠️ 常見陷阱　❌ 錯誤選項分析　🚀 延伸知識</div>
     ${qHtml}
     <div style="text-align:center;color:#9ca3af;font-size:11px;margin-top:30px;border-top:1px solid #e5e7eb;padding-top:14px;line-height:1.7">
-      <div style="margin-bottom:4px">高中生程式檢定模擬　|　完整離線詳解</div>
+      <div style="margin-bottom:4px">高中生程式能力測試　|　完整離線詳解</div>
       <div>⚠️ 本報告為非官方學習工具產出，所有題目皆為程式生成的衍生題目，僅供自學參考。</div>
     </div>
   </body></html>`;
@@ -1540,7 +1548,7 @@ function downloadWordReport(){
   const a = document.createElement('a');
   a.href = url;
   const fileLang = rec.lang === 'python' ? 'Python' : 'Cpp';
-  a.download = `程式檢定模擬_${fileLang}_${G.user}_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.doc`;
+  a.download = `程式能力測試模擬_${fileLang}_${G.user}_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.doc`;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
   toast('Word 報告已下載！');
@@ -1598,6 +1606,13 @@ function toast(msg){
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+/* ============ 頁面載入後自動初始化（無需輸入姓名） ============ */
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', autoInit);
+}else{
+  autoInit();
 }
 </script>
 
