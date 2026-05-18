@@ -1920,6 +1920,11 @@ function generateDerived(count, chFilter, lang){
       if(q.ch !== ch) continue;
       if(q.a<0 || q.a>3) continue;
       if(lang === 'python' && q.cppOnly) continue;
+      // 防錯：確保 4 個選項文字都不重複
+      if(Array.isArray(q.opts) && q.opts.length===4){
+        const unique = new Set(q.opts.map(o=>String(o).trim()));
+        if(unique.size < 4) continue;
+      }
       // 隨機打亂選項順序（讓同一題型能產生多種選項排列、提升題庫多樣性）
       if(Array.isArray(q.opts) && q.opts.length===4){
         const correctText = q.opts[q.a];
