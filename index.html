@@ -1499,6 +1499,290 @@ const GEN = [
       exp:'外層 i 從 1 倍增：1, 2, 4（下一輪 i=8 不再進入）\n  內層 j 跑 i 次。\n  總和 = 1 + 2 + 4 = 7\n  一般式：1+2+4+…+2^(k-1) = 2^k - 1，其中 2^k ≥ n。本題 n=8，2^k = 8 → cnt = 8-1 = 7。\n  時間複雜度為 O(n)（幾何級數收斂），常被誤認為 O(n log n)。'};
   }
 
+,
+
+  /* ============ APCS 第8章資料結構整合題庫（25 題參數化擴充）============ */
+
+  /* --- 鏈結串列 --- */
+  ()=>({ ch:7, q:'單向鏈結串列 (Singly Linked List) 中，每個節點包含哪兩個欄位？',
+    code:null,
+    opts:['資料欄與索引欄','資料欄與指標欄 (next)','鍵值欄與值欄 (key/value)','前指標與後指標 (prev/next)'], a:1,
+    exp:'單向鏈結串列節點 = data + next (指向下一個節點的指標)。「前指標與後指標」是雙向鏈結串列 (Doubly Linked List)；「鍵值欄」屬於 hash map。'
+  }),
+  ()=>({ ch:7, q:'在 C/C++ 中建立鏈結串列新節點時，若沒有將 next 初始化為 <code>nullptr</code>（或 NULL），最可能會產生什麼問題？',
+    code:null,
+    opts:['編譯錯誤','野指標 (dangling/wild pointer)，存取不合法記憶體','迴圈一定會無窮執行','Stack Overflow'], a:1,
+    cppOnly:true,
+    exp:'未初始化的指標稱為野指標 (wild pointer)，內容是不可預測的隨機位址，後續走訪時誤判 next≠NULL 會解參考到非法記憶體，導致程式崩潰或未定義行為。'
+  }),
+  ()=>({ ch:7, q:'下列走訪鏈結串列的程式碼會造成何種錯誤？',
+    code:'while (current != NULL) {\n    printf("%d ", current->data);\n    // 此處缺漏\n}',
+    opts:['少了 current = current->next，造成無窮迴圈','少了 head = NULL，造成記憶體洩漏','少了 malloc 配置記憶體','沒有錯誤'], a:0,
+    cppOnly:true,
+    exp:'走訪迴圈內必須更新 current = current->next；否則 current 永遠指向同一個節點、while 條件永真，造成無窮迴圈。'
+  }),
+  ()=>({ ch:7, q:'環狀鏈結串列 (Circular Linked List) 與單向鏈結串列最大的差異為何？',
+    code:null,
+    opts:['節點有前後兩個指標','最後一個節點的 next 指向 head 形成環','head 必為 NULL','每個節點儲存兩個 data'], a:1,
+    exp:'環狀串列：last->next = head，最後節點指回頭部形成環。走訪時用 do-while 配合條件 ptr->next != head 才能避免無窮迴圈。'
+  }),
+  ()=>({ ch:7, q:'已知 current 指向鏈結串列中某節點，在它「後面」插入新節點 newNode，正確的程式碼為何？',
+    code:null,
+    opts:[
+      'newNode->next = current; current = newNode;',
+      'newNode->next = current->next; current->next = newNode;',
+      'current->next = newNode; newNode->next = NULL;',
+      'newNode = current->next; current->next = newNode;'
+    ], a:1,
+    cppOnly:true,
+    exp:'兩步：① newNode->next 先接到原本 current 之後；② current->next 改指向 newNode。順序顛倒會丟失 current 後面的鏈結。'
+  }),
+
+  /* --- 堆疊 Stack --- */
+  ()=>({ ch:7, q:'以陣列實作的堆疊 (Stack)，<code>top</code> 變數的初始值通常設為多少表示空堆疊？',
+    code:null,
+    opts:['0','1','-1','MAX_SIZE - 1'], a:2,
+    exp:'top = -1 表示完全空 (尚無任何元素)。第一次 push 後 top 變為 0，剛好對應陣列 index 0。若令 top=0 為空，則 push 後要先 top++ 再寫入。'
+  }),
+  ()=>{ // 參數化：隨機 3 個 push 值與 pop 次數
+    const a=[], used=new Set();
+    while(a.length<3){ const v=rnd(1,99); if(!used.has(v)){ used.add(v); a.push(v); } }
+    const pops = rnd(1,2);
+    // 推入 a[0], a[1], a[2]；pop pops 次後剩餘最上面 = a[2-pops]
+    const remainAfter = a.slice(0, 3-pops);
+    const topAfter = remainAfter.length ? remainAfter[remainAfter.length-1] : null;
+    const wrongs = a.filter(v=>v!==topAfter).concat([(topAfter||0)+rnd(1,5)]);
+    const correct = topAfter === null ? '堆疊為空' : String(topAfter);
+    const opts = shuf([correct, String(wrongs[0]), String(wrongs[1]), String(wrongs[2])]);
+    return {
+      ch:7,
+      q:`依序執行 <code>push(${a[0]}), push(${a[1]}), push(${a[2]})</code> 後再連續 pop ${pops} 次，此時堆疊頂端的元素為何？`,
+      code:null, opts, a: opts.indexOf(correct),
+      exp:`LIFO（Last In, First Out）：push 順序 ${a[0]}→${a[1]}→${a[2]}（${a[2]} 在最上面）。pop ${pops} 次依序取出${pops===1?` ${a[2]}`:` ${a[2]} 與 ${a[1]}`}，剩餘堆疊由下到上：${remainAfter.join(',') || '(空)'}，頂端 = ${correct}。`
+    };
+  },
+  ()=>({ ch:7, q:'下列何者是 C/C++ 中正確的 <code>pop()</code> 一行實作？',
+    code:'/* int stack[N], top; */',
+    opts:[
+      'return stack[++top];',
+      'return stack[top--];',
+      'return stack[top];',
+      'top--; return stack[top + 1];'
+    ], a:1,
+    cppOnly:true,
+    exp:'stack[top--] 是「後置遞減」：先讀取 stack[top] 當作回傳值，再執行 top-- 讓 top 減 1。等價於 int v = stack[top]; top--; return v;。'
+  }),
+
+  /* --- 佇列 Queue --- */
+  ()=>({ ch:7, q:'下列關於 Stack 與 Queue 的比較，何者「錯誤」？',
+    code:null,
+    opts:[
+      'Stack 為 LIFO、Queue 為 FIFO',
+      'Stack 的 push 與 Queue 的 enqueue 都從同一端操作',
+      'Queue 的 dequeue 從 front 取出',
+      'Stack 的 pop 從 top 取出'
+    ], a:1,
+    exp:'Stack 的 push/pop 都在 top（同一端）；Queue 的 enqueue 在 rear、dequeue 在 front（不同端）。所以「都從同一端操作」是錯誤的。'
+  }),
+  ()=>({ ch:7, q:'以陣列實作的線性佇列 (Queue)，當 <code>front > rear</code> 時表示什麼狀態？',
+    code:null,
+    opts:['佇列已滿 (overflow)','佇列為空 (underflow)','佇列剛初始化','front 和 rear 設定錯誤'], a:1,
+    exp:'初始 front=0, rear=-1（或 front=rear=0）。所有元素被 dequeue 後 front 會超過 rear，代表 underflow（空佇列）。此時需回傳錯誤訊息。'
+  }),
+  ()=>({ ch:7, q:'下列關於佇列 (Queue) 的敘述，何者「正確」？',
+    code:null,
+    opts:[
+      'Enqueue 從 front 加入、Dequeue 從 rear 取出',
+      'Enqueue 從 rear 加入、Dequeue 從 front 取出',
+      'Enqueue 與 Dequeue 均從 front 操作',
+      'Enqueue 與 Dequeue 均從 rear 操作'
+    ], a:1,
+    exp:'FIFO（First In, First Out）原則：新元素從尾端 (rear) 加入、最舊元素從前端 (front) 取出，先進先出。'
+  }),
+
+  /* --- 二元樹 (Binary Tree) --- */
+  ()=>{ // 參數化：父→左子節點 index
+    const p = rnd(2, 12);
+    const correct = 2 * p;
+    const opts = shuf([String(correct), String(correct+1), String(p+1), String(Math.floor(p/2))]);
+    return {
+      ch:7,
+      q:`在以陣列儲存的二元樹中（index 從 1 開始），若某節點 index 為 <strong>${p}</strong>，其左子節點 index 為何？`,
+      code:null, opts, a: opts.indexOf(String(correct)),
+      exp:`陣列儲存二元樹（root 從 index 1）的公式：\n  左子節點 = 父 × 2 = ${p} × 2 = ${correct}\n  右子節點 = 父 × 2 + 1 = ${correct+1}\n  父節點 = ⌊子 / 2⌋`
+    };
+  },
+  ()=>{ // 參數化：父→右子節點
+    const p = rnd(2, 12);
+    const correct = 2 * p + 1;
+    const opts = shuf([String(correct), String(2*p), String(p+2), String(2*p-1)]);
+    return {
+      ch:7,
+      q:`在以陣列儲存的二元樹中（index 從 1 開始），若某節點 index 為 <strong>${p}</strong>，其右子節點 index 為何？`,
+      code:null, opts, a: opts.indexOf(String(correct)),
+      exp:`右子節點公式：父 × 2 + 1 = ${p} × 2 + 1 = ${correct}。`
+    };
+  },
+  ()=>{ // 參數化：子→父節點
+    const c = rnd(4, 25);
+    const correct = Math.floor(c / 2);
+    const opts = shuf([String(correct), String(c-1), String(2*c), String(c-2)]);
+    return {
+      ch:7,
+      q:`在以陣列儲存的二元樹中（index 從 1 開始），若子節點 index 為 <strong>${c}</strong>，其父節點 index 為何？`,
+      code:null, opts, a: opts.indexOf(String(correct)),
+      exp:`父節點公式：⌊子 / 2⌋ = ⌊${c} / 2⌋ = ${correct}（整數除法，C 語言 ${c}/2 直接得 ${correct}）。`
+    };
+  },
+  ()=>({ ch:7, q:'對下圖二元樹進行<strong>中序走訪 (inorder traversal)</strong>，結果為何？<br><pre style="font-family:monospace;line-height:1.4">          A\n         / \\\n        B   C\n       / \\\n      D   E</pre>',
+    code:null,
+    opts:['A B D E C','D B E A C','A B C D E','D E B A C'], a:1,
+    exp:'中序走訪 = 左 → 根 → 右。\n  visit(A) → visit(B) → visit(D)[葉，印 D] → 印 B → visit(E)[葉，印 E] → 印 A → visit(C)[葉，印 C]\n  輸出：D B E A C'
+  }),
+  ()=>({ ch:7, q:'已知某二元樹的前序走訪為 <code>A B D E C F</code>、中序走訪為 <code>D B E A F C</code>，則後序走訪為何？',
+    code:null,
+    opts:['D E B F C A','A B C D E F','D B E C F A','B D E F C A'], a:0,
+    exp:'從前序第一個字母 A 確認為根；中序中 A 左邊 [D B E] 為左子樹、右邊 [F C] 為右子樹。\n  遞迴重建：根 A、左子樹根 B（左 D、右 E）、右子樹根 C（左 F）。\n  後序走訪 = 左 → 右 → 根：D E B F C A。'
+  }),
+  ()=>({ ch:7, q:'下列關於二元搜尋樹 (BST) 中序走訪的敘述，何者正確？',
+    code:null,
+    opts:[
+      '結果為遞減排列',
+      '結果為遞增排列',
+      '結果為隨機排列',
+      '結果必與前序走訪相同'
+    ], a:1,
+    exp:'BST 性質：左子樹所有值 < 根 < 右子樹所有值。中序走訪 (左→根→右) 剛好按大小順序，因此產生由小到大遞增的序列。此為 APCS 常考性質。'
+  }),
+
+  /* --- 堆積 Heap --- */
+  ()=>({ ch:7, q:'最大堆 (Max-Heap) 一定滿足下列哪一性質？',
+    code:null,
+    opts:[
+      '左子節點 > 右子節點',
+      '根節點 (root) 是整棵樹的最大值',
+      '中序走訪結果為遞增',
+      '是一棵二元搜尋樹 (BST)'
+    ], a:1,
+    exp:'Max-Heap 規則：每個父節點 ≥ 自己的子節點。因此根節點是全樹最大值。但 Heap 不規範左右子節點誰大誰小，也不是 BST。'
+  }),
+  ()=>{ // 參數化：heap index 父節點
+    const c = rnd(3, 20);
+    const correct = Math.floor(c / 2);
+    const opts = shuf([String(correct), String(2*c), String(c-1), String(2*c+1)]);
+    return {
+      ch:7,
+      q:`Heap 以陣列儲存且 index 從 1 開始。若某節點 index 為 <strong>${c}</strong>，其父節點的 index 為何？`,
+      code:null, opts, a: opts.indexOf(String(correct)),
+      exp:`Heap 與一般陣列儲存的二元樹相同：父 = ⌊子 / 2⌋ = ⌊${c} / 2⌋ = ${correct}。`
+    };
+  },
+  ()=>({ ch:7, q:'對 Max-Heap <code>[9, 7, 8, 3, 4, 5, 6]</code> 執行一次 <code>deleteMax()</code> 後，陣列內容為何？',
+    code:null,
+    opts:[
+      '[8, 7, 6, 3, 4, 5]',
+      '[7, 8, 6, 3, 4, 5]',
+      '[8, 7, 5, 3, 4, 6]',
+      '[9, 7, 8, 3, 4, 5]'
+    ], a:0,
+    exp:'deleteMax 步驟：① 取出根節點 9（最大值）。② 將最後一個元素 6 移到根。③ 對 6 進行下移 (sift-down)：與較大子 (7, 8) 比較，與 8 交換 → [8,7,6,3,4,5]。'
+  }),
+
+  /* --- DFS / BFS / Graph --- */
+  ()=>({ ch:7, q:'DFS（深度優先搜尋）的底層通常使用何種資料結構？',
+    code:null,
+    opts:['Queue (佇列)','Stack (堆疊) 或遞迴','Heap (堆積)','Hash Table (雜湊表)'], a:1,
+    exp:'DFS 用遞迴實作時，呼叫堆疊 (Call Stack) 就是 DFS 的底層 Stack。改寫成迭代版本則需明確用 Stack 模擬。BFS 才用 Queue。'
+  }),
+  ()=>({ ch:7, q:'BFS（廣度優先搜尋）在「無權重圖」上找到的路徑有何性質？',
+    code:null,
+    opts:[
+      '路徑最長',
+      '保證為邊數最少的最短路徑',
+      'DFS 一定比 BFS 短',
+      '沒有任何保證'
+    ], a:1,
+    exp:'BFS 以「層」為單位向外擴散，第一次到達某頂點時所經過的邊數一定最少。因此在無權重圖中保證找到最短路徑（以邊數計）。加權圖則需 Dijkstra。'
+  }),
+  ()=>({ ch:7, q:'在 DFS 或 BFS 的圖形走訪中，<code>visited</code> 陣列的主要作用為何？',
+    code:null,
+    opts:[
+      '記錄走訪順序時間戳',
+      '避免重複訪問同一頂點造成無窮迴圈',
+      '儲存邊的權重',
+      '記錄每個頂點的度數 (degree)'
+    ], a:1,
+    exp:'圖形可能有環 (cycle)，若不標記已訪問頂點，走訪到環時會無限循環。visited 確保每個頂點只進入一次，演算法才能在 O(V+E) 內完成。'
+  }),
+  ()=>({ ch:7, q:'無向圖以鄰接矩陣 (adjacency matrix) 表示時，下列哪一性質一定成立？',
+    code:null,
+    opts:[
+      '對角線元素全為 1',
+      '矩陣關於主對角線對稱：matrix[i][j] == matrix[j][i]',
+      '所有元素必為 0 或 1',
+      '以上皆是'
+    ], a:1,
+    exp:'無向圖中 A-B 與 B-A 是同一條邊，故 matrix[i][j] = matrix[j][i]（對稱）。對角線通常為 0（無自環）。加權圖的元素可為任意數，不限 0/1。'
+  }),
+  ()=>({ ch:7, q:'下列關於資料結構的敘述，哪一項「錯誤」？',
+    code:null,
+    opts:[
+      '陣列 (Array) 是靜態線性資料結構',
+      'Stack 只能從 top 端存取',
+      'BST 的中序走訪結果為遞增排列',
+      'BFS 通常以 Stack 實作'
+    ], a:3,
+    exp:'BFS 使用 Queue（佇列）實作 — 因為要先處理較早被加入的頂點。Stack 是 DFS 的底層資料結構。其他三項敘述皆正確。'
+  }),
+  ()=>{ // 參數化：完全圖邊數
+    const n = rnd(5, 12);
+    const correct = n * (n - 1) / 2;
+    const opts = shuf([String(correct), String(n*n), String(n*(n-1)), String(n+1)]);
+    return {
+      ch:7,
+      q:`一個有 <strong>n = ${n}</strong> 個頂點的「完全無向圖」（每對頂點之間都有邊），共有幾條邊？`,
+      code:null, opts, a: opts.indexOf(String(correct)),
+      exp:`完全無向圖：每個頂點與其他 n−1 個頂點都相連。\n  總邊數 = n(n−1)/2 = ${n} × ${n-1} / 2 = ${correct}\n  除以 2 是因為無向圖中 A-B 與 B-A 是同一條邊。`
+    };
+  },
+  ()=>({ ch:7, q:'下列何者「不屬於」線性資料結構？',
+    code:null,
+    opts:['陣列 (Array)','佇列 (Queue)','二元樹 (Binary Tree)','堆疊 (Stack)'], a:2,
+    exp:'線性資料結構：元素依序排列，每元素有唯一前驅與後繼，如 Array / Linked List / Stack / Queue。\n  非線性資料結構：有層級或網狀關係，如 Tree（含 BST、Heap）和 Graph。'
+  }),
+
+  /* --- 鏈結串列操作複雜度 --- */
+  ()=>({ ch:7, q:'下列鏈結串列操作中，哪一項的時間複雜度為 O(1)？',
+    code:null,
+    opts:[
+      '搜尋特定資料值',
+      '已知前一節點，插入新節點',
+      '排序整個串列',
+      '存取第 n 個位置的元素'
+    ], a:1,
+    exp:'已知前一節點 prev 時，插入只需改兩個指標：\n  newNode->next = prev->next;\n  prev->next = newNode;\n常數步驟，O(1)。\n  其餘操作：搜尋 O(n)、存取第 n 個 O(n)、排序 O(n log n) 以上。'
+  }),
+
+  /* --- Push/Pop 序列追蹤（參數化）--- */
+  ()=>{ // 參數化：push 序列 + pop 全部，問輸出
+    const a=[], used=new Set();
+    while(a.length<3){ const v=rnd(1,9); if(!used.has(v)){ used.add(v); a.push(v); } }
+    const reversed = [...a].reverse().join(' ');
+    const opts = shuf([
+      reversed,
+      a.join(' '),
+      `${a[1]} ${a[2]} ${a[0]}`,
+      `${a[0]} ${a[2]} ${a[1]}`
+    ]);
+    return {
+      ch:7,
+      q:`執行以下程式片段後，輸出順序為何？`,
+      code:`push(${a[0]}); push(${a[1]}); push(${a[2]});\nprintf("%d %d %d", pop(), pop(), pop());`,
+      opts, a: opts.indexOf(reversed),
+      exp:`LIFO：堆疊由下到上依序為 ${a[0]}, ${a[1]}, ${a[2]}。連續三次 pop 依序取出最上面：${a[2]} → ${a[1]} → ${a[0]}。輸出：${reversed}`
+    };
+  }
+
 ];
 
 /* 套用 _setAns 後處理 */
@@ -2581,6 +2865,43 @@ function renderQuestion(q, opts){
 }
 
 /* ============ EXAM ============ */
+/* 從題池中依章節平均抽取考題 */
+function pickExamBalanced(pool, cnt){
+  // 將題池按章節分桶
+  const byCh = {};
+  pool.forEach((q, i) => {
+    q.fp = q.id || ('p'+i);
+    if(!byCh[q.ch]) byCh[q.ch] = [];
+    byCh[q.ch].push(q);
+  });
+  const chKeys = Object.keys(byCh).map(Number).sort((a,b)=>a-b);
+  if(chKeys.length === 0) return [];
+
+  // 每章節平均配額（餘數平均給前幾章）
+  const baseShare = Math.floor(cnt / chKeys.length);
+  const remainder = cnt % chKeys.length;
+
+  const selected = [];
+  const selectedSet = new Set();
+  chKeys.forEach((ch, i) => {
+    const target = baseShare + (i < remainder ? 1 : 0);
+    const picked = shuf(byCh[ch]).slice(0, target);
+    picked.forEach(q => {
+      if(!selectedSet.has(q.fp)) { selected.push(q); selectedSet.add(q.fp); }
+    });
+  });
+
+  // 若有章節題源不足，從未選的補滿
+  if(selected.length < cnt){
+    const rest = shuf(pool.filter(q => !selectedSet.has(q.fp)));
+    rest.slice(0, cnt - selected.length).forEach(q => {
+      selected.push(q); selectedSet.add(q.fp);
+    });
+  }
+
+  return shuf(selected).slice(0, cnt);
+}
+
 function startExam(){
   let ch = document.getElementById('exam-ch').value;
   const cnt = parseInt(document.getElementById('exam-cnt').value);
@@ -2592,8 +2913,10 @@ function startExam(){
   }
   const pool = generateDerived(1000, ch==='all'?null:parseInt(ch), G.lang);
   if(pool.length<cnt){ toast('題庫不足，請選擇其他章節'); return; }
+  // 全部章節模式：平均分配各章節；單章節模式則純隨機抽
+  const examQs = (ch === 'all') ? pickExamBalanced(pool, cnt) : shuf(pool).slice(0, cnt);
   G.examState = {
-    qs: shuf(pool).slice(0,cnt),
+    qs: examQs,
     ans: new Array(cnt).fill(-1),
     idx: 0,
     lang: G.lang,
