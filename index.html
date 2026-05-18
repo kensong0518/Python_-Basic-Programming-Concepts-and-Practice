@@ -321,9 +321,13 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
       <div class="card" style="margin-bottom:16px">
         <div class="stitle">📚 APCS 觀念題真題解析</div>
         <div style="font-size:13px;color:var(--dim);line-height:1.7;margin-top:8px">
-          整理自網路公開資源的「APCS 大學程式設計先修檢測」歷屆觀念題，共 <strong>32 題</strong> 真題、依 <strong>8 個分類</strong> 整理。<br>
-          <span style="color:var(--green);font-weight:600">本區為學習參考資料，真題不會出現在左邊「模擬考」題庫中。</span><br>
+          整理自網路公開資源的「APCS 大學程式設計先修檢測」歷屆觀念題，共 <strong>50 題</strong> 真題、依 <strong>8 個分類</strong> 整理（其中第 7 章「資料結構」收錄 <strong>19 題</strong>）。<br>
+          <span style="color:var(--green);font-weight:600">本區為學習參考資料，真題不會出現在「模擬考」題庫中</span> —— 模擬考另由 141 個產生器無限產出衍生題目（C++ 與 Python 雙語）。<br>
           學習策略：先嘗試自己解出，再點開「查看詳解」對照分析。詳解採用 APCS 解題技巧（追蹤程式、找規律、反推法）。
+        </div>
+        <div style="margin-top:10px;padding:10px 12px;background:#fff7ed;border-left:3px solid #f59e0b;border-radius:6px;font-size:12px;color:#92400e;line-height:1.7">
+          <strong>📌 程式語言說明：</strong>APCS 官方觀念題以 C/C++ 語法為主，本區真題完整保留原 C/C++ 語法。模擬考的 <strong>衍生題目</strong> 支援 Python 與 C++ 切換（可在開始考試前選擇）；觀念題中若涉及 C 特有語法（指標、struct、sizeof），Python 模式會自動跳過該題改用其他題目。<br>
+          <strong>難度：</strong>本系統題目對齊 APCS 4-5 級分難度，以「程式碼追蹤、不可能輸出、debug 除錯、視域陷阱」為主要題型。
         </div>
       </div>
       <div id="apcs-content"></div>
@@ -333,6 +337,19 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
       <div style="margin-bottom:6px"><strong>⚠️ 非官方學習工具</strong></div>
       <div>本站為高中生程式能力測試學習輔助工具，與任何官方程式設計能力測試主辦單位均無隸屬或授權關係。</div>
       <div>所有題目皆為程式即時生成的衍生題目，僅供教學與自學參考；正式考試請以各官方考試網站公告為準。</div>
+      <div style="margin-top:10px;padding:10px 14px;background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;color:#92400e;font-size:12px;line-height:1.7">
+        <strong>📢 使用聲明</strong><br>
+        本工具<strong>全部功能完全免費</strong>提供高中生與自學者使用。<br>
+        <strong>嚴禁</strong>任何形式之商業營利用途（含但不限於：販售、收費教學課程、補習班商品包、收費 App 內容、企業內訓收費教材等）。<br>
+        如需用於非營利之公開教育場合（學校社團、公益課程），歡迎自由使用並標註來源。
+      </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap">
+        <div>
+          <img src="https://visitor-badge.laobi.icu/badge?page_id=hs-prog-test-tw.visitors&left_color=555&right_color=10b981&left_text=%E7%B4%AF%E7%A9%8D%E8%A8%AA%E5%AE%A2" alt="累積訪客" style="vertical-align:middle;height:20px" onerror="this.style.display='none';document.getElementById('local-visits-fallback').style.display='inline'" />
+          <span id="local-visits-fallback" style="display:none;font-size:12px;color:var(--muted)">累積訪客：<strong id="local-visits-count">—</strong></span>
+        </div>
+        <div style="font-size:12px;color:var(--muted)">本機瀏覽次數：<strong id="local-views" style="color:var(--green)">—</strong></div>
+      </div>
     </footer>
   </div>
 </div>
@@ -1661,6 +1678,22 @@ function pickLang(l){
 }
 
 /* ============ AUTO INIT（已移除登入流程，直接進入考試） ============ */
+function updateLocalViews(){
+  try {
+    const key = 'hs_prog_test_views';
+    let n = parseInt(localStorage.getItem(key) || '0', 10);
+    if(isNaN(n)) n = 0;
+    n = n + 1;
+    localStorage.setItem(key, String(n));
+    const el = document.getElementById('local-views');
+    if(el) el.textContent = n.toLocaleString();
+    const fb = document.getElementById('local-visits-count');
+    if(fb) fb.textContent = n.toLocaleString();
+  } catch(e){
+    const el = document.getElementById('local-views');
+    if(el) el.textContent = '1';
+  }
+}
 function autoInit(){
   G.user = '考生';
   load();
@@ -1671,6 +1704,7 @@ function autoInit(){
   buildSelects();
   renderExamHome();
   renderExamHist();
+  updateLocalViews();
 }
 // 保留 doLogin 名稱以避免其他地方意外引用，但實際無作用
 function doLogin(){ autoInit(); }
@@ -1918,7 +1952,113 @@ const APCS_REAL = [
         code: `int val[7] = {10, 20, 30, 40, 50, 60, 70};\nint L[7] = {1, 3, 5, -1, -1, -1, -1};\nint R[7] = {2, 4, 6, -1, -1, -1, -1};\nvoid preorder(int u) {\n  if (u == -1) return;\n  printf("%d ", val[u]);\n  preorder(L[u]);\n  preorder(R[u]);\n}\nint main() { preorder(0); }`,
         opts: ['10 20 40 50 30 60 70','40 20 50 10 60 30 70','40 50 20 60 70 30 10','10 20 30 40 50 60 70'], a: 0,
         exp: '從 L、R 陣列建出二元樹：\n  0(10)\n  ├ 左 1(20)\n  │  ├ 左 3(40)\n  │  └ 右 4(50)\n  └ 右 2(30)\n     ├ 左 5(60)\n     └ 右 6(70)\n  前序走訪：根→左→右\n  10 → 20 → 40 → 50 → 30 → 60 → 70'
+      }      ,
+      {
+        year: '105 年 3 月 第 9 題（鏈結串列）',
+        q: '下列為鏈結串列的計算節點數函式。若串列共有 n 個節點，此函式的時間複雜度為何？',
+        code: `struct node { int val; struct node *next; };\nint count(struct node *head) {\n  int c = 0;\n  struct node *p = head;\n  while (p != NULL) {\n    c = c + 1;\n    p = p->next;\n  }\n  return c;\n}`,
+        opts: ['O(1)','O(log n)','O(n)','O(n²)'], a: 2,
+        exp: '鏈結串列無法隨機存取，必須從 head 開始順著 next 指標一個個走訪。\n  迴圈本體執行次數 = 節點數 n，故時間複雜度為 O(n)。\n  這也說明為何鏈結串列無法直接做二元搜尋（O(log n) 需要隨機存取）。'
+      },
+      {
+        year: '改編自 APCS 風格（Stack 括號配對）',
+        q: '下列函式用堆疊判斷括號是否配對。對輸入字串 <code>"(()(()))"</code>，函式回傳值為何？',
+        code: `int isMatch(char *s) {\n  char stk[100];\n  int top = 0;\n  for (int i = 0; s[i] != '\\0'; i++) {\n    if (s[i] == '(') stk[top++] = '(';\n    else if (s[i] == ')') {\n      if (top == 0) return 0;\n      top--;\n    }\n  }\n  return (top == 0) ? 1 : 0;\n}`,
+        opts: ['0','1','字串長度','編譯錯誤'], a: 1,
+        exp: '逐字模擬堆疊：\n  ( → push, top=1\n  ( → push, top=2\n  ) → pop,  top=1\n  ( → push, top=2\n  ( → push, top=3\n  ) → pop,  top=2\n  ) → pop,  top=1\n  ) → pop,  top=0\n  迴圈結束時 top=0，所有括號完美配對 → 回傳 1。'
+      },
+      {
+        year: '改編自 APCS 風格（環形佇列）',
+        q: '下列以環形陣列實作佇列。依序執行 <code>enq(1), enq(2), enq(3), deq(), enq(4), enq(5), deq()</code>，最後 <code>front</code> 與 <code>rear</code> 的值分別為何？',
+        code: `int Q[5];\nint front = 0, rear = 0;\nvoid enq(int x) { Q[rear] = x; rear = (rear + 1) % 5; }\nint deq()       { int x = Q[front]; front = (front + 1) % 5; return x; }`,
+        opts: ['front=2, rear=0','front=0, rear=2','front=2, rear=5','front=5, rear=2'], a: 0,
+        exp: '逐步追蹤（陣列容量 5）：\n  enq(1): Q[0]=1, rear=1\n  enq(2): Q[1]=2, rear=2\n  enq(3): Q[2]=3, rear=3\n  deq() : 回傳 Q[0]=1, front=1\n  enq(4): Q[3]=4, rear=4\n  enq(5): Q[4]=5, rear=(4+1)%5=0  ← 環形回到 0！\n  deq() : 回傳 Q[1]=2, front=2\n  最終 front=2, rear=0。注意「環形」特性：rear 繞回到 0 不代表佇列為空。'
+      },
+      {
+        year: '改編自 APCS 風格（BST 插入）',
+        q: '依序將 <code>50, 30, 20, 40, 70, 60, 80</code> 插入一棵原本空的 BST，最終樹的高度（根為 0、葉為最大值）為何？',
+        code: null,
+        opts: ['1','2','3','6'], a: 1,
+        exp: '逐個插入：\n  50 → 根\n  30 → 50 的左\n  20 → 30 的左（高度 2）\n  40 → 30 的右（高度 2）\n  70 → 50 的右\n  60 → 70 的左（高度 2）\n  80 → 70 的右（高度 2）\n  樹結構：\n          50\n         /  \\\n        30   70\n       /\\   /\\\n      20 40 60 80\n  最大深度為 2。本題為完美平衡的 BST。'
+      },
+      {
+        year: '改編自 APCS 風格（BST 退化）',
+        q: '依序將 <code>1, 2, 3, 4, 5</code> 插入一棵原本空的 BST，最終樹的高度為何？此時樹的形狀像什麼？',
+        code: null,
+        opts: ['1，完全二元樹','2，完美二元樹','3，鏈狀（向右）','4，鏈狀（向右）'], a: 3,
+        exp: 'BST 插入規則：較小走左、較大走右。\n  1 → 根\n  2 → 1 的右（沒有比 2 更小的）\n  3 → 2 的右\n  4 → 3 的右\n  5 → 4 的右\n  形成「右鏈」退化樹：1→2→3→4→5。\n  最大深度為 4（樹高 = n-1）。\n  此時 BST 退化成 Linked List，所有操作變成 O(n)。這是 BST 最壞情況。'
+      },
+      {
+        year: '改編自 APCS 風格（二元樹層序走訪）',
+        q: '下列為以陣列存放的二元樹（val 為節點值、L/R 為左/右子節點索引，-1 為空），使用佇列進行層序走訪 (level-order)。輸出為何？',
+        code: `int val[7] = {1, 2, 3, 4, 5, 6, 7};\nint L[7] = {1, 3, 5, -1, -1, -1, -1};\nint R[7] = {2, 4, 6, -1, -1, -1, -1};\nvoid levelorder() {\n  int Q[20], front = 0, rear = 0;\n  Q[rear++] = 0;\n  while (front < rear) {\n    int u = Q[front++];\n    printf("%d ", val[u]);\n    if (L[u] != -1) Q[rear++] = L[u];\n    if (R[u] != -1) Q[rear++] = R[u];\n  }\n}`,
+        opts: ['1 2 3 4 5 6 7','1 2 4 5 3 6 7','4 5 2 6 7 3 1','1 2 4 3 5 6 7'], a: 0,
+        exp: '層序走訪利用佇列，由根開始一層一層輸出。\n  追蹤佇列狀態：\n    push 0：佇列 [0]\n    pop 0、印 1，push L[0]=1, R[0]=2：佇列 [1, 2]\n    pop 1、印 2，push 3, 4：佇列 [2, 3, 4]\n    pop 2、印 3，push 5, 6：佇列 [3, 4, 5, 6]\n    pop 3、印 4（L/R 皆 -1）\n    pop 4、印 5\n    pop 5、印 6\n    pop 6、印 7\n  輸出：1 2 3 4 5 6 7（巧合與索引同序，因為這是完美二元樹的層序）'
+      },
+      {
+        year: '改編自 APCS 風格（Max-Heap 插入）',
+        q: '對一個原本空的 Max-Heap 依序插入 <code>3, 1, 5, 7, 2</code>，每次插入都會維持 Heap 性質。最後根節點為何？且最後一個元素 2 位於哪個位置（陣列 1-indexed）？',
+        code: null,
+        opts: ['根=7，元素 2 在 index 5','根=5，元素 2 在 index 4','根=7，元素 2 在 index 2','根=3，元素 2 在 index 3'], a: 0,
+        exp: '逐個插入並執行 sift-up（上浮）：\n  insert 3：[3]\n  insert 1：[3, 1]（1<3 不浮）\n  insert 5：[3, 1, 5] → 5>3 上浮 → [5, 1, 3]\n  insert 7：[5, 1, 3, 7] → 7>1 上浮 → [5, 7, 3, 1] → 7>5 再上浮 → [7, 5, 3, 1]\n  insert 2：[7, 5, 3, 1, 2]（index=5，父在 index=2 (val=5)，2<5 不浮）\n  根 = 7，元素 2 位於 index 5。'
+      },
+      {
+        year: '經典 APCS ADT 辨識題',
+        q: '下列函式以資料結構 X 判斷字串是否為回文。X 支援 <code>Init</code>（初始化）、<code>Clear</code>（清空）、<code>add</code>（加入）、<code>getFirst</code>（取出第一個）、<code>getLast</code>（取出最後一個）。請問 X 為何種資料結構？',
+        code: `int isPal(char *s, int len) {\n  Init(&X);\n  for (int i = 0; i < len; i++)\n    add(X, s[i]);\n  int n = len;\n  while (n > 1) {\n    if (getFirst(X) != getLast(X))\n      return 0;\n    n = n - 2;\n  }\n  Clear(&X);\n  return 1;\n}`,
+        opts: ['Stack 堆疊','Queue 佇列','Deque 雙向佇列','Heap 堆積'], a: 2,
+        exp: 'X 同時支援「從頭取出」(getFirst) 與「從尾取出」(getLast)，且能從任一端加入。\n  - Stack：只能從一端操作（LIFO），無法做 getFirst+getLast\n  - Queue：FIFO，一端進另一端出，不能雙端取出\n  - Deque（雙向佇列）：兩端皆可進出 ✓\n  - Heap：優先佇列，按優先級存取，不是頭尾\n  本函式用 Deque 一邊收尾比對是判斷迴文的優雅作法。'
+      },
+      {
+        year: '經典 APCS 中序轉後序題',
+        q: '運算式 <code>3*5/6+2-1</code> 轉換為「後序表示式 (postfix)」為何？（假設 *, / 同優先級且左結合，+, - 同優先級且左結合，*, / 優先級高於 +, -）',
+        code: null,
+        opts: ['3 5 * 6 / 2 + 1 -','3 5 6 * / 2 1 + -','3 * 5 / 6 + 2 - 1','1 2 - 6 / 5 * 3 +'], a: 0,
+        exp: '依結合性加上括號：((3*5)/6)+2-1 = (((3*5)/6) + 2) - 1\n  從最內層往外轉成後序：\n    (3*5) → 3 5 *\n    ((3 5 *)/6) → 3 5 * 6 /\n    ((3 5 * 6 /) + 2) → 3 5 * 6 / 2 +\n    最外層 - 1 → 3 5 * 6 / 2 + 1 -\n  後序計算可用堆疊：遇數字 push，遇運算子彈出兩個數運算後 push 回去。'
+      },
+      {
+        year: '改編自 APCS 風格（Hash 線性探測）',
+        q: '使用雜湊表大小 7、雜湊函式 <code>h(k) = k % 7</code>，採線性探測 (linear probing) 解決衝突。依序插入 <code>50, 700, 76, 85, 92, 73, 101</code>，最後 73 位於哪個索引？',
+        code: null,
+        opts: ['index 3','index 4','index 5','index 6'], a: 1,
+        exp: '逐個計算雜湊位置（碰撞則往後找）：\n  50  → 50%7 = 1 → 空 → 放 index 1\n  700 → 700%7 = 0 → 空 → 放 index 0\n  76  → 76%7 = 6 → 空 → 放 index 6\n  85  → 85%7 = 1 → 占用 → 探 2 → 空 → 放 index 2\n  92  → 92%7 = 1 → 占用 → 探 2 → 占用 → 探 3 → 空 → 放 index 3\n  73  → 73%7 = 3 → 占用 → 探 4 → 空 → 放 index 4  ★\n  101 → 101%7 = 3 → 占用 → 探 4 → 占用 → 探 5 → 空 → 放 index 5\n  73 最終位於 index 4。'
+      },
+      {
+        year: '改編自 APCS 風格（BST 搜尋）',
+        q: '在如下圖的二元搜尋樹中搜尋 60，總共需要做幾次「節點值比較」？<br>樹結構（依序插入 50, 30, 70, 20, 40, 60, 80）：<br><pre style="text-align:center;font-family:monospace">　　　50<br>　　/　　\\<br>　 30　　70<br>　/ \\　/ \\<br>　20 40 60 80</pre>',
+        code: null,
+        opts: ['2 次','3 次','4 次','7 次'], a: 1,
+        exp: 'BST 搜尋路徑：每節點比較一次決定走左或走右。\n  從根開始：\n    比較 60 vs 50：60 > 50，走右\n    比較 60 vs 70：60 < 70，走左\n    比較 60 vs 60：相等，找到 ✓\n  共 3 次比較。\n  說明：BST 平衡時搜尋為 O(log n)，但本樹高度為 2，最壞情況仍是 3 次。'
+      },
+      {
+        year: '改編自 APCS 風格（二元樹後序走訪）',
+        q: '下列以陣列存放的二元樹，<code>val</code> 為節點值、<code>L/R</code> 為左/右子節點索引（-1 為空）。<code>postorder(0)</code> 的輸出為何？',
+        code: `int val[5] = {1, 2, 3, 4, 5};\nint L[5]   = {1, 3, -1, -1, -1};\nint R[5]   = {2, 4, -1, -1, -1};\nvoid postorder(int u) {\n  if (u == -1) return;\n  postorder(L[u]);\n  postorder(R[u]);\n  printf("%d ", val[u]);\n}`,
+        opts: ['1 2 4 5 3','4 5 2 3 1','4 2 5 1 3','1 4 2 5 3'], a: 1,
+        exp: '建出樹結構：\n  0(1)\n  ├ L=1(2)\n  │  ├ L=3(4)（葉）\n  │  └ R=4(5)（葉）\n  └ R=2(3)（葉）\n  後序走訪：左→右→根\n    從 0 開始：先走 L=1\n      從 1：先 L=3 → 印 4；再 R=4 → 印 5；再印 2\n    回到 0：走 R=2 → 印 3\n    最後印 1\n  輸出：4 5 2 3 1'
+      },
+      {
+        year: '改編自 APCS 風格（鏈結串列反轉）',
+        q: '對一個有 n 個節點的單向鏈結串列做「原地反轉」（in-place reverse），總共需要修改幾次 next 指標？',
+        code: `struct node { int val; struct node *next; };\nstruct node* reverse(struct node *head) {\n  struct node *prev = NULL, *cur = head, *next;\n  while (cur != NULL) {\n    next = cur->next;\n    cur->next = prev;  // 反轉指標\n    prev = cur;\n    cur = next;\n  }\n  return prev;\n}`,
+        opts: ['n - 1 次','n 次','2n 次','n² 次'], a: 1,
+        exp: '逐節點走訪，每個節點的 next 被修改恰好一次（指向前一個節點）。\n  共 n 個節點 → n 次修改指標。\n  原 head 的 next 改為 NULL（之前的 prev）→ 1 次；\n  其後每個節點的 next 改為前一個 → 共 n-1 次；\n  總計 n 次。\n  時間複雜度 O(n)、空間 O(1)。'
+      },
+      {
+        year: '改編自 APCS 風格（完美二元樹節點數）',
+        q: '一棵「完美二元樹 (perfect binary tree)」高度為 h（根為高度 0、單一節點時 h=0），共有多少個節點？並計算 h=3 時的節點數。',
+        code: null,
+        opts: ['2h 個，h=3 為 6','2h + 1 個，h=3 為 7','2^(h+1) - 1 個，h=3 為 15','2^h - 1 個，h=3 為 7'], a: 2,
+        exp: '完美二元樹每一層都填滿：\n  第 0 層：1 = 2⁰ 個節點\n  第 1 層：2 = 2¹ 個\n  第 2 層：4 = 2² 個\n  …\n  第 h 層：2ʰ 個\n  總節點數 = 1 + 2 + 4 + … + 2ʰ = 2^(h+1) - 1\n  代 h=3：2⁴ - 1 = 16 - 1 = 15。\n  注意「高度」定義：本題以根為高度 0，葉子高度最大；節點總數公式為等比級數和。'
+      },
+      {
+        year: '改編自 APCS 風格（Heap deleteMax）',
+        q: '對 Max-Heap 陣列 <code>[9, 7, 8, 3, 4, 5, 6]</code>（陣列 0-indexed，9 為 root）執行一次 <code>deleteMax</code> 操作後，陣列為何？',
+        code: `// Max-Heap deleteMax 標準作法\n// 1. 把 root (a[0]) 取出作為回傳值\n// 2. 把最後一個元素移到 a[0]\n// 3. heap size 減 1\n// 4. sift-down 維持 Heap 性質`,
+        opts: ['[7, 8, 3, 4, 5, 6]','[8, 7, 6, 3, 4, 5]','[6, 7, 8, 3, 4, 5]','[8, 4, 6, 3, 7, 5]'], a: 1,
+        exp: '步驟：\n  ① 取出 root 9（作為 deleteMax 回傳值）\n  ② 把最後元素 6 搬到 root：[6, 7, 8, 3, 4, 5]\n  ③ Sift-down 6：\n    與子節點 (idx=1,val=7) 與 (idx=2,val=8) 比較，最大為 8\n    8 > 6，交換：[8, 7, 6, 3, 4, 5]，6 現在 idx=2\n    6 的子節點 idx=5 (val=5)，6 > 5，停止\n  最終陣列：[8, 7, 6, 3, 4, 5]'
       }
+
     ]
   },
   {
@@ -1964,7 +2104,29 @@ const APCS_REAL = [
         code: `int k = 4;\nint m = 1;\nfor (int i = 1; i <= 5; i = i + 1) {\n  for (int j = 1; j <= k; j = j + 1) {\n    printf(" ");\n  }\n  for (int j = 1; j <= m; j = j + 1) {\n    printf("*");\n  }\n  printf("\\n");\n  k = k - 1;\n  m = m + 1;\n}`,
         opts: ['1','2','3','4'], a: 0,
         exp: '目標：每列空格數 4,3,2,1,0（遞減 1），星號數 1,3,5,7,9（遞增 2）。\n  k 控制空格、m 控制星號。\n  第 11 行 k=k-1（正確）；第 12 行 m=m+1（錯誤，應為 m+2）\n  只需改第 12 行為 m = m + 2，1 行修改完成。'
+      }      ,
+      {
+        year: '改編自 APCS 風格（氣泡排序比較次數）',
+        q: '對陣列 <code>{5, 1, 4, 2, 8}</code> 執行下列氣泡排序，<code>if</code> 比較共會執行幾次？',
+        code: `int a[] = {5, 1, 4, 2, 8};\nint n = 5;\nfor (int i = 0; i < n - 1; i++)\n  for (int j = 0; j < n - 1 - i; j++)\n    if (a[j] > a[j+1]) {\n      int t = a[j]; a[j] = a[j+1]; a[j+1] = t;\n    }`,
+        opts: ['4','7','10','25'], a: 2,
+        exp: '氣泡排序的 if 比較次數（無 early exit）= (n-1) + (n-2) + ... + 1 = n(n-1)/2。\n  n=5：5×4/2 = 10 次。\n  追蹤：i=0 時 j 跑 4 次、i=1 時 3 次、i=2 時 2 次、i=3 時 1 次 → 4+3+2+1=10 次。\n  記住公式：氣泡排序 worst/best/average 的「比較次數」都是 n(n-1)/2，不論資料是否已排好。'
+      },
+      {
+        year: '改編自 APCS 風格（Quick Sort partition）',
+        q: '對陣列 <code>{4, 8, 2, 5, 1, 7, 3, 6}</code> 執行下列 Quick Sort 的 <code>partition</code>（pivot 為最右元素 6），結束後陣列為何？',
+        code: `int partition(int a[], int lo, int hi) {\n  int pivot = a[hi];\n  int i = lo - 1;\n  for (int j = lo; j < hi; j++) {\n    if (a[j] < pivot) {\n      i++;\n      int t = a[i]; a[i] = a[j]; a[j] = t;\n    }\n  }\n  int t = a[i+1]; a[i+1] = a[hi]; a[hi] = t;\n  return i + 1;\n}\n// 呼叫 partition(a, 0, 7)`,
+        opts: ['{4,2,5,1,3,6,8,7}','{4,8,2,5,1,7,3,6}','{1,2,3,4,5,6,7,8}','{2,4,5,1,3,7,8,6}'], a: 0,
+        exp: 'Lomuto partition：i 指向「< pivot 區」的右邊界，j 掃描比較。\n  追蹤（pivot=6）：\n    j=0, a[0]=4<6, i=0, swap a[0]↔a[0]: {4,8,2,5,1,7,3,6}\n    j=1, a[1]=8≥6, 跳過\n    j=2, a[2]=2<6, i=1, swap a[1]↔a[2]: {4,2,8,5,1,7,3,6}\n    j=3, a[3]=5<6, i=2, swap a[2]↔a[3]: {4,2,5,8,1,7,3,6}\n    j=4, a[4]=1<6, i=3, swap a[3]↔a[4]: {4,2,5,1,8,7,3,6}\n    j=5, a[5]=7≥6, 跳過\n    j=6, a[6]=3<6, i=4, swap a[4]↔a[6]: {4,2,5,1,3,7,8,6}\n  最後 swap a[i+1]=a[5]↔a[7]=pivot: {4,2,5,1,3,6,8,7}\n  pivot 6 落在 index 5，左側皆 < 6、右側皆 > 6。'
+      },
+      {
+        year: '改編自 APCS 風格（Insertion Sort 比較次數）',
+        q: '對陣列 <code>{3, 1, 4, 1, 5, 9, 2, 6}</code> 執行下列插入排序，內層 <code>while</code> 條件判斷共執行幾次？',
+        code: `int a[] = {3, 1, 4, 1, 5, 9, 2, 6};\nint n = 8;\nfor (int i = 1; i < n; i++) {\n  int key = a[i], j = i - 1;\n  while (j >= 0 && a[j] > key) {\n    a[j+1] = a[j];\n    j--;\n  }\n  a[j+1] = key;\n}`,
+        opts: ['7','11','14','28'], a: 2,
+        exp: '追蹤每個 i 的內層 while 進入次數（每次「進入 while 本體」算 1 次）：\n  i=1 key=1：a[0]=3>1 移、j=-1 退出 → 1 次\n  i=2 key=4：a[1]=3<4 退出 → 1 次\n  i=3 key=1：a[2]=4>1、a[1]=3>1、a[0]=1>1 不成立 → 3 次\n  i=4 key=5：a[3]=4<5 → 1 次\n  i=5 key=9：a[4]=5<9 → 1 次\n  i=6 key=2：a[5]=9>2、a[4]=5>2、a[3]=4>2、a[2]=3>2、a[1]=1>2 不成立 → 5 次\n  i=7 key=6：a[6]=9>6、a[5]=5>6 不成立 → 2 次\n  總和 = 1+1+3+1+1+5+2 = 14 次。\n  說明：陣列在排序過程中持續變動，須在每個 i 完成後更新後續分析的陣列。'
       }
+
     ]
   }
 ];
