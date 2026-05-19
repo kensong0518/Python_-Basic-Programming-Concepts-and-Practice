@@ -88,6 +88,12 @@ input[type=range]{width:100%;accent-color:var(--green)}
 .lang-pill{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:14px 10px;border-radius:11px;border:2px solid var(--line);background:#fff;color:var(--dim);cursor:pointer;transition:all .15s;font-family:inherit;line-height:1.3}
 .lang-pill:hover{border-color:var(--greenl);color:var(--ink)}
 .lang-pill.on{border-color:var(--green);background:var(--greenll);color:var(--green);box-shadow:0 2px 8px rgba(29,92,58,.12)}
+.diff-pills{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.diff-pill{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 8px;border-radius:11px;border:2px solid var(--line);background:#fff;color:var(--dim);cursor:pointer;transition:all .15s;font-family:inherit;line-height:1.3}
+.diff-pill:hover{border-color:var(--greenl);color:var(--ink)}
+.diff-pill[data-d="1"].on{border-color:#3b82f6;background:#eff6ff;color:#1d4ed8;box-shadow:0 2px 8px rgba(59,130,246,.15)}
+.diff-pill[data-d="2"].on{border-color:var(--green);background:var(--greenll);color:var(--green);box-shadow:0 2px 8px rgba(29,92,58,.12)}
+.diff-pill[data-d="3"].on{border-color:#ef4444;background:#fef2f2;color:#b91c1c;box-shadow:0 2px 8px rgba(239,68,68,.15)}
 .code-wrap{background:var(--code-bg);border-radius:10px;margin:12px 0;overflow:hidden;border:1px solid #30363d}
 .code-header{background:#161b22;padding:8px 14px;font-size:11px;color:#8b949e;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:8px;border-bottom:1px solid #30363d}
 .code-dots{display:flex;gap:5px}
@@ -286,6 +292,26 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
               <option value="25" selected>25 題</option>
             </select>
           </div>
+          <div style="margin-bottom:14px;text-align:left">
+            <div style="font-size:12px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">🎯 難度等級</div>
+            <div class="diff-pills">
+              <button type="button" class="diff-pill" data-d="1" id="diff-1" onclick="pickDiff(1)">
+                <span style="font-size:18px">⭐</span>
+                <span style="font-weight:700">基礎</span>
+                <span style="font-size:11px;opacity:.7">概念為主</span>
+              </button>
+              <button type="button" class="diff-pill on" data-d="2" id="diff-2" onclick="pickDiff(2)">
+                <span style="font-size:18px">⭐⭐</span>
+                <span style="font-weight:700">普通</span>
+                <span style="font-size:11px;opacity:.7">程式追蹤</span>
+              </button>
+              <button type="button" class="diff-pill" data-d="3" id="diff-3" onclick="pickDiff(3)">
+                <span style="font-size:18px">⭐⭐⭐</span>
+                <span style="font-weight:700">困難</span>
+                <span style="font-size:11px;opacity:.7">互遞迴/演算法</span>
+              </button>
+            </div>
+          </div>
           <button class="btn btn-green full" style="font-size:15px;padding:14px" onclick="startExam()">🚀 開始模擬考試</button>
         </div>
         <div id="exam-hist"></div>
@@ -300,8 +326,10 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
         <div class="pbar" style="margin-bottom:10px"><div class="pbar-fill" id="exam-pbar" style="width:0%;background:var(--green)"></div></div>
         <div class="q-palette" id="q-palette"></div>
         <div id="exam-qwrap"></div>
-        <div class="exam-nav" style="grid-template-columns:1fr">
-          <button class="btn btn-green full" style="font-size:15px;padding:14px" onclick="submitExam()">📝 提交考卷</button>
+        <div class="exam-nav" style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin-top:12px">
+          <button id="exam-prev" class="btn" style="font-size:14px;padding:12px" onclick="examNav(-1)">← 上一題</button>
+          <button class="btn btn-red" style="font-size:14px;padding:12px 18px" onclick="submitExam()">📝 交卷</button>
+          <button id="exam-next" class="btn btn-green" style="font-size:14px;padding:12px" onclick="examNav(1)">下一題 →</button>
         </div>
       </div>
 
@@ -376,7 +404,7 @@ const GEN = [
   },
   ()=>{ // 十六進位轉十進位
     const n = rnd(20,255), hex = n.toString(16).toUpperCase();
-    const o = mk(n, [n+1,n-1,parseInt(hex,10),n+16]);
+    const o = mk(n, [n+1,n-1,n+16,n-8].filter(v=>v>0&&v!==n));
     return {ch:2, q:`下列十六進位數 <code>${hex}₁₆</code> 的十進位值為何？`, code:null, opts:o.opts, a:o.a,
       exp:`${hex}₁₆ = ${hex.split('').map((c,i)=>`${parseInt(c,16)}×16^${hex.length-1-i}`).join(' + ')} = ${n}`};
   },
@@ -1783,6 +1811,154 @@ const GEN = [
     };
   }
 
+,
+  /* ============ 基礎入門題（超簡單）============ */
+
+  // 整數加法
+  ()=>{
+    const a=rnd(1,20), b=rnd(1,20), c=a+b;
+    const pool=[c+1,c-1,c+2,a*b,a+b+1].filter(v=>v!==c&&v>0);
+    const w=shuf([...new Set(pool)]).slice(0,3);
+    const opts=shuf([String(c),...w.map(String)]);
+    return {ch:2, q:'下列程式碼的輸出為何？',
+      code:`int a = ${a};\nint b = ${b};\nprintf("%d", a + b);`,
+      opts, a:opts.indexOf(String(c)),
+      exp:`a 的值是 ${a}，b 的值是 ${b}。\na + b = ${a} + ${b} = ${c}。\nprintf 印出 ${c}。`};
+  },
+  // 整數減法
+  ()=>{
+    const b=rnd(1,9), a=b+rnd(5,20), c=a-b;
+    const pool=[c+1,c-1,a+b,a,b].filter(v=>v!==c);
+    const w=shuf([...new Set(pool)]).slice(0,3);
+    const opts=shuf([String(c),...w.map(String)]);
+    return {ch:2, q:'下列程式碼的輸出為何？',
+      code:`int a = ${a};\nint b = ${b};\nprintf("%d", a - b);`,
+      opts, a:opts.indexOf(String(c)),
+      exp:`a = ${a}，b = ${b}。\na - b = ${a} - ${b} = ${c}。\n輸出 ${c}。`};
+  },
+  // 整數乘法
+  ()=>{
+    const a=rnd(2,9), b=rnd(2,9), c=a*b;
+    const pool=[c+1,c-1,a+b,c+a,c-a].filter(v=>v!==c&&v>0);
+    const w=shuf([...new Set(pool)]).slice(0,3);
+    const opts=shuf([String(c),...w.map(String)]);
+    return {ch:2, q:'下列程式碼的輸出為何？',
+      code:`int a = ${a};\nint b = ${b};\nprintf("%d", a * b);`,
+      opts, a:opts.indexOf(String(c)),
+      exp:`a = ${a}，b = ${b}。\na * b = ${a} × ${b} = ${c}。\n輸出 ${c}。`};
+  },
+  // 整數除法
+  ()=>{
+    const b=rnd(2,5), q0=rnd(2,8), a=q0*b+rnd(1,b-1);
+    const trunc=Math.floor(a/b);
+    const pool=[trunc+1,trunc-1,a,b,trunc*b].filter(v=>v!==trunc&&v>=0);
+    const w=shuf([...new Set(pool)]).slice(0,3);
+    const opts=shuf([String(trunc),...w.map(String)]);
+    return {ch:2, q:'C++ 整數除法會捨去小數，下列程式碼的輸出為何？',
+      code:`int a = ${a};\nint b = ${b};\nprintf("%d", a / b);`,
+      opts, a:opts.indexOf(String(trunc)),
+      exp:`a = ${a}，b = ${b}。\n${a} ÷ ${b} 精確結果是 ${(a/b).toFixed(2)}。\nC++ 整數除法只保留整數部分，小數去掉，所以結果是 ${trunc}。\n輸出 ${trunc}。`};
+  },
+  // 取餘數
+  ()=>{
+    const b=rnd(2,7), q0=rnd(2,6), r=rnd(1,b-1), a=b*q0+r;
+    const pool=[r+1,r-1,b,Math.floor(a/b),r+b].filter(v=>v!==r&&v>=0);
+    const w=shuf([...new Set(pool)]).slice(0,3);
+    const opts=shuf([String(r),...w.map(String)]);
+    return {ch:2, q:'% 是取餘數運算，下列程式碼的輸出為何？',
+      code:`int a = ${a};\nint b = ${b};\nprintf("%d", a % b);`,
+      opts, a:opts.indexOf(String(r)),
+      exp:`% 是取餘數。\n${a} ÷ ${b} = ${q0} 餘 ${r}。\n所以 ${a} % ${b} = ${r}，輸出 ${r}。\n(驗算：${b} × ${q0} + ${r} = ${a} ✓)`};
+  },
+  // 變數賦值
+  ()=>{
+    const val=rnd(5,99);
+    const pool=[val+1,val-1,0,val*2,val+10].filter(v=>v!==val&&v>=0);
+    const w=shuf([...new Set(pool)]).slice(0,3);
+    const opts=shuf([String(val),...w.map(String)]);
+    return {ch:2, q:'下列程式碼執行後，輸出的值是多少？',
+      code:`int x = ${val};\nprintf("%d", x);`,
+      opts, a:opts.indexOf(String(val)),
+      exp:`第一行：把 ${val} 存入變數 x。\n第二行：printf 印出 x 的內容。\n因為 x = ${val}，輸出 ${val}。`};
+  },
+  // 布林 AND
+  ()=>{
+    const cases=[['true','true','true'],['true','false','false'],['false','true','false'],['false','false','false']];
+    const [p,q2,ans]=cases[rnd(0,3)];
+    const opts=['true','false','true && false','false && false'];
+    const a=opts.indexOf(ans);
+    return {ch:2, q:`邏輯運算 <code>${p} && ${q2}</code>（AND）的結果是？`,
+      code:null, opts, a,
+      exp:`&&（AND）規則：兩邊都是 true 才是 true，有任一邊是 false 結果就是 false。\n左邊：${p}，右邊：${q2}。\n${p==='true'&&q2==='true'?'兩邊都是 true，結果：true。':'至少一邊是 false，結果：false。'}\n答案：${ans}。`};
+  },
+  // 布林 OR
+  ()=>{
+    const cases=[['true','true','true'],['true','false','true'],['false','true','true'],['false','false','false']];
+    const [p,q2,ans]=cases[rnd(0,3)];
+    const opts=['true','false','true || false','false || false'];
+    const a=opts.indexOf(ans);
+    return {ch:2, q:`邏輯運算 <code>${p} || ${q2}</code>（OR）的結果是？`,
+      code:null, opts, a,
+      exp:`||（OR）規則：任一邊是 true 結果就是 true；兩邊都是 false 才是 false。\n左邊：${p}，右邊：${q2}。\n${p==='true'||q2==='true'?'至少有一邊是 true，結果：true。':'兩邊都是 false，結果：false。'}\n答案：${ans}。`};
+  },
+  // 簡單 if
+  ()=>{
+    // 確保 va !== vb 且選項不重複
+    let va=rnd(1,15), vb=rnd(1,20);
+    while(va===vb) vb=rnd(1,20);
+    const bigger=Math.max(va,vb), smaller=Math.min(va,vb);
+    const correct=String(bigger);
+    // 固定用四個預設選項，確保唯一
+    const candidates=[bigger+1,bigger-1,smaller,va+vb];
+    const seen=new Set([bigger]);
+    const wrongs=[];
+    for(const c of candidates){
+      if(!seen.has(c)&&c>0){seen.add(c);wrongs.push(c);}
+      if(wrongs.length===3) break;
+    }
+    // 不足補充
+    let extra=100;
+    while(wrongs.length<3){if(!seen.has(extra)){seen.add(extra);wrongs.push(extra);}extra++;}
+    const opts=shuf([correct,...wrongs.map(String)]);
+    return {ch:3, q:'下列程式碼的輸出為何？',
+      code:`int a = ${va};\nint b = ${vb};\nif (a > b) {\n    printf("%d", a);\n} else {\n    printf("%d", b);\n}`,
+      opts, a:opts.indexOf(correct),
+      exp:`a = ${va}，b = ${vb}。\n判斷 a > b？ ${va} > ${vb}？ ${va>vb?'成立！':'不成立！'}\n→ 執行${va>vb?'if':'else'}區塊，印出 ${bigger}。\n這個程式的目的：印出 a 和 b 中比較大的那個。`};
+  },
+  // for 迴圈計數
+  ()=>{
+    const n=rnd(3,8);
+    const pool=[n+1,n-1,0,n*2,n+2].filter(v=>v!==n&&v>=0);
+    const w=shuf([...new Set(pool)]).slice(0,3);
+    const opts=shuf([String(n),...w.map(String)]);
+    return {ch:3, q:'下列程式碼中，printf 總共會執行幾次？',
+      code:`for (int i = 1; i <= ${n}; i++) {\n    printf("*");\n}`,
+      opts, a:opts.indexOf(String(n)),
+      exp:`i 從 1 開始，條件 i <= ${n}，每次加 1。\n${Array.from({length:n},(_,k)=>`  i=${k+1}：${k+1}<=${n}？成立 → 印 *`).join('\n')}\n  i=${n+1}：${n+1}<=${n}？不成立 → 停止。\n共 ${n} 次。`};
+  },
+  // while 倒數
+  ()=>{
+    const start=rnd(3,7);
+    const pool=[start+1,start-1,0,start*2].filter(v=>v!==start&&v>=0);
+    const w=shuf([...new Set(pool)]).slice(0,3);
+    const opts=shuf([String(start),...w.map(String)]);
+    return {ch:3, q:'下列程式碼中，printf 總共執行幾次？',
+      code:`int i = ${start};\nwhile (i > 0) {\n    printf("%d", i);\n    i = i - 1;\n}`,
+      opts, a:opts.indexOf(String(start)),
+      exp:`i 從 ${start} 開始，條件 i > 0，每次減 1。\n${Array.from({length:start},(_,k)=>`  i=${start-k}：>0 成立 → 印出，i 變 ${start-k-1}`).join('\n')}\n  i=0：0>0 不成立 → 停止。\n共 ${start} 次。`};
+  },
+  // 累加迴圈
+  ()=>{
+    const n=rnd(3,6), total=n*(n+1)/2;
+    const pool=[total+1,total-1,n,n*n].filter(v=>v!==total&&v>0);
+    const w=shuf([...new Set(pool)]).slice(0,3);
+    const opts=shuf([String(total),...w.map(String)]);
+    return {ch:3, q:'下列程式碼執行後，sum 的值為何？',
+      code:`int sum = 0;\nfor (int i = 1; i <= ${n}; i++) {\n    sum = sum + i;\n}`,
+      opts, a:opts.indexOf(String(total)),
+      exp:`sum 從 0 開始，每次把 i 加進去。\n${Array.from({length:n},(_,k)=>{const cur=(k+1)*(k+2)/2;const prev=k*(k+1)/2;return`  i=${k+1}：sum = ${prev} + ${k+1} = ${cur}`;}).join('\n')}\n最終 sum = ${total}。`};
+  }
+
 ];
 
 /* 套用 _setAns 後處理 */
@@ -1837,54 +2013,47 @@ const CH_INFO = {
 
 function buildDetailedExp(q){
   const ch = CH_INFO[q.ch] || {name:'', concept:'', tips:'', pitfall:'', extend:''};
-  const ansLetter = String.fromCharCode(65 + q.a);
-  const ansText = q.opts[q.a];
+  const ansIdx  = q.a;
+  const ansLetter = String.fromCharCode(65 + ansIdx);
+  const ansText   = q.opts[ansIdx];
 
-  // 自動分析錯誤選項（嘗試找出可能的計算錯誤）
-  let wrongAnalysis = '';
-  q.opts.forEach((opt, i) => {
-    if(i === q.a) return;
-    const letter = String.fromCharCode(65 + i);
-    let reason = '此選項不符合題目要求';
-    // 嘗試針對數值類型推測錯誤類型
-    const ansNum = parseFloat(ansText);
-    const optNum = parseFloat(opt);
-    if(!isNaN(ansNum) && !isNaN(optNum)){
-      const diff = optNum - ansNum;
-      if(diff === 1 || diff === -1) reason = `常見「差一錯誤」(off-by-one)，計算時可能多算或少算一次迭代`;
-      else if(diff === ansNum) reason = `將結果誤乘以 2，可能多算了一輪`;
-      else if(diff === -ansNum) reason = `將結果誤算為 0 或漏計一部分`;
-      else if(optNum === ansNum * 2) reason = `誤將結果加倍，可能重複計算或誤判迴圈次數`;
-      else if(optNum * 2 === ansNum) reason = `誤將結果減半，可能漏掉部分計算`;
-      else if(Math.abs(diff) <= 5) reason = `數值接近正確答案，可能是邊界條件或進位處理錯誤`;
-      else reason = `數值差距較大，可能是運算順序或公式套用錯誤`;
-    }
-    wrongAnalysis += `  • ${letter}: ${opt} ── ${reason}\n`;
-  });
+  // 錯誤選項列表（只列出，不做有風險的猜測）
+  const wrongLines = q.opts.map((opt, i) => {
+    if(i === ansIdx) return null;
+    const L = String.fromCharCode(65 + i);
+    return `（${L}）${opt}　→ 錯誤，請對照以下解題步驟確認`;
+  }).filter(Boolean).join('\n');
 
-  return `🎯 核心觀念
-${ch.concept}
+  // 解題步驟——把 q.exp 裡的分行整理成有編號的格式
+  const steps = (q.exp || '').split('\n').filter(s=>s.trim()).map((s,i)=>`${i+1}. ${s.trim()}`).join('\n');
 
-📝 詳細解題步驟
-${q.exp}
-✅ 正確答案：${ansLetter}: ${ansText}
-
-🔑 關鍵技巧
-${ch.tips}
-
-⚠️ 常見陷阱
-${ch.pitfall}
-
-❌ 錯誤選項分析
-${wrongAnalysis.trimEnd()}
-
-🚀 延伸知識
-${ch.extend}`;
+  return [
+    '【本題考點】',
+    ch.concept || '—',
+    '',
+    '【解題步驟】',
+    steps || (q.exp || ''),
+    '',
+    '【正確答案】',
+    `✅ （${ansLetter}）${ansText}`,
+    '',
+    '【其他選項說明】',
+    wrongLines,
+    '',
+    '【解題關鍵提示】',
+    ch.tips || '—',
+    '',
+    '【常見錯誤陷阱】',
+    ch.pitfall || '—',
+    '',
+    '【延伸觀念】',
+    ch.extend || '—',
+  ].join('\n');
 }
 
 
 /* ============ 生成衍生題庫 ============ */
-function generateDerived(count, chFilter, lang){
+function generateDerived(count, chFilter, lang, diff){
   lang = lang || 'cpp';
 
   // 將 generator 依章節分桶（取樣一次取得 ch 資訊；同一個 generator 的 ch 是固定的）
@@ -1895,6 +2064,7 @@ function generateDerived(count, chFilter, lang){
     if(!sample || typeof sample.ch !== 'number') continue;
     if(chFilter && sample.ch !== chFilter) continue;
     if(lang === 'python' && sample.cppOnly) continue;
+    if(diff && difficultyOf(sample) !== diff) continue;
     if(!byCh[sample.ch]) byCh[sample.ch] = [];
     byCh[sample.ch].push(g);
   }
@@ -1960,12 +2130,45 @@ function buildMasterBank(){
 let G = {
   user:null,
   lang:'cpp',          // 'cpp' or 'python'
+  diff:2,              // 1=輕鬆, 2=簡單, 3=超難
   examState:null,
   exams:[]
 };
 const SK = 'hs_prog_test_v1';
-function save(){ try{ localStorage.setItem(SK, JSON.stringify({exams:G.exams, lang:G.lang})); }catch(e){} }
-function load(){ try{ const d=JSON.parse(localStorage.getItem(SK)||'{}'); G.exams=d.exams||[]; if(d.lang) G.lang=d.lang; }catch(e){ G.exams=[]; } }
+function save(){ try{ localStorage.setItem(SK, JSON.stringify({exams:G.exams, lang:G.lang, diff:G.diff})); }catch(e){} }
+function load(){ try{ const d=JSON.parse(localStorage.getItem(SK)||'{}'); G.exams=d.exams||[]; if(d.lang) G.lang=d.lang; if(d.diff) G.diff=d.diff; }catch(e){ G.exams=[]; } }
+
+/* ============ DIFFICULTY ============ */
+/* 自動判斷題目難度（1=輕鬆, 2=簡單, 3=超難） */
+function difficultyOf(q){
+  const code = q.code || '';
+  const txt = (q.q || '') + code;
+  const lines = code.trim() ? code.split('\n').length : 0;
+
+  // ⭐⭐⭐ 困難：長程式碼 / 互遞迴 / 複雜演算法 / 圖形遍歷
+  if(lines > 8) return 3;
+  if(/互遞迴|DFS|BFS|postfix|後序.*中序|前序.*中序|完全無向圖|deleteMax|三層迴圈|n²\(n\+1\)|n\(n-1\)\/2|Dijkstra|MST|動態規劃|DP|貪婪|逆序對|快排|merge sort|heap sort|時間複雜度.*O\(n²\)|O\(n log/.test(txt)) return 3;
+  if(lines >= 6 && /遞迴|recursive|互.*呼叫|void f[12]/.test(txt)) return 3;
+  if(lines >= 5 && /三層|巢狀.*for|雙層.*迴圈/.test(txt)) return 3;
+
+  // ⭐ 基礎：純概念（無程式碼）且屬於基礎主題；或 1-3 行不含遞迴的簡短程式
+  if(lines === 0){
+    // 資料結構進階概念 → 歸為 ⭐⭐ 普通
+    if(/BST|二元搜尋樹|中序.*遞增|Max.Heap|Min.Heap|前序|後序|中序走訪|鄰接矩陣|環狀.*串列|雙向.*串列|父節點|子節點|完全二元樹|堆積|鏈結串列.*O\(1\)|深度優先|廣度優先|有向圖|無向圖|visited/.test(txt)) return 2;
+    return 1;
+  }
+  if(lines <= 3 && !/遞迴|recursive/.test(txt)) return 1;
+
+  // ⭐⭐ 普通：其餘（4-8 行程式碼追蹤、中等複雜度）
+  return 2;
+}
+function pickDiff(d){
+  G.diff = d;
+  [1,2,3].forEach(i => {
+    document.getElementById('diff-'+i).classList.toggle('on', i === d);
+  });
+  save();
+}
 
 /* ============ LANGUAGE PICKER ============ */
 function pickLang(l){
@@ -1998,6 +2201,7 @@ function autoInit(){
   // 同步語言 pill 的狀態
   document.getElementById('lang-cpp').classList.toggle('on', G.lang==='cpp');
   document.getElementById('lang-py').classList.toggle('on', G.lang==='python');
+  [1,2,3].forEach(i => document.getElementById('diff-'+i).classList.toggle('on', i === G.diff));
   buildMasterBank();
   buildSelects();
   renderExamHome();
@@ -2870,38 +3074,58 @@ function renderQuestion(q, opts){
 }
 
 /* ============ EXAM ============ */
-/* 從題池中依章節平均抽取考題 */
+/* 從題池中依「難度 × 章節」均衡抽取考題
+   三個難度等級各佔 1/3；每個難度內再按章節平均分配 */
 function pickExamBalanced(pool, cnt){
-  // 將題池按章節分桶
-  const byCh = {};
-  pool.forEach((q, i) => {
-    q.fp = q.id || ('p'+i);
-    if(!byCh[q.ch]) byCh[q.ch] = [];
-    byCh[q.ch].push(q);
-  });
-  const chKeys = Object.keys(byCh).map(Number).sort((a,b)=>a-b);
-  if(chKeys.length === 0) return [];
+  // 為每題建立指紋
+  pool.forEach((q, i) => { q.fp = q.id || ('p'+i); });
 
-  // 每章節平均配額（餘數平均給前幾章）
-  const baseShare = Math.floor(cnt / chKeys.length);
-  const remainder = cnt % chKeys.length;
+  // 依難度分桶
+  const byDiff = {1:[], 2:[], 3:[]};
+  pool.forEach(q => {
+    const d = difficultyOf(q);
+    if(byDiff[d]) byDiff[d].push(q);
+  });
+
+  // 每個難度級別的目標題數（三等分，餘數給難度 1 和 2）
+  const base = Math.floor(cnt / 3);
+  const rem  = cnt % 3;
+  const targets = { 1: base + (rem > 0 ? 1 : 0),
+                    2: base + (rem > 1 ? 1 : 0),
+                    3: base };
 
   const selected = [];
   const selectedSet = new Set();
-  chKeys.forEach((ch, i) => {
-    const target = baseShare + (i < remainder ? 1 : 0);
-    const picked = shuf(byCh[ch]).slice(0, target);
-    picked.forEach(q => {
-      if(!selectedSet.has(q.fp)) { selected.push(q); selectedSet.add(q.fp); }
+
+  // 對每個難度等級，在其內部按章節再均分
+  [1, 2, 3].forEach(d => {
+    const dPool = byDiff[d];
+    const need  = targets[d];
+    if(!dPool.length || need === 0) return;
+
+    // 按章節分桶
+    const byCh = {};
+    dPool.forEach(q => {
+      if(!byCh[q.ch]) byCh[q.ch] = [];
+      byCh[q.ch].push(q);
+    });
+    const chKeys = Object.keys(byCh).sort();
+    const perCh  = Math.floor(need / chKeys.length);
+    const chRem  = need % chKeys.length;
+
+    chKeys.forEach((ch, i) => {
+      const t = perCh + (i < chRem ? 1 : 0);
+      shuf(byCh[ch]).slice(0, t).forEach(q => {
+        if(!selectedSet.has(q.fp)) { selected.push(q); selectedSet.add(q.fp); }
+      });
     });
   });
 
-  // 若有章節題源不足，從未選的補滿
+  // 若有難度層題源不足，從剩餘題補滿
   if(selected.length < cnt){
-    const rest = shuf(pool.filter(q => !selectedSet.has(q.fp)));
-    rest.slice(0, cnt - selected.length).forEach(q => {
-      selected.push(q); selectedSet.add(q.fp);
-    });
+    shuf(pool.filter(q => !selectedSet.has(q.fp)))
+      .slice(0, cnt - selected.length)
+      .forEach(q => { selected.push(q); selectedSet.add(q.fp); });
   }
 
   return shuf(selected).slice(0, cnt);
@@ -2916,8 +3140,8 @@ function startExam(){
     ch = 'all';
     document.getElementById('exam-ch').value = 'all';
   }
-  const pool = generateDerived(1000, ch==='all'?null:parseInt(ch), G.lang);
-  if(pool.length<cnt){ toast('題庫不足，請選擇其他章節'); return; }
+  const pool = generateDerived(1000, ch==='all'?null:parseInt(ch), G.lang, G.diff);
+  if(pool.length<cnt){ toast('此難度題庫不足，請換難度或章節'); return; }
   // 全部章節模式：平均分配各章節；單章節模式則純隨機抽
   const examQs = (ch === 'all') ? pickExamBalanced(pool, cnt) : shuf(pool).slice(0, cnt);
   G.examState = {
@@ -2938,16 +3162,44 @@ function startExam(){
 }
 function renderExamQ(){
   const s = G.examState;
-  // 一次顯示全部題目
-  let html = '';
-  s.qs.forEach((q,qi)=>{
-    html += renderQuestion(q, {num:qi+1, qIdx:qi, userAns:s.ans[qi], onclick:`examPick(${qi},IDX)`});
-  });
-  document.getElementById('exam-qwrap').innerHTML = html;
+  const qi = s.idx;
+  const q = s.qs[qi];
+  const total = s.qs.length;
   const done = s.ans.filter(x=>x>=0).length;
-  document.getElementById('exam-prog-txt').textContent = `${done}/${s.qs.length}`;
-  document.getElementById('exam-pbar').style.width = (done/s.qs.length*100)+'%';
+
+  // 難度標籤
+  const diff = difficultyOf(q);
+  const diffBadge = diff===1
+    ? '<span style="background:#d1fae5;color:#065f46;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700">⭐ 基礎</span>'
+    : diff===2
+    ? '<span style="background:#fef3c7;color:#92400e;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700">⭐⭐ 普通</span>'
+    : '<span style="background:#fee2e2;color:#991b1b;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700">⭐⭐⭐ 困難</span>';
+
+  // 章節標籤
+  const ch = CHS.find(c=>c.id===q.ch);
+  const chBadge = ch ? `<span style="background:#e0e7ff;color:#3730a3;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700">${ch.icon} ${ch.name}</span>` : '';
+
+  const html = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:6px">
+      <div style="font-size:14px;font-weight:700;color:var(--dim)">第 <strong style="font-size:18px;color:var(--fg)">${qi+1}</strong> / ${total} 題</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${chBadge} ${diffBadge}</div>
+    </div>
+    ${renderQuestion(q, {num:qi+1, qIdx:qi, userAns:s.ans[qi], onclick:'examPick('+qi+',IDX)'})}
+  `;
+  document.getElementById('exam-qwrap').innerHTML = html;
+
+  // 更新進度條
+  document.getElementById('exam-prog-txt').textContent = `${done}/${total}`;
+  document.getElementById('exam-pbar').style.width = (done/total*100)+'%';
+
+  // 上一題/下一題按鈕狀態
+  const prevBtn = document.getElementById('exam-prev');
+  const nextBtn = document.getElementById('exam-next');
+  if(prevBtn) prevBtn.disabled = (qi === 0);
+  if(nextBtn) nextBtn.style.background = (qi === total-1) ? 'var(--dim)' : '';
+
   renderQPalette();
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 function renderQPalette(){
   const s = G.examState;
@@ -2958,32 +3210,34 @@ function renderQPalette(){
 }
 function examPick(qIdx, optIdx){
   G.examState.ans[qIdx] = optIdx;
-  // 局部更新：只更新該題卡片內的選項樣式，避免整頁重繪導致捲動位置跳掉
+  // 更新當前題目卡片的選項樣式（即時反饋）
   const q = G.examState.qs[qIdx];
   const card = document.getElementById('qc-'+q.id);
   if(card){
     card.classList.add('q-answered');
-    const optEls = card.querySelectorAll('.opt');
-    optEls.forEach((el,i)=>{
+    card.querySelectorAll('.opt').forEach((el,i)=>{
       el.classList.toggle('selected', i===optIdx);
     });
   }
-  // 更新進度條 & 題號面板（不重繪題目）
+  // 更新進度 & 面板
   const s = G.examState;
   const done = s.ans.filter(x=>x>=0).length;
   document.getElementById('exam-prog-txt').textContent = `${done}/${s.qs.length}`;
   document.getElementById('exam-pbar').style.width = (done/s.qs.length*100)+'%';
   renderQPalette();
+  // 選完後 0.5 秒自動跳下一題（最後一題不跳）
+  if(qIdx < s.qs.length - 1){
+    setTimeout(()=>{ s.idx = qIdx + 1; renderExamQ(); }, 500);
+  }
 }
 function examNav(d){
-  // 已改為一次顯示全部題目，不需要上一題/下一題
-  return;
+  const s = G.examState;
+  s.idx = Math.max(0, Math.min(s.qs.length-1, s.idx + d));
+  renderExamQ();
 }
 function jumpExam(i){
-  // 滾動到指定題目
-  const q = G.examState.qs[i];
-  const card = document.getElementById('qc-'+q.id);
-  if(card) card.scrollIntoView({behavior:'smooth', block:'start'});
+  G.examState.idx = i;
+  renderExamQ();
 }
 let _timerInt=null;
 function startTimer(){
