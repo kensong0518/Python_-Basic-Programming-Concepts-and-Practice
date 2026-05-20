@@ -302,12 +302,12 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
               </button>
               <button type="button" class="diff-pill on" data-d="2" id="diff-2" onclick="pickDiff(2)">
                 <span style="font-size:18px">⭐⭐</span>
-                <span style="font-weight:700">普通</span>
+                <span style="font-weight:700">進階</span>
                 <span style="font-size:11px;opacity:.7">程式追蹤</span>
               </button>
               <button type="button" class="diff-pill" data-d="3" id="diff-3" onclick="pickDiff(3)">
                 <span style="font-size:18px">⭐⭐⭐</span>
-                <span style="font-weight:700">困難</span>
+                <span style="font-weight:700">挑戰</span>
                 <span style="font-size:11px;opacity:.7">互遞迴/演算法</span>
               </button>
             </div>
@@ -2151,7 +2151,7 @@ function difficultyOf(q){
   const txt = (q.q || '') + code;
   const lines = code.trim() ? code.split('\n').length : 0;
 
-  // ⭐⭐⭐ 困難：長程式碼 / 互遞迴 / 複雜演算法 / 圖形遍歷
+  // ⭐⭐⭐ 挑戰：長程式碼 / 互遞迴 / 複雜演算法 / 圖形遍歷
   if(lines > 8) return 3;
   if(/互遞迴|DFS|BFS|postfix|後序.*中序|前序.*中序|完全無向圖|deleteMax|三層迴圈|n²\(n\+1\)|n\(n-1\)\/2|Dijkstra|MST|動態規劃|DP|貪婪|逆序對|快排|merge sort|heap sort|時間複雜度.*O\(n²\)|O\(n log/.test(txt)) return 3;
   if(lines >= 6 && /遞迴|recursive|互.*呼叫|void f[12]/.test(txt)) return 3;
@@ -2159,13 +2159,13 @@ function difficultyOf(q){
 
   // ⭐ 基礎：純概念（無程式碼）且屬於基礎主題；或 1-3 行不含遞迴的簡短程式
   if(lines === 0){
-    // 資料結構進階概念 → 歸為 ⭐⭐ 普通
+    // 資料結構進階概念 → 歸為 ⭐⭐ 進階
     if(/BST|二元搜尋樹|中序.*遞增|Max.Heap|Min.Heap|前序|後序|中序走訪|鄰接矩陣|環狀.*串列|雙向.*串列|父節點|子節點|完全二元樹|堆積|鏈結串列.*O\(1\)|深度優先|廣度優先|有向圖|無向圖|visited/.test(txt)) return 2;
     return 1;
   }
   if(lines <= 3 && !/遞迴|recursive/.test(txt)) return 1;
 
-  // ⭐⭐ 普通：其餘（4-8 行程式碼追蹤、中等複雜度）
+  // ⭐⭐ 進階：其餘（4-8 行程式碼追蹤、中等複雜度）
   return 2;
 }
 function pickDiff(d){
@@ -3178,8 +3178,8 @@ function renderExamQ(){
   const diffBadge = diff===1
     ? '<span style="background:#d1fae5;color:#065f46;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700">⭐ 基礎</span>'
     : diff===2
-    ? '<span style="background:#fef3c7;color:#92400e;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700">⭐⭐ 普通</span>'
-    : '<span style="background:#fee2e2;color:#991b1b;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700">⭐⭐⭐ 困難</span>';
+    ? '<span style="background:#fef3c7;color:#92400e;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700">⭐⭐ 進階</span>'
+    : '<span style="background:#fee2e2;color:#991b1b;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700">⭐⭐⭐ 挑戰</span>';
 
   // 章節標籤
   const ch = CHS.find(c=>c.id===q.ch);
