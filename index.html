@@ -2145,7 +2145,7 @@ function difficultyOf(q){
   const txt = (q.q || '') + code;
   const lines = code.trim() ? code.split('\n').length : 0;
 
-  // ⭐⭐⭐ 困難：長程式碼 / 互遞迴 / 複雜演算法 / 圖形遍歷
+  // ⭐⭐⭐ 挑戰：長程式碼 / 互遞迴 / 複雜演算法 / 圖形遍歷
   if(lines > 8) return 3;
   if(/互遞迴|DFS|BFS|postfix|後序.*中序|前序.*中序|完全無向圖|deleteMax|三層迴圈|n²\(n\+1\)|n\(n-1\)\/2|Dijkstra|MST|動態規劃|DP|貪婪|逆序對|快排|merge sort|heap sort|時間複雜度.*O\(n²\)|O\(n log/.test(txt)) return 3;
   if(lines >= 6 && /遞迴|recursive|互.*呼叫|void f[12]/.test(txt)) return 3;
@@ -2159,7 +2159,7 @@ function difficultyOf(q){
   }
   if(lines <= 3 && !/遞迴|recursive/.test(txt)) return 1;
 
-  // ⭐⭐ 普通：其餘（4-8 行程式碼追蹤、中等複雜度）
+  // ⭐⭐ 進階：其餘（4-8 行程式碼追蹤、中等複雜度）
   return 2;
 }
 function pickDiff(d){
