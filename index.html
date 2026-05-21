@@ -2107,7 +2107,7 @@ function generateDerived(count, chFilter, lang, diff){
         q.opts = shuf(q.opts);
         q.a = q.opts.indexOf(correctText);
       }
-      const fp = q.ch+'|'+q.q+'|'+(q.code||'')+'|'+q.opts.join(',');
+      const fp = q.ch+'|'+q.q+'|'+(q.code||'')+'|'+[...q.opts].sort().join(',');
       if(seen.has(fp)) continue;
       seen.add(fp);
       const item = {...q, id:'D'+(out.length+1), derived:true, lang};
@@ -3088,8 +3088,12 @@ function renderQuestion(q, opts){
 /* 從題池中依「難度 × 章節」均衡抽取考題
    三個難度等級各佔 1/3；每個難度內再按章節平均分配 */
 function pickExamBalanced(pool, cnt){
-  // 為每題建立指紋
-  pool.forEach((q, i) => { q.fp = q.id || ('p'+i); });
+  // 以「題目文字（去除HTML）+ 程式碼 + 章節」作為唯一指紋
+  // 確保同一份考試中每道題只出現一次（不論選項順序如何）
+  pool.forEach(q => {
+    const qText = (q.q || '').replace(/<[^>]*>/g, '').trim();
+    q.fp = 'ch' + q.ch + '|' + qText + '|' + (q.code || '');
+  });
 
   // 依難度分桶
   const byDiff = {1:[], 2:[], 3:[]};
@@ -3106,9 +3110,9 @@ function pickExamBalanced(pool, cnt){
                     3: base };
 
   const selected = [];
-  const selectedSet = new Set();
+  const selectedSet = new Set();  // 已選題目的指紋集合
 
-  // 對每個難度等級，在其內部按章節再均分
+  // 對每個難度，在其內部按章節平均分配，並確保不重複
   [1, 2, 3].forEach(d => {
     const dPool = byDiff[d];
     const need  = targets[d];
@@ -3126,17 +3130,28 @@ function pickExamBalanced(pool, cnt){
 
     chKeys.forEach((ch, i) => {
       const t = perCh + (i < chRem ? 1 : 0);
-      shuf(byCh[ch]).slice(0, t).forEach(q => {
-        if(!selectedSet.has(q.fp)) { selected.push(q); selectedSet.add(q.fp); }
-      });
+      // 迭代（不只是 slice）確保取到 t 道不重複的題目
+      let added = 0;
+      for(const q of shuf(byCh[ch])) {
+        if(added >= t) break;
+        if(!selectedSet.has(q.fp)) {
+          selected.push(q);
+          selectedSet.add(q.fp);
+          added++;
+        }
+      }
     });
   });
 
-  // 若有難度層題源不足，從剩餘題補滿
+  // 若有難度層題源不足，從剩餘題補滿（同樣確保不重複）
   if(selected.length < cnt){
-    shuf(pool.filter(q => !selectedSet.has(q.fp)))
-      .slice(0, cnt - selected.length)
-      .forEach(q => { selected.push(q); selectedSet.add(q.fp); });
+    for(const q of shuf(pool)) {
+      if(selected.length >= cnt) break;
+      if(!selectedSet.has(q.fp)) {
+        selected.push(q);
+        selectedSet.add(q.fp);
+      }
+    }
   }
 
   return shuf(selected).slice(0, cnt);
