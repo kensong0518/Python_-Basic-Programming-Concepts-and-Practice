@@ -351,7 +351,7 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
       <div style="margin-top:10px;padding:10px 14px;background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;color:#92400e;font-size:12px;line-height:1.7">
         <strong>📢 使用聲明</strong><br>
         本工具<strong>全部功能完全免費</strong>提供高中生與自學者使用。<br>
-        <strong>嚴禁</strong>任何形式之商業營利用途<br>
+        <strong>嚴禁</strong>任何形式之商業營利用途（含但不限於：販售、收費教學課程、補習班商品包、收費 App 內容、企業內訓收費教材等）。<br>
         如需用於非營利之公開教育場合（學校社團、公益課程），歡迎自由使用並標註來源。
       </div>
       <div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap">
@@ -3059,8 +3059,13 @@ function renderQuestion(q, opts){
     } else if(sel===i){
       cls += ' selected';
     }
+    // HTML 跳脫：防止選項內的 & < > -> 被瀏覽器誤解析成 HTML
+    const safeOpt = String(o)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
     html += `<div class="${cls}" onclick="${opts.onclick?opts.onclick.replace('IDX',i):''}">
-      <span class="lt" style="font-weight:700;margin-right:8px">${String.fromCharCode(65+i)}:</span><span>${o}</span></div>`;
+      <span class="lt" style="font-weight:700;margin-right:8px">${String.fromCharCode(65+i)}:</span><span>${safeOpt}</span></div>`;
   });
   html += '</div>';
   if(showAns){
