@@ -559,10 +559,13 @@ const GEN = [
     const vals = [1,2,3];
     const x = pick(vals);
     const outs = {1:'ABC', 2:'BC', 3:'C'};
+    const out = outs[x];
+    const optArr = ['A','AB','ABC','BC'].includes(out) ? shuf(['A','AB','ABC','BC']) : shuf([out,'A','AB','BC']);
     return {ch:3, cppOnly:true, q:'下列 C 程式輸出為何？',
       code:`int x = ${x};\nswitch(x){\n  case 1: printf("A");\n  case 2: printf("B");\n  case 3: printf("C"); break;\n  default: printf("D");\n}`,
-      opts:['A','AB','ABC','BC'].includes(outs[x])?shuf(['A','AB','ABC','BC']):shuf([outs[x],'A','AB','BC']),
-      a:0,exp:`x=${x}，從 case ${x} 開始執行，因為沒有 break 會「貫穿 (fall-through)」往下執行，直到遇到 case 3 的 break，故輸出 ${outs[x]}`};
+      opts:optArr,
+      a:optArr.indexOf(out),
+      exp:`x=${x}，從 case ${x} 開始執行，因為沒有 break 會「貫穿 (fall-through)」往下執行，直到遇到 case 3 的 break，故輸出 ${out}`};
   },
   ()=>{ // break/continue
     const a=rnd(2,4), b=rnd(6,9);
