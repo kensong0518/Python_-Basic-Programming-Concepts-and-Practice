@@ -475,8 +475,15 @@ const GEN = [
     const a=rnd(30,99), b=rnd(3,9);
     const q=Math.floor(a/b), r=a%b;
     const correct=`${q} ${r}`;
-    const w1=`${r} ${q}`, w2=`${q+1} ${r}`, w3=`${q} ${r+1}`;
-    const all = shuf([correct, w1, w2, w3]);
+    // 確保 w1 不等於 correct（當 q==r 時 swap 會重複）
+    const w1 = q===r ? `${q+1} ${r}` : `${r} ${q}`;
+    const w2 = `${q+1} ${r}`;
+    const w3 = `${q} ${r+1}`;
+    // 過濾掉與 correct 相同的 wrong，用 Set 確保唯一
+    const wrongSet = new Set([correct]);
+    const wrongs = [w1, w2, w3].filter(w => { if(wrongSet.has(w)) return false; wrongSet.add(w); return true; });
+    while(wrongs.length < 3) { const e = `${q+wrongs.length+1} ${r}`; if(!wrongSet.has(e)){ wrongSet.add(e); wrongs.push(e); } }
+    const all = shuf([correct, ...wrongs]);
     return {ch:2, q:'下列 C 程式輸出為何？',
       code:`int a = ${a}, b = ${b};\nprintf("%d %d", a/b, a%b);`,
       opts: all, a: all.indexOf(correct),
@@ -705,7 +712,8 @@ const GEN = [
 
   /* === Ch6 指標 === */
   ()=>{ // 解參考修改
-    const a = rnd(5,30), b = rnd(5,30);
+    let a = rnd(5,30), b = rnd(5,30);
+    while(a === b) b = rnd(5,30); // 確保 a≠b，避免選項重複
     return {ch:6, cppOnly:true, q:'下列 C 程式輸出為何？',
       code:`int a = ${a};\nint *p = &a;\n*p = ${b};\nprintf("%d", a);`,
       opts:shuf([String(a),String(b),'&a','錯誤']), a:-1,
@@ -893,7 +901,7 @@ const GEN = [
       exp:`主對角線 a[0][0]+a[1][1]+a[2][2] = 1+5+9 = 15；反對角線 a[0][2]+a[1][1]+a[2][0] = 3+5+7 = 15。注意 a[1][1]=5 被加兩次。總和 30`};
   },
   ()=>{ // 字串反轉
-    const strs = ['ABCDE','HELLO','CODES','SWAPS','RADAR'];
+    const strs = ['ABCDE','HELLO','CODES','SWAPS'];  // 移除 RADAR（迴文，反轉=自身，會產生重複選項）
     const s = pick(strs);
     const rev = s.split('').reverse().join('');
     const opts = shuf([rev, s, s.slice(1)+s[0], rev.slice(1)+rev[0]]);
@@ -1582,9 +1590,15 @@ const GEN = [
     // 推入 a[0], a[1], a[2]；pop pops 次後剩餘最上面 = a[2-pops]
     const remainAfter = a.slice(0, 3-pops);
     const topAfter = remainAfter.length ? remainAfter[remainAfter.length-1] : null;
-    const wrongs = a.filter(v=>v!==topAfter).concat([(topAfter||0)+rnd(1,5)]);
     const correct = topAfter === null ? '堆疊為空' : String(topAfter);
-    const opts = shuf([correct, String(wrongs[0]), String(wrongs[1]), String(wrongs[2])]);
+    // 用 Set 確保 4 個選項全不重複
+    const optSet = new Set([correct]);
+    const candidates = a.filter(v=>v!==topAfter).map(String)
+      .concat([String((topAfter||0)+rnd(1,5)), String((topAfter||0)+rnd(6,10))]);
+    const wrongs = [];
+    for(const c of candidates){ if(!optSet.has(c)){ optSet.add(c); wrongs.push(c); } if(wrongs.length>=3) break; }
+    while(wrongs.length<3){ const e=String((topAfter||0)+wrongs.length+11); if(!optSet.has(e)){optSet.add(e);wrongs.push(e);} }
+    const opts = shuf([correct, ...wrongs]);
     return {
       ch:7,
       q:`依序執行 <code>push(${a[0]}), push(${a[1]}), push(${a[2]})</code> 後再連續 pop ${pops} 次，此時堆疊頂端的元素為何？`,
@@ -1635,7 +1649,13 @@ const GEN = [
   ()=>{ // 參數化：父→左子節點 index
     const p = rnd(2, 12);
     const correct = 2 * p;
-    const opts = shuf([String(correct), String(correct+1), String(p+1), String(Math.floor(p/2))]);
+    // 確保四個選項不重複（避免邊界問題）
+    const seen = new Set([String(correct)]);
+    const cands = [correct+1, p+1, Math.floor(p/2), p, correct-1, correct+2].filter(v=>v>0&&!seen.has(String(v)));
+    cands.forEach(v=>seen.add(String(v)));
+    const ws = cands.slice(0,3);
+    while(ws.length<3){let e=correct+ws.length+2;while(seen.has(String(e)))e++;ws.push(e);seen.add(String(e));}
+    const opts = shuf([String(correct),...ws.map(String)]);
     return {
       ch:7,
       q:`在以陣列儲存的二元樹中（index 從 1 開始），若某節點 index 為 <strong>${p}</strong>，其左子節點 index 為何？`,
@@ -1646,18 +1666,32 @@ const GEN = [
   ()=>{ // 參數化：父→右子節點
     const p = rnd(2, 12);
     const correct = 2 * p + 1;
-    const opts = shuf([String(correct), String(2*p), String(p+2), String(2*p-1)]);
+    // 用 Set 去重，確保 4 個選項完全不同
+    const optSet2 = new Set([String(correct)]);
+    const ws = [];
+    for(const v of [2*p, p+2, 2*p-1, p, correct-2, correct+2, correct+3]){
+      if(v>0 && !optSet2.has(String(v))){ optSet2.add(String(v)); ws.push(String(v)); }
+      if(ws.length >= 3) break;
+    }
+    while(ws.length<3){ let e=correct+ws.length+3; while(optSet2.has(String(e)))e++; optSet2.add(String(e)); ws.push(String(e)); }
+    const opts2 = shuf([String(correct), ...ws]);
     return {
       ch:7,
       q:`在以陣列儲存的二元樹中（index 從 1 開始），若某節點 index 為 <strong>${p}</strong>，其右子節點 index 為何？`,
-      code:null, opts, a: opts.indexOf(String(correct)),
+      code:null, opts: opts2, a: opts2.indexOf(String(correct)),
       exp:`右子節點公式：父 × 2 + 1 = ${p} × 2 + 1 = ${correct}。`
     };
   },
   ()=>{ // 參數化：子→父節點
     const c = rnd(4, 25);
     const correct = Math.floor(c / 2);
-    const opts = shuf([String(correct), String(c-1), String(2*c), String(c-2)]);
+    // 確保四個選項不重複（避免 c=4 時 c-2==floor(c/2) 的邊界問題）
+    const wrongSet154 = new Set([String(correct)]);
+    const cands154 = [c-1, 2*c, c-2, c+1, correct+1, correct-1].filter(v=>!wrongSet154.has(String(v))&&v>0);
+    cands154.forEach(v=>wrongSet154.add(String(v)));
+    const wrongs154 = [...wrongSet154].slice(1,4);
+    while(wrongs154.length<3){ let e=correct+wrongs154.length+1; while(wrongSet154.has(String(e))) e++; wrongs154.push(String(e)); wrongSet154.add(String(e)); }
+    const opts = shuf([String(correct), ...wrongs154]);
     return {
       ch:7,
       q:`在以陣列儲存的二元樹中（index 從 1 開始），若子節點 index 為 <strong>${c}</strong>，其父節點 index 為何？`,
