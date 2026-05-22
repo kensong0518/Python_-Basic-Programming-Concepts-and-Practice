@@ -1997,6 +1997,236 @@ const GEN = [
       exp:`sum 從 0 開始，每次把 i 加進去。\n${Array.from({length:n},(_,k)=>{const cur=(k+1)*(k+2)/2;const prev=k*(k+1)/2;return`  i=${k+1}：sum = ${prev} + ${k+1} = ${cur}`;}).join('\n')}\n最終 sum = ${total}。`};
   }
 
+,
+  /* ===== Ch3 流程控制 ⭐ 基礎（概念題）===== */
+  ()=>({ ch:3, q:'C 語言中，<code>for</code> 迴圈的哪一個部分決定迴圈是否繼續執行？',
+    code:null, opts:['初始化','條件判斷','更新式','迴圈本體'], a:1,
+    exp:'for(初始化; 條件判斷; 更新式)。每次執行前先判斷條件，條件為 true 才繼續，false 就結束。' }),
+  ()=>({ ch:3, q:'<code>while</code> 與 <code>do-while</code> 最大的差異是？',
+    code:null, opts:['while 執行更快','do-while 至少執行一次主體','while 可以有多個條件','do-while 不需要條件'], a:1,
+    exp:'do-while 先執行主體，之後才判斷條件，所以不管條件是否成立，主體至少執行一次。while 則先判斷，條件一開始就 false 的話主體一次也不執行。' }),
+  ()=>({ ch:3, q:'下列關於 <code>break</code> 的描述，何者正確？',
+    code:null, opts:['跳到下一次迴圈','立即結束整個程式','結束目前迴圈或 switch，跳到後面的程式碼','跳過目前這一次，繼續下一次迴圈'], a:2,
+    exp:'break 用於跳出「目前所在」的迴圈或 switch；continue 才是跳過本次直接進下一次迴圈。' }),
+  ()=>({ ch:3, q:'<code>continue</code> 的作用是？',
+    code:null, opts:['結束整個迴圈','跳過本次迴圈剩餘的程式碼，直接進行下一次判斷','立即結束程式','等同 break'], a:1,
+    exp:'continue 讓迴圈跳過本次後面的程式碼，直接進入更新式再判斷條件，繼續下一輪。' }),
+  ()=>({ ch:3, q:'if-else if-else 結構中，若所有 if/else if 條件都不成立，會執行哪一段？',
+    code:null, opts:['第一個 if','最後一個 else if','else（如果有的話）','不執行任何程式碼'], a:2,
+    exp:'if-else 結構：從上往下依序判斷，所有條件都不成立時，執行最後的 else 區塊（若沒有 else，則什麼都不做）。' }),
+  ()=>({ ch:3, q:'C 語言的 <code>for(;;)</code> 代表什麼？',
+    code:null, opts:['語法錯誤','迴圈執行零次','無窮迴圈（條件永遠為真）','只執行一次'], a:2,
+    exp:'for(;;) 三個部分都省略。省略條件判斷等於條件永遠為 true，所以是無窮迴圈，需要 break 才能結束。' }),
+
+  /* ===== Ch5 函式範疇 ⭐ 基礎（概念題）===== */
+  ()=>({ ch:5, q:'C 語言中，函式的「回傳型別」寫在哪裡？',
+    code:null, opts:['函式名稱後面的括號','函式名稱「前面」','大括號 {} 裡面','函式呼叫的地方'], a:1,
+    exp:'格式：回傳型別 函式名稱(參數){ ... }。例如 int add(int a, int b)，int 就是回傳型別，寫在函式名稱的「前面」。' }),
+  ()=>({ ch:5, q:'若函式的回傳型別宣告為 <code>void</code>，代表什麼？',
+    code:null, opts:['此函式沒有參數','此函式不回傳任何值','此函式只能被呼叫一次','此函式執行速度最快'], a:1,
+    exp:'void 表示「空、無」。void 回傳型別代表函式執行完畢後不回傳任何值，不需要 return 語句（寫 return; 也可以）。' }),
+  ()=>({ ch:5, q:'「區域變數 (local variable)」的有效範圍是？',
+    code:null, opts:['整個程式','宣告它的函式內部','同一個 .c 檔案內','從宣告到程式結束'], a:1,
+    exp:'區域變數宣告在函式（或程式區塊 {}）內，只在該函式的大括號範圍內有效。函式結束後自動消失。' }),
+  ()=>({ ch:5, q:'「全域變數 (global variable)」宣告在哪裡？',
+    code:null, opts:['函式 main 最上面','任意 {} 內部','所有函式外部（函式定義之前）','#include 之前'], a:2,
+    exp:'全域變數寫在所有函式的外部，可以被同一個程式中的所有函式存取。生命週期為整個程式執行期間。' }),
+  ()=>({ ch:5, q:'「傳值呼叫 (call by value)」的特點是？',
+    code:null, opts:['函式可以直接修改原始變數的值','函式內的修改不影響呼叫端的原始變數','函式只能接受整數參數','必須搭配 return 使用'], a:1,
+    exp:'傳值呼叫會「複製」實際參數的值給函式的形式參數。函式內修改的是複本，不影響呼叫端原本的變數。' }),
+  ()=>({ ch:5, q:'函式的「原型宣告 (prototype)」有什麼用途？',
+    code:null, opts:['讓函式只能被呼叫一次','讓編譯器在函式定義之前就知道函式的存在','強制函式必須回傳值','縮短程式執行時間'], a:1,
+    exp:'函式原型（如 int add(int, int);）讓編譯器提前了解函式的回傳型別與參數型別，這樣主函式就算放在函式定義之前也能正確呼叫。' }),
+
+  /* ===== Ch6 指標 ⭐ 基礎（概念題）===== */
+  ()=>({ ch:6, q:'C/C++ 中的「指標 (pointer)」儲存的是什麼？',
+    code:null, opts:['一個整數值','一個字元','變數的記憶體位址','變數的資料型別'], a:2, cppOnly:true,
+    exp:'指標變數專門儲存「記憶體位址」，而不是實際的資料值。例如 int *p = &a; 讓 p 儲存變數 a 的位址。' }),
+  ()=>({ ch:6, q:'在 C/C++ 中，<code>&x</code> 的意義是？',
+    code:null, opts:['x 乘以 2','取得變數 x 的記憶體位址','解參考 x','x 的位元 AND'], a:1, cppOnly:true,
+    exp:'& 是「取址運算子 (address-of operator)」，&x 回傳變數 x 在記憶體中的位址（一個位址數值）。' }),
+  ()=>({ ch:6, q:'在 C/C++ 中，<code>*p</code> 的意義是（p 是指標）？',
+    code:null, opts:['p 乘以自己','宣告 p 為指標','解參考：取得 p 所指向位址的值','取得 p 本身的位址'], a:2, cppOnly:true,
+    exp:'* 是「解參考運算子 (dereference operator)」，*p 表示「到 p 指向的位址，取出那裡的值」。' }),
+  ()=>({ ch:6, q:'宣告 <code>int *p;</code> 代表什麼？',
+    code:null, opts:['宣告一個整數 p 並乘以某值','宣告 p 是指向 int 型別的指標','宣告一個值為 0 的 int','p 的值永遠不能改變'], a:1, cppOnly:true,
+    exp:'int *p 宣告 p 是一個「指向 int 的指標」（pointer to int）。p 本身儲存的是某個 int 變數的記憶體位址。' }),
+  ()=>({ ch:6, q:'在 C/C++ 中，NULL 指標代表什麼？',
+    code:null, opts:['指向第 0 個記憶體位址的資料','指標沒有指向任何有效的記憶體位址','指標的值為 -1','指標已經被釋放'], a:1, cppOnly:true,
+    exp:'NULL（或 nullptr in C++）代表指標目前沒有指向任何有效位址，常用來初始化指標或判斷指標是否已設定。' }),
+
+  /* ===== Ch6 指標 ⭐⭐⭐ 挑戰（複雜指標操作）===== */
+  ()=>{
+    const vals = [rnd(5,20), rnd(5,20), rnd(5,20)];
+    while(vals[0]===vals[1]||vals[1]===vals[2]||vals[0]===vals[2]) { vals[1]=rnd(5,20); vals[2]=rnd(5,20); }
+    const a2=vals[0]+vals[1], c2=vals[2]*2;
+    const correct=`${a2} ${vals[1]} ${c2}`;
+    const optSet=new Set([correct]);
+    const cands=[`${vals[0]} ${vals[1]} ${c2}`,`${a2} ${vals[1]} ${vals[2]}`,`${vals[0]*2} ${vals[1]} ${c2}`,`${a2} ${vals[2]} ${c2}`].filter(x=>!optSet.has(x));
+    cands.forEach(x=>optSet.add(x));
+    const ws=cands.slice(0,3);
+    while(ws.length<3){const e=`${ws.length} ${vals[1]} ${c2}`;if(!optSet.has(e)){optSet.add(e);ws.push(e);}}
+    const opts=shuf([correct,...ws]);
+    return {ch:6, cppOnly:true, q:'下列 C 程式輸出為何？',
+      code:`int a=${vals[0]}, b=${vals[1]}, c=${vals[2]};\nint *p = &a, *q = &b;\n*p += *q;\np = &c;\n*p *= 2;\nprintf("%d %d %d", a, b, c);`,
+      opts, a:-1, _setAns:(q)=>{q.a=q.opts.indexOf(correct);return q;},
+      exp:`p→a, q→b。\n*p += *q 即 a += b → a=${a2}。\np = &c 改指向 c。\n*p *= 2 即 c *= 2 → c=${c2}。\nb 未動 = ${vals[1]}。\n輸出：${correct}`};
+  },
+  ()=>{
+    const n=rnd(2,6), a=rnd(1,5);
+    const result=Array.from({length:n},(_,i)=>a*(i+1));
+    const lastVal=a*n;
+    const correct=String(lastVal);
+    const optSet=new Set([correct]);
+    // 確保候選 wrong options 唯一
+    const rawCands=[a*(n-1), a, lastVal+1, lastVal+2, lastVal+3];
+    const ws=[];
+    for(const v of rawCands){
+      const s=String(v);
+      if(!optSet.has(s)&&v>0){optSet.add(s);ws.push(s);}
+      if(ws.length>=3) break;
+    }
+    while(ws.length<3){const e=String(lastVal+ws.length+3);if(!optSet.has(e)){optSet.add(e);ws.push(e);}}
+    const opts=shuf([correct,...ws]);
+    return {ch:6, cppOnly:true, q:'下列 C 程式輸出為何？',
+      code:`int arr[${n}];\nint *p = arr;\nfor(int i=0;i<${n};i++) *(p+i) = ${a}*(i+1);\nprintf("%d", *(p+${n-1}));`,
+      opts, a:-1, _setAns:(q)=>{q.a=q.opts.indexOf(correct);return q;},
+      exp:`*(p+i) = arr[i]。arr = [${result.join(',')}]。\n*(p+${n-1}) = arr[${n-1}] = ${lastVal}。`};
+  },
+
+  /* ===== Ch2 ⭐⭐⭐ 挑戰（複雜位元/型別/巨集）===== */
+  ()=>{
+    const x=rnd(5,30);
+    const ans1=x&(x-1), ans2=x|(x+1);
+    const correct=`${ans1} ${ans2}`;
+    const opts=shuf([correct,`${x-1} ${x}`,`${x|x} ${x&x}`,`${x^(x-1)} ${x|(x-1)}`]);
+    return {ch:2, q:'下列 C 程式輸出為何？（位元運算）',
+      code:`int x = ${x};\nprintf("%d %d", x & (x-1), x | (x+1));`,
+      opts, a:opts.indexOf(correct),
+      exp:`x=${x}，x-1=${x-1}，x+1=${x+1}。\\nx & (x-1) 清除最低位元的 1，結果=${ans1}。\\nx | (x+1) 設定最低位元的 0，結果=${ans2}。`};
+  },
+  ()=>{
+    const a=rnd(1,9), b=rnd(1,9), c=rnd(1,9);
+    const val = a + b * c;
+    const macro_res = (a + b) * (a + b);  // #define sq(x) x*x → sq(a+b) = a+b*a+b
+    const trap = a + b * a + b;  // sq(a+b) without parens: a+b*a+b
+    const correct=String(trap);
+    // 確保選項唯一
+    const macroSet=new Set([correct]);
+    const macroCands=[String(macro_res),String(val),String(a+b),String(a*b),String(a+b+1)].filter(x=>!macroSet.has(x)&&(macroSet.add(x)||true));
+    const macroWs=macroCands.slice(0,3);
+    while(macroWs.length<3){const e=String(+correct+macroWs.length+1);if(!macroSet.has(e)){macroSet.add(e);macroWs.push(e);}}
+    const opts=shuf([correct,...macroWs]);
+    return {ch:2, q:'下列 C 程式輸出為何？（巨集陷阱）',
+      code:`#define sq(x) x*x\nprintf("%d", sq(${a}+${b}));`,
+      opts, a:opts.indexOf(correct),
+      exp:`#define sq(x) x*x 展開 sq(${a}+${b}) → ${a}+${b}*${a}+${b}（無括號保護）。\\n運算優先序：乘法先：${b}*${a}=${b*a}，再加法：${a}+${b*a}+${b}=${trap}。`};
+  },
+
+  /* ===== Ch4 ⭐⭐⭐ 挑戰（複雜陣列/字串）===== */
+  ()=>{
+    const n=rnd(3,5);
+    const arr=Array.from({length:n},(_,i)=>i+1);
+    const last=arr[n-1];
+    const rotated=[last,...arr.slice(0,n-1)];
+    const correct=rotated.join(' ');
+    const leftRotate=[...arr.slice(1),arr[0]].join(' ');
+    const reversed=[...arr].reverse().join(' ');
+    const optSet=new Set([correct]);
+    const cands=[leftRotate,reversed,arr.join(' ')].filter(x=>!optSet.has(x));
+    cands.forEach(x=>optSet.add(x));
+    const ws=cands.slice(0,3);
+    while(ws.length<3){const e=String(n+ws.length);if(!optSet.has(e)){optSet.add(e);ws.push(e);}}
+    const opts=shuf([correct,...ws]);
+    return {ch:4, q:'下列 C 程式執行後陣列的輸出為何？',
+      code:`int a[${n}] = {${arr.join(',')}},t;\nt = a[${n-1}];\nfor(int i=${n-1}; i>0; i--) a[i]=a[i-1];\na[0]=t;\nfor(int i=0;i<${n};i++) printf("%d ",a[i]);`,
+      opts, a:opts.indexOf(correct),
+      exp:`a[${n-1}]=${last} 先存到 t。迴圈將所有元素右移一位。a[0]=t=${last}。\n結果：${correct}`};
+  },
+  ()=>{
+    const s='HELLO';
+    const len=5;
+    // reverse the string
+    const rev='OLLEH';
+    const opts=shuf([rev, s, 'HLLEO', 'OELLH']);
+    return {ch:4, q:'下列 C 程式輸出為何？',
+      code:`char s[] = "HELLO";\nint n = strlen(s);\nfor(int i=0;i<n/2;i++){\n  char t=s[i]; s[i]=s[n-1-i]; s[n-1-i]=t;\n}\nprintf("%s", s);`,
+      opts, a:opts.indexOf(rev),
+      exp:`字串反轉：i=0: 交換 s[0]='H' 與 s[4]='O' → OELLH；i=1: 交換 s[1]='E' 與 s[3]='L' → OLEH...最終 OLLEH。`};
+  },
+
+  /* ===== Ch7 ⭐ 基礎（資料結構基礎概念）===== */
+  ()=>({ ch:7, diff:1, q:'Stack（堆疊）的存取原則為何？',
+    code:null, opts:['先進先出 (FIFO)','後進先出 (LIFO)','隨機存取','依優先序存取'], a:1,
+    exp:'Stack 像一疊盤子：最後放上去的最先被拿走，稱為 LIFO（Last In, First Out）。push 加入，pop 取出。' }),
+  ()=>({ ch:7, diff:1, q:'Queue（佇列）的存取原則為何？',
+    code:null, opts:['後進先出 (LIFO)','先進先出 (FIFO)','由大到小取出','隨機存取'], a:1,
+    exp:'Queue 像排隊：先進入的先出去，稱為 FIFO（First In, First Out）。enqueue 從後端加入，dequeue 從前端取出。' }),
+  ()=>({ ch:7, diff:1, q:'下列哪一種情況最適合使用 Stack？',
+    code:null, opts:['先到先服務的排隊系統','瀏覽器的「上一頁」功能','印表機工作佇列','作業系統的排程'], a:1,
+    exp:'瀏覽器上一頁：最近造訪的頁面最先被回到，符合 LIFO。印表機/排程是 Queue (FIFO)。' }),
+  ()=>({ ch:7, diff:1, q:'二元搜尋樹 (BST) 的主要特性是？',
+    code:null, opts:['每個節點最多有 3 個子節點','左子節點 < 父節點 < 右子節點','只能儲存整數','根節點必為最小值'], a:1,
+    exp:'BST 的核心性質：對每個節點，左子樹所有值 < 節點值 < 右子樹所有值。這個性質讓搜尋可以每次排除一半。' }),
+  ()=>({ ch:7, diff:1, q:'陣列（Array）與鏈結串列（Linked List）最大的差異是？',
+    code:null, opts:['陣列只能存整數','鏈結串列的元素存在連續記憶體','陣列可隨機存取 O(1)，鏈結串列需循序走訪 O(n)','鏈結串列不能新增元素'], a:2,
+    exp:'陣列：記憶體連續，可用 index 直接存取 O(1)。鏈結串列：記憶體不連續，透過指標串接，隨機存取需走訪 O(n)，但插入/刪除較彈性。' }),
+  ()=>({ ch:7, diff:1, q:'Heap（堆積）是哪種資料結構？',
+    code:null, opts:['線性串列','完全二元樹（Complete Binary Tree）','二元搜尋樹','Graph（圖）'], a:1,
+    exp:'Heap 是以「完全二元樹」為基礎實作的資料結構。Max-Heap 保證父節點 ≥ 子節點（根是最大值），Min-Heap 相反。' }),
+
+,
+  /* ── Ch2 ⭐⭐⭐ 挑戰（補 9 題）── */
+  ()=>{const x=rnd(5,30);const a1=x&(x-1),a2=x|(x+1);const c=`${a1} ${a2}`;const s=new Set([c]);const ws=[];for(const v of[`${x-1} ${x}`,`${x} ${x+1}`,`${a1+1} ${a2-1}`,`${x^1} ${x+2}`]){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=`${x+ws.length} ${x}`;if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([c,...ws]);return{ch:2,diff:3,q:'下列 C 程式輸出為何？',code:`int x = ${x};\nprintf("%d %d", x & (x-1), x | (x+1));`,opts,a:opts.indexOf(c),exp:`x=${x}。x&(x-1)清除最低位1→${a1}；x|(x+1)設定最低位0→${a2}。`};},
+  ()=>{const a=rnd(2,9),b=rnd(2,9);const trap=a+b*a+b;const macro=(a+b)*(a+b);const s=new Set([String(trap)]);const ws=[];for(const v of[String(macro),String(a+b*b),String(a+b+1),String(trap-1)]){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(trap+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(trap),...ws]);return{ch:2,diff:3,q:'下列 C 程式輸出為何？（注意巨集展開）',code:`#define MUL(x) x*x\nprintf("%d", MUL(${a}+${b}));`,opts,a:opts.indexOf(String(trap)),exp:`MUL(${a}+${b})展開→${a}+${b}*${a}+${b}（無括號）。運算：${b}*${a}=${b*a}，${a}+${b*a}+${b}=${trap}。`};},
+  ()=>{const a=rnd(1,5),b=rnd(1,5),c=rnd(1,5);const ans=a>b?a:b>c?b:c;const s=new Set([String(ans)]);const ws=[];for(const v of[a,b,c,a+b,b+c].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:3,q:'下列 C 程式輸出為何？',code:`int a=${a},b=${b},c=${c};\nint r = a>b ? a : (b>c ? b : c);\nprintf("%d",r);`,opts,a:opts.indexOf(String(ans)),exp:`先判斷 a>b（${a}>${b}）${a>b?'成立':'不成立'}。${a>b?`結果 a=${a}`:`再判斷 b>c（${b}>${c}）${b>c?'成立':'不成立'}，結果 ${b>c?`b=${b}`:`c=${c}`}`}。r=${ans}。`};},
+  ()=>{const a=rnd(5,15),b=rnd(2,5);const q0=Math.floor(a/b),r=a%b;const ans=`${q0} ${r}`;const s=new Set([ans]);const ws=[];for(const v of[`${r} ${q0}`,`${q0+1} ${r}`,`${q0} ${r+1}`,`${a} ${b}`]){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=`${q0+ws.length} ${r}`;if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([ans,...ws]);return{ch:2,diff:3,q:'下列 C 程式輸出為何？',code:`int a=${a},b=${b};\nprintf("%d %d", a/b, a%b);`,opts,a:opts.indexOf(ans),exp:`整數除法：${a}/${b}=${q0}（商）；${a}%${b}=${r}（餘）。輸出：${ans}。`};},
+  ()=>{const n=rnd(1,4);const ans=1<<n;const s=new Set([String(ans)]);const ws=[];for(const v of[String(ans-1),String(ans+1),String(n),String(2*n)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:3,q:'下列 C 程式輸出為何？',code:`int x = 1 << ${n};\nprintf("%d", x);`,opts,a:opts.indexOf(String(ans)),exp:`1<<${n} 表示將 1 左移 ${n} 位，等於 2^${n} = ${ans}。位元左移 n 位 = 乘以 2^n。`};},
+  ()=>{const x=rnd(10,60);const ans=(x&1)===0?'偶數':'奇數';const opts=shuf([ans,'偶數','奇數','無法判斷'].filter((v,i,a)=>a.indexOf(v)===i));return{ch:2,diff:3,q:`已知 x = ${x}，下列程式的輸出為何？`,code:`printf("%s", (${x} & 1) ? "奇數" : "偶數");`,opts:opts.length===4?opts:['偶數','奇數','0','1'],a:opts.length===4?opts.indexOf(ans):(x%2===0?0:1),exp:`x & 1 取最低位元：${x} & 1 = ${x&1}（${(x&1)?'1→奇數':'0→偶數'}）。`};},
+  ()=>{const a=rnd(2,9),b=rnd(2,9),c=rnd(2,9);const ans=a*(b+c);const wrong1=a*b+c,wrong2=a+b*c,wrong3=a*b+a*c+1;const s=new Set([String(ans)]);const ws=[];for(const v of[wrong1,wrong2,wrong3,ans+1].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:3,q:'下列 C 程式輸出為何？（注意括號）',code:`int a=${a},b=${b},c=${c};\nprintf("%d", a*(b+c));`,opts,a:opts.indexOf(String(ans)),exp:`括號優先：先算 b+c=${b+c}，再乘 a=${a}，得 ${ans}。`};},
+  ()=>{const x=rnd(5,20),n=rnd(1,4);const ans=(x>>n);const s=new Set([String(ans)]);const ws=[];for(const v of[String(x<<n),String(ans+1),String(ans-1),String(n)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:3,q:'下列 C 程式輸出為何？',code:`int x = ${x};\nprintf("%d", x >> ${n});`,opts,a:opts.indexOf(String(ans)),exp:`>> 是右移運算：${x} >> ${n} = ${x}/2^${n} = ${ans}（整數，捨去小數）。`};},
+  ()=>{const a=rnd(2,6),b=rnd(2,6);const ans=a^b;const s=new Set([String(ans)]);const ws=[];for(const v of[String(a&b),String(a|b),String(ans+1),String(ans-1)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:3,q:'下列 C 程式輸出為何？（位元 XOR）',code:`int a=${a}, b=${b};\nprintf("%d", a ^ b);`,opts,a:opts.indexOf(String(ans)),exp:`XOR：相同為 0，不同為 1。${a}(${a.toString(2)}) ^ ${b}(${b.toString(2)}) = ${ans.toString(2)} = ${ans}。`};},
+
+  /* ── Ch3 ⭐ 基礎（補 4 題）── */
+  ()=>({ch:3,q:'關於 C 語言中的 <code>if-else</code>，下列敘述何者正確？',code:null,opts:['if 區塊一定要有對應的 else','else 不是必要的，if 可以獨立使用','if 條件必須是整數','else 區塊一定先執行'],a:1,exp:'if 可以單獨存在，不必配 else。只有在需要「條件不成立時做另一件事」才加 else。'}),
+  ()=>({ch:3,q:'下列哪一種迴圈「保證至少執行一次主體」？',code:null,opts:['for','while','do-while','if-else'],a:2,exp:'do-while 的特性：先執行主體，之後才判斷條件。不管條件是否成立，主體至少執行一次。for 和 while 都是先判斷再執行。'}),
+  ()=>({ch:3,q:'C 語言中，<code>switch</code> 缺少 <code>break</code> 時會發生什麼？',code:null,opts:['編譯錯誤','只執行符合的 case','繼續往下執行其他 case（fall-through）','直接跳到 default'],a:2,exp:'這叫 fall-through。switch 找到符合的 case 後，若沒有 break，會繼續往下執行下一個 case 的程式碼，直到遇到 break 或 switch 結束。'}),
+  ()=>({ch:3,q:'for 迴圈的初始式、條件、更新式都可以省略，<code>for(;;)</code> 代表什麼？',code:null,opts:['只執行一次','語法錯誤','無窮迴圈','迴圈不執行'],a:2,exp:'for(;;) 省略條件等於條件永遠為 true，形成無窮迴圈。需要在迴圈內用 break 才能跳出。'}),
+
+  /* ── Ch4 ⭐⭐⭐ 挑戰（補 5 題）── */
+  ()=>{const n=rnd(4,7);const arr=Array.from({length:n},()=>rnd(1,20));const passes=Math.floor(n/2);let a=[...arr];for(let p=0;p<passes;p++){for(let i=0;i<n-1-p;i++){if(a[i]>a[i+1]){let t=a[i];a[i]=a[i+1];a[i+1]=t;}}}const ans=a.join(' ');const s=new Set([ans]);const ws=[];for(const v of[[...arr].reverse().join(' '),[...arr].sort((a,b)=>b-a).join(' '),arr.join(' ')].filter(v=>!s.has(v)&&s.add(v))){ws.push(v);if(ws.length===3)break;}while(ws.length<3){const e=String(ws.length)+' ...';if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([ans,...ws.slice(0,3)]);return{ch:4,diff:3,q:`對陣列 {${arr.join(',')}} 進行 ${passes} 次 Bubble Sort，此時陣列為何？`,code:null,opts:opts.length===4?opts:shuf([ans,...[...arr].sort((a,b)=>a-b).join(' ').split(' ').slice(0,3).map((v,i)=>v+' '+i)].slice(0,3)),a:opts.indexOf(ans),exp:`Bubble Sort 每次把最大值「冒泡」到右端。${passes} 次後，最大的 ${passes} 個數已排到右側。結果：${ans}。`};},
+  ()=>{const n=rnd(4,8);const arr=Array.from({length:n},(_,i)=>i*2+1);const target=arr[rnd(0,n-1)];let lo=0,hi=n-1,steps=0,found=-1;while(lo<=hi){steps++;const mid=Math.floor((lo+hi)/2);if(arr[mid]===target){found=mid;break;}else if(arr[mid]<target)lo=mid+1;else hi=mid-1;}const ans=String(steps);const s=new Set([ans]);const ws=[];for(const v of[String(steps+1),String(steps-1||1),String(n),String(Math.ceil(Math.log2(n+1)))].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(+ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([ans,...ws]);return{ch:4,diff:3,q:`對排序陣列 {${arr.join(',')}} 用二元搜尋法找 ${target}，共需幾次比較？`,code:null,opts,a:opts.indexOf(ans),exp:`二元搜尋每次取中間值比較。陣列長度 ${n}。搜尋 ${target} 需要 ${steps} 次比較。`};},
+  ()=>{const s='HELLO',len=5,rev='OLLEH';const opts=shuf([rev,s,'HLLEO','OELLH']);return{ch:4,diff:3,q:'下列 C 程式輸出為何？',code:`char s[]="HELLO";\nfor(int i=0,j=4;i<j;i++,j--){\n  char t=s[i];s[i]=s[j];s[j]=t;\n}\nprintf("%s",s);`,opts,a:opts.indexOf(rev),exp:`雙指標交換：(H,O)→OELLH，(E,L)→OLLEH，i=2,j=2停止。輸出：OLLEH。`};},
+  ()=>{const n=rnd(3,5),val=rnd(2,5);const arr=Array.from({length:n},(_,i)=>val*(i+1));const ans=arr.reduce((a,b)=>a+b,0);const s=new Set([String(ans)]);const ws=[];for(const v of[String(ans-val),String(ans+val),String(n*val),String(val*val)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:4,diff:3,q:'下列 C 程式輸出為何？',code:`int a[]={${arr.join(',')}},s=0;\nfor(int i=0;i<${n};i++) s+=a[i];\nprintf("%d",s);`,opts,a:opts.indexOf(String(ans)),exp:`a={${arr.join(',')}}，求和：${arr.join('+')}=${ans}。`};},
+  ()=>{const a=rnd(65,68),b=rnd(65,68);const ans=String.fromCharCode(a)<String.fromCharCode(b)?'<':'>';const ca=String.fromCharCode(a),cb=String.fromCharCode(b);const opts=['<','>','==','錯誤'];return{ch:4,diff:3,q:`在 C 語言中，字元比較 <code>'${ca}' ${ans} '${cb}'</code> 結果為何？（依 ASCII 值）`,code:null,opts,a:opts.indexOf(ans),exp:`ASCII：A=65,B=66,C=67,D=68。'${ca}'=${a}，'${cb}'=${b}。${a} ${ans} ${b}，所以 '${ca}' ${ans} '${cb}'。`};},
+
+  /* ── Ch5 ⭐ 基礎（補 3 題）── */
+  ()=>({ch:5,q:'C 語言函式可以「回傳多個值」嗎？',code:null,opts:['可以，直接寫 return a, b','不行，return 只能回傳一個值（但可用指標或結構傳多個）','可以，用 return[] 陣列','可以，用 return()括號包住多個值'],a:1,exp:'C 語言的 return 只能回傳一個值。若需要回傳多個值，通常透過指標參數（傳址呼叫）或用 struct 包裝後回傳。'}),
+  ()=>({ch:5,q:'下列關於「遞迴函式」的敘述，何者正確？',code:null,opts:['遞迴函式不需要結束條件','遞迴函式就是函式呼叫自己，需要有基本情況（base case）才能終止','遞迴函式比迴圈執行更快','遞迴函式不能有回傳值'],a:1,exp:'遞迴函式必須有「基本情況（base case）」，否則會無限遞迴直到 stack overflow。每次呼叫自己都應朝向 base case 靠近。'}),
+  ()=>({ch:5,q:'「靜態變數（static variable）」宣告在函式內時，其生命週期為？',code:null,opts:['函式執行期間','每次函式呼叫都重新初始化','整個程式執行期間，且只初始化一次','宣告後立即消失'],a:2,exp:'static 區域變數：存在於程式整個執行過程，不像一般區域變數在函式結束後消失。只有第一次進入函式時初始化，之後保留上一次的值。'}),
+
+  /* ── Ch6 ⭐ 基礎（補 5 題）── */
+  ()=>({ch:6,q:'下列關於 C/C++ 指標的敘述，何者「錯誤」？',code:null,opts:['指標變數佔用的記憶體大小與系統架構有關（32位元=4bytes，64位元=8bytes）','int *p 和 double *p 佔用的記憶體大小不同','指標可以進行加減運算（指標算術）','指標可以設定為 NULL 表示不指向任何位址'],a:1,cppOnly:true,exp:'指標本身只儲存「位址」，不管指向什麼型別，指標變數本身的大小都一樣（取決於系統位元數，不是指向的資料型別）。'}),
+  ()=>({ch:6,q:'在 C/C++ 中，<code>int arr[5]</code> 中 <code>arr</code> 代表什麼？',code:null,opts:['陣列的長度','陣列第一個元素 arr[0] 的值','陣列第一個元素的記憶體位址（指標常數）','陣列所有元素的總和'],a:2,cppOnly:true,exp:'陣列名稱 arr 本身代表「指向第一個元素的指標」，即 &arr[0]。所以 arr 和 &arr[0] 的值相同。'}),
+  ()=>({ch:6,q:'下列程式執行後，a 的值為何？<br><code>int a=10; int *p=&a; *p=20;</code>',code:null,opts:['10','20','&a 的位址值','不確定'],a:1,cppOnly:true,exp:'p 指向 a，*p=20 等同 a=20。解參考運算子 * 讓你透過指標修改它所指向的變數。'}),
+  ()=>({ch:6,q:'<code>const int *p</code> 表示什麼？',code:null,opts:['p 本身不能改變','p 所指向的值不能透過 p 修改','p 不能指向 NULL','p 只能指向一個位址'],a:1,cppOnly:true,exp:'const int *p（pointer to const int）：指標 p 可以改變（指向不同位址），但不能用 *p 修改其所指向的 int 值。'}),
+  ()=>({ch:6,q:'呼叫函式時，下列哪種方式可以讓函式修改「呼叫端的原始變數」？',code:null,opts:['傳值呼叫（call by value）','傳址呼叫（call by pointer，傳入 &變數）','兩種都不行，函式無法修改外部變數','只有 global 變數才能被修改'],a:1,cppOnly:true,exp:'傳址呼叫：把變數的「位址」傳入函式，函式透過解參考 *p 直接修改原始記憶體位址的值，因此能改變呼叫端的變數。'}),
+
+  /* ── Ch6 ⭐⭐⭐ 挑戰（補 10 題，需 diff:3）── */
+  ()=>{const a=rnd(10,20),b=rnd(2,a-1);const ans=`${b} ${a}`;const s=new Set([ans]);const ws=[];for(const v of[`${a} ${b}`,`${a+b} ${a-b}`,`${b} ${b}`]){if(!s.has(v)){s.add(v);ws.push(v);}}while(ws.length<3){const e=`${ws.length+1} ${a}`;if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([ans,...ws]);return{ch:6,diff:3,cppOnly:true,q:'下列 C 程式輸出為何？',code:`int a=${a},b=${b};\nint *p=&a,*q=&b;\nint t=*p; *p=*q; *q=t;\nprintf("%d %d",a,b);`,opts,a:opts.indexOf(ans),exp:`指標交換：t=a=${a}，a=b=${b}，b=t=${a}。輸出：${b} ${a}。`};},
+
+  ()=>{const a=rnd(3,10),b=a+rnd(1,5),c=b+rnd(1,5);const ans=`${b} ${a} ${c}`;const s=new Set([ans]);const ws=[];for(const v of[`${a} ${b} ${c}`,`${c} ${b} ${a}`,`${b} ${c} ${a}`]){if(!s.has(v)){s.add(v);ws.push(v);}}while(ws.length<3){const e=`${ws.length} ${a} ${c}`;if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([ans,...ws]);return{ch:6,diff:3,cppOnly:true,q:'下列 C 程式輸出為何？',code:`int a=${a},b=${b},c=${c};\nint *arr[3]={&a,&b,&c};\nint t=*arr[0];*arr[0]=*arr[1];*arr[1]=t;\nprintf("%d %d %d",a,b,c);`,opts,a:opts.indexOf(ans),exp:`指標陣列指向 a,b,c。交換 *arr[0](a=${a}) 和 *arr[1](b=${b})：a 變 ${b}，b 變 ${a}，c 不動=${c}。輸出：${b} ${a} ${c}。`};},
+  ()=>{const x=rnd(4,9);const ans=x*x;const s=new Set([String(ans)]);const ws=[];for(const v of[String(ans-x),String(ans+x),String(2*x),String(x+1),String(ans-1)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+2);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:6,diff:3,cppOnly:true,q:'下列 C 程式輸出為何？（函式指標）',code:`int sq(int n){ return n*n; }\nint (*fp)(int) = sq;\nprintf("%d", fp(${x}));`,opts,a:opts.indexOf(String(ans)),exp:`fp 是函式指標，指向 sq 函式。fp(${x}) 等同 sq(${x}) = ${x}*${x} = ${ans}。`};},
+  ()=>{const n=rnd(2,5),base=rnd(2,4);const arr=Array.from({length:n},(_,i)=>base+i);const ans=arr[n-1];const s=new Set([String(ans)]);const ws=[];for(const v of[arr[0],ans+1,ans-1,base*n].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:6,diff:3,cppOnly:true,q:'下列 C 程式輸出為何？（指標算術）',code:`int arr[]={${arr.join(',')}};\nint *p=arr;\np += ${n-1};\nprintf("%d",*p);`,opts,a:opts.indexOf(String(ans)),exp:`p 指向 arr[0]=${arr[0]}。p+=${n-1} 讓 p 指向 arr[${n-1}]=${ans}。*p=${ans}。`};},
+  ()=>{const a=rnd(5,20),inc=rnd(1,5);const ans=a+inc;const s=new Set([String(ans)]);const ws=[];for(const v of[a,ans+inc,ans-1,a+inc*2].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:6,diff:3,cppOnly:true,q:'下列 C 程式輸出為何？',code:`int a=${a};\nint *p=&a;\n(*p) += ${inc};\nprintf("%d",a);`,opts,a:opts.indexOf(String(ans)),exp:`(*p)+=${inc} 等同 a+=${inc}，a 從 ${a} 變為 ${ans}。`};},
+  ()=>{const a=rnd(5,20),b=rnd(5,20);const ans=a>b?a:b;const s=new Set([String(ans)]);const ws=[];for(const v of[a,b,a+b,Math.abs(a-b)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:6,diff:3,cppOnly:true,q:'下列 C 程式輸出為何？',code:`int a=${a},b=${b};\nint *p=(a>b)?&a:&b;\nprintf("%d",*p);`,opts,a:opts.indexOf(String(ans)),exp:`條件運算子：a>b(${a}>${b})${a>b?'成立':'不成立'}，p 指向${a>b?'a':'b'}=${ans}。`};},
+  ()=>{const a=rnd(5,15),b=rnd(5,15);const ans=`${a*2} ${b*2}`;const s=new Set([ans]);const ws=[];for(const v of[`${a} ${b}`,`${a+b} ${a+b}`,`${a*2} ${b}`,`${a} ${b*2}`]){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}const opts=shuf([ans,...ws]);return{ch:6,diff:3,cppOnly:true,q:'下列 C 程式輸出為何？',code:`void dbl(int *x){ *x *= 2; }\nint a=${a},b=${b};\ndbl(&a); dbl(&b);\nprintf("%d %d",a,b);`,opts,a:opts.indexOf(ans),exp:`傳址呼叫：dbl(&a) 讓 *x=&a，*x*=2 即 a*=2=${a*2}。dbl(&b) 同理 b=${b*2}。`};},
+  ()=>{const n=rnd(3,6),val=rnd(2,5);const arr=Array.from({length:n},(_,i)=>val*(i+1));const ans=arr.reduce((a,b)=>a+b,0);const s=new Set([String(ans)]);const ws=[];for(const v of[ans-val,ans+val,arr[0]*n,val*n*n].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:6,diff:3,cppOnly:true,q:'下列 C 程式輸出為何？（指標走訪陣列）',code:`int a[]={${arr.join(',')}},s=0;\nfor(int *p=a;p<a+${n};p++) s+=*p;\nprintf("%d",s);`,opts,a:opts.indexOf(String(ans)),exp:`指標 p 從 a[0] 走到 a[${n-1}]，逐一累加。總和=${arr.join('+')}=${ans}。`};},
+  ()=>{const a=rnd(3,15),b=rnd(3,15);const ans=`${b} ${a}`;const s=new Set([ans]);const ws=[];for(const v of[`${a} ${b}`,`${a+b} ${b-a}`,`${b} ${b}`].filter(v=>!s.has(v)&&s.add(v))){ws.push(v);}while(ws.length<3){const e=String(ws.length)+' '+String(a);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([ans,...ws.slice(0,3)]);return{ch:6,diff:3,cppOnly:true,q:'下列 C 程式輸出為何？',code:`int a=${a},b=${b};\nint **pp;\nint *p=&a;\npp=&p;\n*(*pp)=b;\np=&b;\n*(*pp)=a;\nprintf("%d %d",a,b);`,opts,a:opts.indexOf(ans),exp:`pp→p→a。*(*pp)=b 即 a=b=${b}。然後 p=&b；*(*pp)=a 即 b=a=${a}（但 a 已是 ${b}！）。最終 a=${b}，b=${a}。輸出：${b} ${a}。`};},
+
+,
+  ()=>({ch:5,diff:1,q:'C 語言函式中，<code>return</code> 的主要作用是？',code:null,opts:['宣告一個新變數','結束函式並回傳值給呼叫者','重複執行函式','跳過函式中的某段程式碼'],a:1,exp:'return 將函式的執行結果（值）回傳給呼叫者，並立即結束函式。若函式宣告為 void，可以直接寫 return; 不帶值。'}),
+  ()=>({ch:5,diff:1,q:'關於「函式多載 (function overloading)」，下列敘述何者正確？',code:null,opts:['C 語言支援，C++ 不支援','兩個函式名稱相同但參數不同，C++ 允許','一個函式可以有無限個回傳型別','函式多載讓函式執行更快'],a:1,exp:'函式多載：C++ 允許定義同名函式，只要「參數的個數或型別不同」即可。C 語言不支援。呼叫時，編譯器根據傳入的參數自動選擇正確的版本。'})
 ];
 
 /* 套用 _setAns 後處理 */
@@ -2131,8 +2361,9 @@ function generateDerived(count, chFilter, lang, diff){
       // Python 模式：自動偵測並跳過含 C 專屬語法的程式碼
       if(lang === 'python' && q.code){
         const cCode = q.code;
-        const hasCOnly = /printf\s*\(|scanf\s*\(|&&|\|\||\+\+|--|int\s+\w|char\s+\w|void\s+\w|->|\bNULL\b|#include|#define/.test(cCode);
-        if(hasCOnly) continue;
+        // 只過濾 Python 完全沒有的語法：指標操作、前置指令
+        const hasPtrOnly = /->|\bNULL\b|\bNULLPTR\b|\w\s*\*\s*\w|char\s*\*|void\s*\*|\*\s*\w+\s*=|\*\s*\w+\s*\+=|int\s*\*|double\s*\*|float\s*\*|#include|#define/.test(cCode);
+        if(hasPtrOnly) continue;
       }
       // 防錯：確保 4 個選項文字都不重複
       if(Array.isArray(q.opts) && q.opts.length===4){
@@ -2185,33 +2416,50 @@ function load(){ try{ const d=JSON.parse(localStorage.getItem(SK)||'{}'); G.exam
 /* ============ DIFFICULTY ============ */
 /* 自動判斷題目難度（1=輕鬆, 2=簡單, 3=超難） */
 function difficultyOf(q){
+  if(q.diff && q.diff >= 1 && q.diff <= 3) return q.diff; // 強制難度標記
   const code = q.code || '';
   const txt  = (q.q || '') + ' ' + code;
   const lines = code.trim() ? code.split('\n').length : 0;
 
-  /* ─── ⭐⭐⭐ 挑戰 ─── */
-  // 任何遞迴（問題或程式碼提及）→ 挑戰
+  /* ─── ⭐⭐⭐ 挑戰：遞迴、複雜演算法、複雜度分析、進階資料結構 ─── */
   if(/遞迴|recursive|互遞迴/i.test(txt)) return 3;
-  // 複雜演算法關鍵字 → 挑戰
-  if(/互遞迴|DFS|BFS|postfix|後序.*中序|前序.*中序|完全無向圖|deleteMax|三層迴圈|n²\(n\+1\)|n\(n-1\)\/2|Dijkstra|MST|動態規劃|\bDP\b|貪婪|逆序對|快排|merge\s*sort|heap\s*sort|O\(n\s*log/.test(txt)) return 3;
-  // 程式碼超長 → 挑戰
   if(lines > 8) return 3;
-  // 有兩個以上 for/while（巢狀或多層迴圈）→ 挑戰
+  // 演算法複雜度 / 效能分析
+  if(/時間複雜度|空間複雜度|Big.?O|T\(n\)|Θ\(|Ω\(|下界|比較排序|comparison.sort/.test(txt)) return 3;
+  if(/O\(n\s*log|O\(n²\)|O\(2\^n\)|O\(log\s*n\)|最壞情況.*O\(|平均.*O\(/.test(txt)) return 3;
+  // 進階排序分析
+  if(/不穩定|就地排序|in.?place|Heapsort|heap\s*sort|merge\s*sort|Quick.*最壞|quicksort.*worst|比較排序.*下界/.test(txt)) return 3;
+  // 進階演算法
+  if(/DFS|BFS|Dijkstra|MST|最短路徑|最小生成|動態規劃|\bDP\b|貪婪|回溯|分而治之|Divide.*Conquer|八皇后|河內塔|Hanoi|postfix|後序.*中序|前序.*中序/.test(txt)) return 3;
+  // 進階資料結構
+  if(/雜湊|Hash.*表|負載因子|線性探測|分離鏈結|deleteMax|完全無向圖|n\(n-1\)\/2|逆序對|主定理|Master.*Theorem/.test(txt)) return 3;
+  // 複雜程式碼
+  if(/互遞迴|DFS|BFS|三層迴圈|n²\(n\+1\)|O\(n\s*log/.test(txt)) return 3;
   const forCnt = (code.match(/\bfor\s*\(/g) || []).length;
   const whileCnt = (code.match(/\bwhile\s*\(/g) || []).length;
   if(forCnt + whileCnt >= 2) return 3;
 
-  /* ─── ⭐ 基礎 ─── */
+  /* ─── ⭐⭐ 進階：資料結構操作、演算法概念、有程式碼的控制流 ─── */
   if(lines === 0){
-    // 0 行：純概念，但若涉及資料結構或流程控制 → 進階
-    if(/Stack|Queue|BST|Heap|堆積|Graph|圖形|鏈結串列|Linked|前序|後序|中序走訪|父節點|子節點|完全二元樹|有向圖|無向圖|visited|鄰接矩陣|環狀|雙向|DFS|BFS/.test(txt)) return 2;
-    if(/\bfor\b|\bwhile\b|迴圈|switch\s*\(|do-while|dangling/.test(txt)) return 2;
-    return 1; // 純基礎概念
+    // 資料結構操作概念
+    if(/push|pop|enqueue|dequeue|堆疊|佇列|Stack|Queue|BST|Heap|堆積|Graph|圖形|鏈結串列|Linked|前序|後序|中序|父節點|子節點|完全二元樹|有向圖|無向圖|visited|鄰接矩陣|環狀|雙向|DFS|BFS|線性資料結構|非線性/.test(txt)) return 2;
+    // 演算法概念
+    if(/排序|搜尋|search|sort|二元搜尋|線性搜尋|複雜度|最壞|最佳|平均|Big|Θ|Ω|成長速度/.test(txt)) return 2;
+    // 位元運算 / 記憶體位址
+    if(/位元|bitwise|x\s*>>\s*\d|x\s*<<\s*\d|x\s*\&\s*\d|x\s*\|\s*\d|0x[0-9A-Fa-f]+.*運算|二維陣列.*位址|記憶體位址|sizeof.*位址/.test(txt)) return 2;
+    // 樹結構計算 / 圖形計算
+    if(/完全二元樹.*節點|葉節點|樹.*邊\s*\(|edge.*tree|n.*節點.*樹|樹.*高度.*節點|perfect.*binary|Heap.*index|index.*父節點/.test(txt)) return 2;
+    // 中等流程概念（只擋複雜的）
+    if(/switch.*fall|dangling|scope|範疇|巢狀.*迴圈|多層.*for|sprintf|strcmp|資料結構.*錯誤/.test(txt)) return 2;
+    // 複合布林邏輯（含3個以上變數或巢狀括號）
+    if(/x1.*x2.*x3|多函式|互.*呼叫/.test(txt)) return 2;
+    /* ─── ⭐ 基礎：簡單概念（含基本迴圈/條件/函式/指標的入門問題）─── */
+    return 1;
   }
-  // 1-2 行且沒有任何控制流 → 基礎
+  // 1-2 行純算術/賦值/布林（無控制流）→ 基礎
   if(lines <= 2 && !/\bfor\s*\(|\bwhile\s*\(|\bdo\s*\{|\bif\s*\(|\bswitch\s*\(/.test(code)) return 1;
 
-  /* ─── ⭐⭐ 進階 ─── */
+  /* ─── ⭐⭐ 進階：其餘有程式碼的中等題 ─── */
   return 2;
 }
 function pickDiff(d){
