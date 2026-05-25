@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta name="version" content="v20260525-1107" data-version="v20260525-1107">
+  <meta name="version" content="v20260525-1128" data-version="v20260525-1128">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>高中生程式能力測試（非官方）</title>
@@ -1522,10 +1522,10 @@ const GEN = [
       exp:'追蹤：\n  第1次：lo=0, hi=7, mid=3, a[3]=15 < 23 → lo=4\n  第2次：lo=4, hi=7, mid=5, a[5]=23 == target → break\n  共執行 2 次。\n  雖然 N=8 最壞需要 ⌈log₂8⌉ = 3 次，本題目標剛好落在第 2 次的 mid。'};
   },
   ()=>{ // 氣泡排序 pass 數（APCS 風格）
-    return {ch:7, q:'下列氣泡排序對 <code>{5, 1, 4, 2, 8}</code> 排序，最外層 <code>for</code> 迴圈會將內層執行幾次完整的 pass，使資料完全排序？',
+    return {ch:7, q:'下列氣泡排序對 <code>{5, 1, 4, 2, 8}</code> 排序，<strong>依此程式碼撰寫方式</strong>，最外層 <code>for</code> 迴圈總共會執行幾次完整的 pass？（即使中途資料已排序，迴圈仍會繼續執行）',
       code:`int a[] = {5, 1, 4, 2, 8};\nint n = 5;\nfor (int i = 0; i < n - 1; i++)\n  for (int j = 0; j < n - 1 - i; j++)\n    if (a[j] > a[j+1]) {\n      int t = a[j]; a[j] = a[j+1]; a[j+1] = t;\n    }`,
       opts:['1','2','3','4'], a:3,
-      exp:'氣泡排序對 n=5 個元素，外層 for 跑 n-1=4 次（i 從 0 到 3），不論資料是否已排序都會跑完全部 4 個 pass。\n  追蹤排序過程：\n    Pass i=0: [1,4,2,5,8]（最大值 8 沉底）\n    Pass i=1: [1,2,4,5,8]（4、5 排好）\n    Pass i=2: [1,2,4,5,8]（已排序但仍跑）\n    Pass i=3: [1,2,4,5,8]\n  共執行 4 次完整 pass。'};
+      exp:'此程式碼為「沒有提早退出機制」的氣泡排序：外層 for 條件為 i < n - 1，n=5 所以外層 for 跑 n-1=4 次（i = 0,1,2,3），即使資料中途已排序也會跑完全部 4 個 pass。\n  追蹤排序過程：\n    Pass i=0: [1,4,2,5,8]（最大值 8 沉底）\n    Pass i=1: [1,2,4,5,8]（已排序，但程式仍繼續）\n    Pass i=2: [1,2,4,5,8]\n    Pass i=3: [1,2,4,5,8]\n  共執行 4 次完整 pass。\n  ⚠ 注意：如果加入 break 提早退出（透過 flag 偵測無交換），只需 2 個 pass 即可完成排序。但本題程式碼沒有 break，所以答案是 4。'};
   },
   ()=>{ // 樹的前序走訪程式碼追蹤
     return {ch:7, q:'下列為某二元樹的前序走訪。陣列 <code>L</code> 是左子節點索引、<code>R</code> 是右子節點索引（-1 表示無子節點）。輸出為何？',
