@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta name="version" content="v20260525-1027" data-version="v20260525-1027">
+  <meta name="version" content="v20260525-1107" data-version="v20260525-1107">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>高中生程式能力測試（非官方）</title>
@@ -2399,7 +2399,7 @@ const GEN = [
 ()=>{const n=rnd(3,5);let sum=0;for(let i=1;i<=n;i++)for(let j=i;j<=n;j++)sum++;const s=new Set([String(sum)]);const ws=[];for(const v of[sum+1,sum-1,n*n,n*(n+1)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(sum+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(sum),...ws]);return{ch:3,diff:3,q:'下列 C 程式片段中 printf 共執行幾次？',code:`for(int i=1;i<=${n};i++)\n  for(int j=i;j<=${n};j++)\n    printf("*");`,opts,a:opts.indexOf(String(sum)),exp:`j 從 i 到 ${n}：當 i=1 執行 ${n} 次, i=2 執行 ${n-1} 次,...,i=${n} 執行 1 次。合計 ${n}+${n-1}+...+1 = ${sum}。`};},
 ()=>{const n=rnd(2,4),m=rnd(2,4);const ans=n*m*m;const s=new Set([String(ans)]);const ws=[];for(const v of[n*m,m*m,ans+1,ans-1<1?ans+2:ans-1].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(ans+_x+2);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(ans),...ws]);return{ch:3,diff:3,q:'下列 C 程式片段中 cnt++ 共執行幾次？',code:`int cnt=0;\nfor(int i=0;i<${n};i++)\n  for(int j=0;j<${m};j++)\n    for(int k=0;k<${m};k++) cnt++;`,opts,a:opts.indexOf(String(ans)),exp:`三層迴圈：${n}（外）× ${m}（中）× ${m}（內）= ${n}×${m}×${m} = ${ans} 次。`};},
 // Ch4 ⭐⭐⭐ 挑戰 +2
-()=>{const n=rnd(4,7);const arr=Array.from({length:n},(_,i)=>rnd(i*2,i*2+4));let lo=0,hi=n-1,cnt=0;while(lo<hi){cnt++;const mid=Math.floor((lo+hi)/2);lo=mid+1;}const s=new Set([String(cnt)]);const ws=[];for(const v of[cnt-1||1,cnt+1,n,n-1].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(cnt+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(cnt),...ws]);return{ch:4,diff:3,q:`對長度 ${n} 的陣列做二元搜尋，最多需要幾次比較（最壞情況）？`,code:null,opts,a:opts.indexOf(String(cnt)),exp:`二元搜尋最多 ceil(log2(${n}+1)) = ${cnt} 次比較。`};},
+()=>{const n=rnd(4,15);const cnt=Math.ceil(Math.log2(n+1));const s=new Set([String(cnt)]);const ws=[];for(const v of[cnt-1||1,cnt+1,n,n-1].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(cnt+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(cnt),...ws]);return{ch:4,diff:3,q:`對長度 ${n} 的陣列做二元搜尋，最多需要幾次比較（最壞情況）？`,code:null,opts,a:opts.indexOf(String(cnt)),exp:`二元搜尋最壞情況需 ⌈log₂(${n}+1)⌉ = ⌈log₂(${n+1})⌉ = ${cnt} 次比較。每次比較砍掉一半範圍。`};},
 ()=>{const n=rnd(4,8);const arr=Array.from({length:n},()=>rnd(1,20));const s_val=arr.reduce((a,b)=>a+b,0);const avg=Math.round(s_val/n*100)/100;const ans=String(Math.floor(s_val/n));const s=new Set([ans]);const ws=[];for(const v of[String(Math.floor(s_val/n)+1),String(n),String(s_val)].filter(v=>!s.has(v)&&s.add(v))){ws.push(v);}while(ws.length<3)ws.push(String(ws.length+10));const opts=shuf([ans,...ws.slice(0,3)]);return{ch:4,diff:3,q:'下列 C 程式計算陣列整數平均，結果為何？',code:`int a[]={${arr.join(',')}},n=${n},s=0;\nfor(int i=0;i<n;i++) s+=a[i];\nprintf("%d",s/n);`,opts,a:opts.indexOf(ans),exp:`s=${arr.join('+')}=${s_val}。s/n（整數）=${s_val}/${n}=${ans}（截斷小數）。`};}
 ];
 
@@ -3329,6 +3329,9 @@ function toPython(c){
     }).filter(Boolean).join(', ');
     return `def ${name}(${args}):{`;
   });
+
+  // 5.5) 函式原型 (forward declaration) → 移除（Python 不需要）
+  py = py.replace(/^\s*\b(?:int|void|double|float|char|long|short)\s+\w+\s*\([^)]*\)\s*;\s*$/gm, '');
 
   // 6) 變數宣告
   py = py.replace(/\b(?:int|double|float|long|short|unsigned)\s+([^;{}]+);/g, (m, body) => {
