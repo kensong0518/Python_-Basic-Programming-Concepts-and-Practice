@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta name="version" content="v20260525-1128" data-version="v20260525-1128">
+  <meta name="version" content="v20260525-1207" data-version="v20260525-1207">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>高中生程式能力測試（非官方）</title>
@@ -247,6 +247,7 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
       <div class="hero" style="text-align:center">
         <h2 id="hero-greet">⌨️ 高中生程式能力測試</h2>
         <p>高中生程式能力測試考・完整解析・Word 報告下載</p>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">版本：<span id="app-version">v20260525-1207</span> · <a href="#" id="clear-history" style="color:var(--muted);text-decoration:underline;cursor:pointer">清除舊考試紀錄</a></div>
         <div class="hero-stats">
           <div class="hs"><div class="v" id="hs-exam">0</div><div class="l">已完成模擬考</div></div>
           <div class="hs"><div class="v" id="hs-best">—</div><div class="l">最佳成績</div></div>
@@ -759,12 +760,13 @@ const GEN = [
 
   /* === Ch7 遞迴搜尋 === */
   ()=>{ // 二元搜尋次數
-    const k = rnd(8,14);
+    const k = rnd(4,8);
     const n = Math.pow(2,k);
-    const o = mk(k, [k-1, k+1, k*2]);
+    const ans = k+1;  // 最壞情況需 ceil(log2(n+1)) = k+1 次比較（不是 k）
+    const o = mk(ans, [k, k+2, k*2, n]);
     return {ch:7, q:`對已排序的 N = ${n} 個元素進行二元搜尋，最壞情況需要比較幾次？`,
       code:null, opts:o.opts, a:o.a,
-      exp:`二元搜尋每次將範圍折半，最多比較 log₂N 次。log₂(${n}) = log₂(2^${k}) = ${k}`};
+      exp:`二元搜尋最壞情況需 ⌈log₂(N+1)⌉ 次比較（決策樹深度）。\n  對 N=${n}=2^${k}：⌈log₂(${n+1})⌉ = ${ans} 次。\n  ⚠ 注意：N=2^k 時，最壞需 k+1 次（要走到葉節點），不是 k 次。`};
   },
   ()=>{ // GCD
     const pairs=[[24,36,12],[18,24,6],[48,36,12],[60,48,12],[35,42,7],[100,75,25]];
@@ -2187,7 +2189,7 @@ const GEN = [
 
   /* ── Ch4 ⭐⭐⭐ 挑戰（補 5 題）── */
   ()=>{const n=rnd(4,7);const arr=Array.from({length:n},()=>rnd(1,20));const passes=Math.floor(n/2);let a=[...arr];for(let p=0;p<passes;p++){for(let i=0;i<n-1-p;i++){if(a[i]>a[i+1]){let t=a[i];a[i]=a[i+1];a[i+1]=t;}}}const ans=a.join(' ');const s=new Set([ans]);const ws=[];for(const v of[[...arr].reverse().join(' '),[...arr].sort((a,b)=>b-a).join(' '),arr.join(' ')].filter(v=>!s.has(v)&&s.add(v))){ws.push(v);if(ws.length===3)break;}while(ws.length<3){const e=String(ws.length)+' ...';if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([ans,...ws.slice(0,3)]);return{ch:4,diff:3,q:`對陣列 {${arr.join(',')}} 進行 ${passes} 次 Bubble Sort，此時陣列為何？`,code:null,opts:opts.length===4?opts:shuf([ans,...[...arr].sort((a,b)=>a-b).join(' ').split(' ').slice(0,3).map((v,i)=>v+' '+i)].slice(0,3)),a:opts.indexOf(ans),exp:`Bubble Sort 每次把最大值「冒泡」到右端。${passes} 次後，最大的 ${passes} 個數已排到右側。結果：${ans}。`};},
-  ()=>{const n=rnd(4,8);const arr=Array.from({length:n},(_,i)=>i*2+1);const target=arr[rnd(0,n-1)];let lo=0,hi=n-1,steps=0,found=-1;while(lo<=hi){steps++;const mid=Math.floor((lo+hi)/2);if(arr[mid]===target){found=mid;break;}else if(arr[mid]<target)lo=mid+1;else hi=mid-1;}const ans=String(steps);const s=new Set([ans]);const ws=[];for(const v of[String(steps+1),String(steps-1||1),String(n),String(Math.ceil(Math.log2(n+1)))].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(+ans+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([ans,...ws]);return{ch:4,diff:3,q:`對排序陣列 {${arr.join(',')}} 用二元搜尋法找 ${target}，共需幾次比較？`,code:null,opts,a:opts.indexOf(ans),exp:`二元搜尋每次取中間值比較。陣列長度 ${n}。搜尋 ${target} 需要 ${steps} 次比較。`};},
+  ()=>{const n=rnd(4,8);const arr=Array.from({length:n},(_,i)=>i*2+1);const target=arr[rnd(0,n-1)];let lo=0,hi=n-1,steps=0,found=-1;while(lo<=hi){steps++;const mid=Math.floor((lo+hi)/2);if(arr[mid]===target){found=mid;break;}else if(arr[mid]<target)lo=mid+1;else hi=mid-1;}const ans=String(steps);const s=new Set([ans]);const ws=[];for(const v of[String(steps+1),String(steps-1||1),String(n),String(Math.ceil(Math.log2(n+1)))].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(+ans+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([ans,...ws]);return{ch:4,diff:3,q:`對排序陣列 <code>{${arr.join(',')}}</code> 用二元搜尋法找 <strong>${target}</strong>，從 lo=0、hi=${n-1} 開始追蹤，共需幾次比較？`,code:null,opts,a:opts.indexOf(ans),exp:`二元搜尋追蹤（lo=0, hi=${n-1}）：每次比較 a[mid] 與 ${target}。陣列長度 ${n}。完整搜尋 ${target} 共需 ${steps} 次比較。`};},
   ()=>{const s='HELLO',len=5,rev='OLLEH';const opts=shuf([rev,s,'HLLEO','OELLH']);return{ch:4,diff:3,q:'下列 C 程式輸出為何？',code:`char s[]="HELLO";\nfor(int i=0,j=4;i<j;i++,j--){\n  char t=s[i];s[i]=s[j];s[j]=t;\n}\nprintf("%s",s);`,opts,a:opts.indexOf(rev),exp:`雙指標交換：(H,O)→OELLH，(E,L)→OLLEH，i=2,j=2停止。輸出：OLLEH。`};},
   ()=>{const n=rnd(3,5),val=rnd(2,5);const arr=Array.from({length:n},(_,i)=>val*(i+1));const ans=arr.reduce((a,b)=>a+b,0);const s=new Set([String(ans)]);const ws=[];for(const v of[String(ans-val),String(ans+val),String(n*val),String(val*val)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(ans+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(ans),...ws]);return{ch:4,diff:3,q:'下列 C 程式輸出為何？',code:`int a[]={${arr.join(',')}},s=0;\nfor(int i=0;i<${n};i++) s+=a[i];\nprintf("%d",s);`,opts,a:opts.indexOf(String(ans)),exp:`a={${arr.join(',')}}，求和：${arr.join('+')}=${ans}。`};},
   ()=>{const a=rnd(65,68),b=rnd(65,68);const ans=String.fromCharCode(a)<String.fromCharCode(b)?'<':'>';const ca=String.fromCharCode(a),cb=String.fromCharCode(b);const opts=['<','>','==','錯誤'];return{ch:4,diff:3,q:`在 C 語言中，字元比較 <code>'${ca}' ${ans} '${cb}'</code> 結果為何？（依 ASCII 值）`,code:null,opts,a:opts.indexOf(ans),exp:`ASCII：A=65,B=66,C=67,D=68。'${ca}'=${a}，'${cb}'=${b}。${a} ${ans} ${b}，所以 '${ca}' ${ans} '${cb}'。`};},
@@ -2272,11 +2274,11 @@ const GEN = [
 ()=>{const n=rnd(4,8);const arr=Array.from({length:n},()=>rnd(1,5));const freq={};arr.forEach(v=>{freq[v]=(freq[v]||0)+1;});const maxFreq=Math.max(...Object.values(freq));const mode=parseInt(Object.keys(freq).find(k=>freq[k]===maxFreq));const s=new Set([String(mode)]);const ws=[];for(const v of arr.filter(v=>v!==mode).map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(mode+_x+5);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(mode),...ws]);return{ch:4,diff:2,q:`下列陣列 {${arr.join(',')}} 中出現次數最多的元素（眾數）為何？`,code:null,opts,a:opts.indexOf(String(mode)),exp:`計算各元素出現次數：${Object.entries(freq).map(([k,v])=>`${k}出現${v}次`).join(',')}。出現最多的是 ${mode}（${maxFreq}次）。`};},
 ()=>{const n=rnd(3,5),m=rnd(3,5);const ans=n*m;const s=new Set([String(ans)]);const ws=[];for(const v of[n+m,ans+1,ans-1,n*m+n].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(ans+_x+2);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(ans),...ws]);return{ch:4,diff:2,q:`int a[${n}][${m}] 共有幾個元素？`,code:null,opts,a:opts.indexOf(String(ans)),exp:`二維陣列 [${n}][${m}] 的元素總數 = ${n} × ${m} = ${ans}。`};},
 // Ch4 ⭐⭐⭐ 挑戰
-()=>{const n=rnd(3,6);const arr=Array.from({length:n},()=>rnd(1,10));let passes=0,sorted=false,a=[...arr];while(!sorted){sorted=true;for(let j=0;j<a.length-1-passes;j++){if(a[j]>a[j+1]){[a[j],a[j+1]]=[a[j+1],a[j]];sorted=false;}}passes++;}const ans=String(passes);const s=new Set([ans]);const ws=[];for(const v of[String(passes-1||1),String(passes+1),String(n-1),String(n)].filter(v=>!s.has(v)&&s.add(v))){ws.push(v);if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(passes+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([ans,...ws]);return{ch:4,diff:3,q:`陣列 {${arr.join(',')}} 進行 Bubble Sort，需要幾趟（passes）才能完成排序？`,code:null,opts,a:opts.indexOf(ans),exp:`Bubble Sort 逐趟追蹤：${arr.join(',')}>..>${[...arr].sort((a,b)=>a-b).join(',')} 共需 ${passes} 趟。`};},
-()=>{const n=rnd(4,8);const arr=Array.from({length:n},(_,i)=>rnd(i*3+1,i*3+3));const target=pick(arr);let lo=0,hi=n-1,cnt=0,found=-1;while(lo<=hi){cnt++;const mid=Math.floor((lo+hi)/2);if(arr[mid]===target){found=mid;break;}else if(arr[mid]<target)lo=mid+1;else hi=mid-1;}const s=new Set([String(cnt)]);const ws=[];for(const v of[cnt-1||1,cnt+1,n,Math.ceil(Math.log2(n+1))].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(cnt+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(cnt),...ws]);return{ch:4,diff:3,q:`對排序陣列 {${arr.join(',')}} 以二元搜尋找 ${target}，共需比較幾次？`,code:null,opts,a:opts.indexOf(String(cnt)),exp:`二元搜尋每次砍半，共比較 ${cnt} 次找到目標值 ${target}。`};},
+()=>{const n=rnd(3,6);const arr=Array.from({length:n},()=>rnd(1,10));let passes=0,a=[...arr];const isSorted=arr2=>arr2.every((v,i)=>i===0||arr2[i-1]<=v);const trace=[arr.join(',')];while(!isSorted(a)){for(let j=0;j<a.length-1;j++){if(a[j]>a[j+1]){[a[j],a[j+1]]=[a[j+1],a[j]];}}passes++;trace.push(a.join(','));}const ans=String(passes);const s=new Set([ans]);const ws=[];for(const v of[String(passes+1),String(n-1),String(n),String(Math.max(1,passes-1))].filter(v=>!s.has(v)&&s.add(v))){ws.push(v);if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(passes+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([ans,...ws]);return{ch:4,diff:3,q:`陣列 {${arr.join(',')}} 進行 Bubble Sort，至少需要幾趟（passes）資料才會完全排序？`,code:null,opts,a:opts.indexOf(ans),exp:`Bubble Sort 逐趟追蹤：\n${trace.map((s,i)=>`  趟 ${i}: [${s}]`).join('\n')}\n共需 ${passes} 趟資料才完全排序。`};},
+()=>{const n=rnd(4,8);const arr=Array.from({length:n},(_,i)=>rnd(i*3+1,i*3+3));const target=pick(arr);let lo=0,hi=n-1,cnt=0,found=-1;while(lo<=hi){cnt++;const mid=Math.floor((lo+hi)/2);if(arr[mid]===target){found=mid;break;}else if(arr[mid]<target)lo=mid+1;else hi=mid-1;}const s=new Set([String(cnt)]);const ws=[];for(const v of[cnt-1||1,cnt+1,n,Math.ceil(Math.log2(n+1))].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(cnt+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(cnt),...ws]);return{ch:4,diff:3,q:`對排序陣列 <code>{${arr.join(',')}}</code> 以二元搜尋找 <strong>${target}</strong>，從 lo=0、hi=${n-1} 開始追蹤，共需比較幾次？`,code:null,opts,a:opts.indexOf(String(cnt)),exp:`二元搜尋追蹤（lo=0, hi=${n-1}）：每次取 mid=(lo+hi)/2 比較。共比較 ${cnt} 次找到 ${target}。`};},
 ()=>{const n=rnd(3,5);const arr=Array.from({length:n},(_,i)=>i+1);const rotate=1;const rotated=[arr[n-rotate],...arr.slice(0,n-rotate)];const ans=rotated.join(' ');const s=new Set([ans]);const ws=[];[[...arr.slice(1),arr[0]].join(' '),arr.join(' '),[...arr].reverse().join(' ')].filter(v=>!s.has(v)&&s.add(v)).forEach(v=>{if(ws.length<3)ws.push(v);});while(ws.length<3)ws.push(String(ws.length));const opts=shuf([ans,...ws.slice(0,3)]);return{ch:4,diff:3,q:'下列 C 程式執行後陣列輸出為何？（陣列右移一位）',code:`int a[]={${arr.join(',')}},n=${n},t=a[n-1];\nfor(int i=n-1;i>0;i--) a[i]=a[i-1];\na[0]=t;\nfor(int i=0;i<n;i++) printf("%d ",a[i]);`,opts,a:opts.indexOf(ans),exp:`最後一個元素 ${arr[n-1]} 移到 a[0]，其餘右移一位：{${arr.join(',')}}→{${rotated.join(',')}}。`};},
 ()=>{const n=rnd(4,7);const arr1=Array.from({length:Math.floor(n/2)},(_,i)=>i*2+1);const arr2=Array.from({length:Math.ceil(n/2)},(_,i)=>i*2+2);const merged=[...arr1,...arr2].sort((a,b)=>a-b);const ans=merged.join(',');const s=new Set([ans]);const ws=[];[[...arr1,...arr2].join(','),[...arr2,...arr1].join(',')].filter(v=>!s.has(v)&&s.add(v)).forEach(v=>{if(ws.length<3)ws.push(v);});while(ws.length<3)ws.push(String(ws.length));const opts=shuf([ans,...ws.slice(0,3)]);return{ch:4,diff:3,q:`已排序陣列 {${arr1.join(',')}} 和 {${arr2.join(',')}} 合併後的正確結果為何？`,code:null,opts,a:opts.indexOf(ans),exp:`合併排序（merge）：兩個已排序陣列合併，依序比較取小，結果：{${ans}}。`};},
-()=>{const n=rnd(5,9);const arr=Array.from({length:n},()=>rnd(1,50));const target=pick(arr);let lo=0,hi=n-1;const sarr=[...arr].sort((a,b)=>a-b);const sTarget=sarr.indexOf(target);let lo2=0,hi2=sarr.length-1,steps=0;while(lo2<=hi2){steps++;const mid=Math.floor((lo2+hi2)/2);if(sarr[mid]===target)break;else if(sarr[mid]<target)lo2=mid+1;else hi2=mid-1;}const linSteps=arr.indexOf(target)+1;const s=new Set([String(steps)]);const ws=[];for(const v of [linSteps,steps+1,steps-1||1,n].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(steps+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(steps),...ws]);return{ch:4,diff:3,q:`下列何者是對「已排序」陣列搜尋最有效率的方法，且對 ${n} 個元素搜尋 ${target} 需幾次比較？`,code:null,opts,a:opts.indexOf(String(steps)),exp:`二元搜尋對已排序陣列最有效：O(log n)。搜尋 ${target} 需 ${steps} 次比較。線性搜尋需 ${linSteps} 次。`};},
+()=>{const n=rnd(5,15);const worstCase=Math.ceil(Math.log2(n+1));const s=new Set([String(worstCase)]);const ws=[];for(const v of [worstCase+1,worstCase-1||1,n,Math.floor(n/2)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(worstCase+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(worstCase),...ws]);return{ch:4,diff:3,q:`對「已排序」的 ${n} 個元素陣列進行二元搜尋，最壞情況需要比較幾次？`,code:null,opts,a:opts.indexOf(String(worstCase)),exp:`二元搜尋每次砍半，最壞情況需 ⌈log₂(${n}+1)⌉ = ⌈log₂(${n+1})⌉ = ${worstCase} 次比較。\n（線性搜尋最壞需 ${n} 次，效率較差）`};},
 ()=>{const n=rnd(3,6);const mat=Array.from({length:n},()=>Array.from({length:n},()=>rnd(1,5)));const trace=Array.from({length:n},(_,i)=>mat[i][i]).reduce((a,b)=>a+b,0);const s=new Set([String(trace)]);const ws=[];for(const v of [trace+1,trace-1,n*n,trace*2].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(trace+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(trace),...ws]);const initCode=mat.map((r,i)=>r.map((v,j)=>`a[${i}][${j}]=${v}`).join(';')).join(';\n');return{ch:4,diff:3,q:`下列 ${n}x${n} 矩陣對角線元素之和為何？`,code:`int a[${n}][${n}]={{${mat.map(r=>r.join(',')).join('},{')}}};\nint s=0;\nfor(int i=0;i<${n};i++) s+=a[i][i];\nprintf("%d",s);`,opts,a:opts.indexOf(String(trace)),exp:`對角線元素 a[0][0]+a[1][1]+...+a[${n-1}][${n-1}] = ${Array.from({length:n},(_,i)=>mat[i][i]).join('+')} = ${trace}。`};},
 ()=>{const n=rnd(3,6);const arr=Array.from({length:n},(_,i)=>(i+1)*2);const insert=rnd(1,n*2+1);let pos=0;while(pos<n&&arr[pos]<insert)pos++;const result=[...arr.slice(0,pos),insert,...arr.slice(pos)];const ans=result.slice(0,n+1).join(' ');const s=new Set([ans]);const ws=[];[[insert,...arr].join(' '),[...arr,insert].join(' '),[...arr].join(' ')].filter(v=>!s.has(v)&&s.add(v)).forEach(v=>{if(ws.length<3)ws.push(v);});while(ws.length<3)ws.push(String(ws.length));const opts=shuf([ans,...ws.slice(0,3)]);return{ch:4,diff:3,q:`將 ${insert} 插入已排序陣列 {${arr.join(',')}} 後的結果為何？`,code:null,opts,a:opts.indexOf(ans),exp:`找到插入位置（第 ${pos} 個位置），將後面元素右移，插入 ${insert}。結果：{${ans.replace(/ /g,',')}}。`};},
 ()=>{const n=rnd(3,5);const arr=Array.from({length:n},(_,i)=>i+1);const tgt=pick(arr);const dupIdx=rnd(0,n-1);arr[dupIdx]=tgt;const cnt=arr.filter(v=>v===tgt).length;const s=new Set([String(cnt)]);const ws=[];for(const v of [cnt-1||1,cnt+1,1,n].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(cnt+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(cnt),...ws]);return{ch:4,diff:3,q:'下列 C 程式執行後 cnt 的值為何？',code:`int a[]={${arr.join(',')}},cnt=0;\nfor(int i=0;i<${n};i++)\n  if(a[i]==${tgt}) cnt++;\nprintf("%d",cnt);`,opts,a:opts.indexOf(String(cnt)),exp:`在 {${arr.join(',')}} 中搜尋 ${tgt}：出現 ${cnt} 次。`};},
@@ -2385,7 +2387,7 @@ const GEN = [
 ()=>{const x=rnd(5,15);const s=new Set([String(x+1)]);const ws=[];for(const v of[x,x+2,x-1].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(x+_x+3);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(x+1),...ws]);return{ch:2,diff:2,q:'下列 C 程式執行後 x 的值為何？',code:`int x=${x};\nx++;\nprintf("%d",x);`,opts,a:opts.indexOf(String(x+1)),exp:`x++ 是後置遞增：執行後 x 從 ${x} 變為 ${x+1}。最終輸出 ${x+1}。`};},
 // Ch2 ⭐⭐⭐ 挑戰 +10
 ()=>{const a=rnd(1,255);const comp=~a&0xFF;const s=new Set([String(comp)]);const ws=[];for(const v of[a,255-a+1,comp+1,comp-1<0?comp+2:comp-1].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(comp+_x+3);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(comp),...ws]);return{ch:2,diff:3,q:`8 位元表示中，~${a}（位元 NOT）的無號結果為何？`,code:null,opts,a:opts.indexOf(String(comp)),exp:`~${a}：將 ${a}(${a.toString(2).padStart(8,'0')}₂) 每位反轉 = ${comp.toString(2).padStart(8,'0')}₂ = ${comp}（無號 8 位元）。`};},
-()=>{const a=rnd(0,7);const ans=(a&1)===1?'奇數':'偶數';const opts=['奇數','偶數','0','1'];const optsFmt=shuf(opts);return{ch:2,diff:3,q:`已知 n=${a}，運算式 n & 1 可以判斷什麼？`,code:null,opts:optsFmt,a:optsFmt.indexOf(ans),exp:`n & 1 取最低位元：若最低位為 1 是奇數，為 0 是偶數。${a} & 1 = ${a&1}（${ans}）。`};},
+()=>{const a=rnd(2,15);const ans=(a&1)===1?'奇數':'偶數';const wrongParity=ans==='奇數'?'偶數':'奇數';const opts=[ans,wrongParity,'總是 0','總是 1'];const optsFmt=shuf(opts);return{ch:2,diff:3,q:`已知 n=${a}，由運算式 <code>n & 1</code> 的結果，可判斷 n 是：`,code:null,opts:optsFmt,a:optsFmt.indexOf(ans),exp:`n & 1 取最低位元：若結果為 1 表示 n 是奇數；為 0 表示 n 是偶數。\n${a} & 1 = ${a&1}，所以 n=${a} 是${ans}。`};},
 ()=>{const n=rnd(1,8);const ans=!(n&(n-1))&&n>0?'是 2 的次方':'不是 2 的次方';const isPow2=!(n&(n-1))&&n>0;const opts=['是 2 的次方','不是 2 的次方','n 為偶數','n 為奇數'];const optsFmt=shuf(opts);return{ch:2,diff:3,q:`運算式 (n & (n-1)) == 0 對 n=${n} 的結果，表示什麼？`,code:null,opts:optsFmt,a:optsFmt.indexOf(ans),exp:`n & (n-1)：若 n 是 2 的次方，二進位只有一個 1，n-1 的那個 1 就變成 0，AND 後為 0。n=${n}(${n.toString(2)})：${isPow2?'是 2 的次方（'+ans+'）':'不是 2 的次方（'+ans+'）'}。`};},
 ()=>{const a=rnd(10,20),b=rnd(10,20);let tempA=a,tempB=b;tempA^=tempB;tempB^=tempA;tempA^=tempB;const correct=`a=${tempA},b=${tempB}`;const s=new Set([correct]);const ws=[];for(const v of[`a=${a},b=${b}`,`a=${b},b=${a}`,`a=${a^b},b=${b}`].filter(v=>!s.has(v)&&s.add(v))){ws.push(v);if(ws.length===3)break;}while(ws.length<3)ws.push('a=0,b='+String(ws.length));const optsFmt=shuf([correct,...ws.slice(0,3)]);return{ch:2,diff:3,q:'下列 C 程式執行後 a, b 的值為何？（XOR 交換法）',code:`int a=${a},b=${b};\na=a^b; b=b^a; a=a^b;\nprintf("a=%d,b=%d",a,b);`,opts:optsFmt,a:optsFmt.indexOf(correct),exp:'XOR 交換後 a 和 b 互換。a='+String(tempA)+', b='+String(tempB)+'。'};},
 ()=>{const x=rnd(100,200);const mask=0x0F;const ans=x&mask;const s=new Set([String(ans)]);const ws=[];for(const v of[x>>4,ans+1,ans-1<0?ans+2:ans-1,mask].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(ans+_x+3);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:3,q:`x = ${x}，x & 0x0F 的結果為何？（取低 4 位）`,code:null,opts,a:opts.indexOf(String(ans)),exp:`0x0F = 00001111₂。AND 遮罩取低 4 位：${x}(${x.toString(2)}) & 0x0F = ${ans}。`};},
@@ -2584,8 +2586,25 @@ let G = {
   exams:[]
 };
 const SK = 'hs_prog_test_v1';
-function save(){ try{ localStorage.setItem(SK, JSON.stringify({exams:G.exams, lang:G.lang, diff:G.diff})); }catch(e){} }
-function load(){ try{ const d=JSON.parse(localStorage.getItem(SK)||'{}'); G.exams=d.exams||[]; if(d.lang) G.lang=d.lang; if(d.diff) G.diff=d.diff; }catch(e){ G.exams=[]; } }
+const APP_VERSION = 'v20260525-1207';  // 升級時自動清除舊資料
+function save(){ try{ localStorage.setItem(SK, JSON.stringify({version:APP_VERSION, exams:G.exams, lang:G.lang, diff:G.diff})); }catch(e){} }
+function load(){
+  try{
+    const d=JSON.parse(localStorage.getItem(SK)||'{}');
+    // 版本不符 → 強制清除舊考試紀錄（避免舊版 bug 的 q.a 被當正解）
+    if(d.version !== APP_VERSION){
+      console.log('[版本升級] 從', d.version || '(無)', '→', APP_VERSION, '，清除舊考試紀錄');
+      G.exams = [];
+      if(d.lang) G.lang = d.lang;
+      if(d.diff) G.diff = d.diff;
+      save();  // 立刻寫入新版本
+      return;
+    }
+    G.exams=d.exams||[];
+    if(d.lang) G.lang=d.lang;
+    if(d.diff) G.diff=d.diff;
+  }catch(e){ G.exams=[]; }
+}
 
 /* ============ DIFFICULTY ============ */
 /* 自動判斷題目難度（1=輕鬆, 2=簡單, 3=超難） */
@@ -2681,6 +2700,18 @@ function autoInit(){
   renderExamHome();
   renderExamHist();
   updateLocalViews();
+  // 清除歷史按鈕
+  const ch = document.getElementById('clear-history');
+  if(ch) ch.addEventListener('click', (e)=>{
+    e.preventDefault();
+    if(confirm('確定要清除所有舊考試紀錄嗎？\n（舊版本可能有答案錯誤的快取資料，清除後重新作答會用最新的題目邏輯）')){
+      G.exams = [];
+      save();
+      renderExamHome();
+      renderExamHist();
+      alert('已清除。請重新作答！');
+    }
+  });
 }
 // 保留 doLogin 名稱以避免其他地方意外引用，但實際無作用
 function doLogin(){ autoInit(); }
