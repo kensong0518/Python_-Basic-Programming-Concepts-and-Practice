@@ -1537,7 +1537,9 @@ const GEN = [
       code:`int cnt = 0;\nfor (int i = 1; i < n; i *= 2)\n  for (int j = 0; j < i; j++)\n    cnt++;`,
       opts:['3','7','8','15'], a:1,
       exp:'外層 i 從 1 倍增：1, 2, 4（下一輪 i=8 不再進入）\n  內層 j 跑 i 次。\n  總和 = 1 + 2 + 4 = 7\n  一般式：1+2+4+…+2^(k-1) = 2^k - 1，其中 2^k ≥ n。本題 n=8，2^k = 8 → cnt = 8-1 = 7。\n  時間複雜度為 O(n)（幾何級數收斂），常被誤認為 O(n log n)。'};
-  },
+  }
+
+,
 
   /* ============ APCS 第8章資料結構整合題庫（25 題參數化擴充）============ */
 
@@ -1845,7 +1847,9 @@ const GEN = [
       opts, a: opts.indexOf(reversed),
       exp:`LIFO：堆疊由下到上依序為 ${a[0]}, ${a[1]}, ${a[2]}。連續三次 pop 依序取出最上面：${a[2]} → ${a[1]} → ${a[0]}。輸出：${reversed}`
     };
-  },
+  }
+
+,
   /* ============ 基礎入門題（超簡單）============ */
 
   // 整數加法
@@ -1991,7 +1995,9 @@ const GEN = [
       code:`int sum = 0;\nfor (int i = 1; i <= ${n}; i++) {\n    sum = sum + i;\n}`,
       opts, a:opts.indexOf(String(total)),
       exp:`sum 從 0 開始，每次把 i 加進去。\n${Array.from({length:n},(_,k)=>{const cur=(k+1)*(k+2)/2;const prev=k*(k+1)/2;return`  i=${k+1}：sum = ${prev} + ${k+1} = ${cur}`;}).join('\n')}\n最終 sum = ${total}。`};
-  },
+  }
+
+,
   /* ===== Ch3 流程控制 ⭐ 基礎（概念題）===== */
   ()=>({ ch:3, q:'C 語言中，<code>for</code> 迴圈的哪一個部分決定迴圈是否繼續執行？',
     code:null, opts:['初始化','條件判斷','更新式','迴圈本體'], a:1,
@@ -2168,6 +2174,8 @@ const GEN = [
   ()=>({ ch:7, diff:1, q:'Heap（堆積）是哪種資料結構？',
     code:null, opts:['線性串列','完全二元樹（Complete Binary Tree）','二元搜尋樹','Graph（圖）'], a:1,
     exp:'Heap 是以「完全二元樹」為基礎實作的資料結構。Max-Heap 保證父節點 ≥ 子節點（根是最大值），Min-Heap 相反。' }),
+
+,
   /* ── Ch2 ⭐⭐⭐ 挑戰（補 9 題）── */
   ()=>{const x=rnd(5,30);const a1=x&(x-1),a2=x|(x+1);const c=`${a1} ${a2}`;const s=new Set([c]);const ws=[];for(const v of[`${x-1} ${x}`,`${x} ${x+1}`,`${a1+1} ${a2-1}`,`${x^1} ${x+2}`]){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=`${x+ws.length} ${x}`;if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([c,...ws]);return{ch:2,diff:3,q:'下列 C 程式輸出為何？',code:`int x = ${x};\nprintf("%d %d", x & (x-1), x | (x+1));`,opts,a:opts.indexOf(c),exp:`x=${x}。x&(x-1)清除最低位1→${a1}；x|(x+1)設定最低位0→${a2}。`};},
   ()=>{const a=rnd(2,9),b=rnd(2,9);const trap=a+b*a+b;const macro=(a+b)*(a+b);const s=new Set([String(trap)]);const ws=[];for(const v of[String(macro),String(a+b*b),String(a+b+1),String(trap-1)]){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(trap+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(trap),...ws]);return{ch:2,diff:3,q:'下列 C 程式輸出為何？（注意巨集展開）',code:`#define MUL(x) x*x\nprintf("%d", MUL(${a}+${b}));`,opts,a:opts.indexOf(String(trap)),exp:`MUL(${a}+${b})展開→${a}+${b}*${a}+${b}（無括號）。運算：${b}*${a}=${b*a}，${a}+${b*a}+${b}=${trap}。`};},
@@ -2178,6 +2186,7 @@ const GEN = [
   ()=>{const a=rnd(2,9),b=rnd(2,9),c=rnd(2,9);const ans=a*(b+c);const wrong1=a*b+c,wrong2=a+b*c,wrong3=a*b+a*c+1;const s=new Set([String(ans)]);const ws=[];for(const v of[wrong1,wrong2,wrong3,ans+1].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:3,q:'下列 C 程式輸出為何？（注意括號）',code:`int a=${a},b=${b},c=${c};\nprintf("%d", a*(b+c));`,opts,a:opts.indexOf(String(ans)),exp:`括號優先：先算 b+c=${b+c}，再乘 a=${a}，得 ${ans}。`};},
   ()=>{const x=rnd(5,20),n=rnd(1,4);const ans=(x>>n);const s=new Set([String(ans)]);const ws=[];for(const v of[String(x<<n),String(ans+1),String(ans-1),String(n)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:3,q:'下列 C 程式輸出為何？',code:`int x = ${x};\nprintf("%d", x >> ${n});`,opts,a:opts.indexOf(String(ans)),exp:`>> 是右移運算：${x} >> ${n} = ${x}/2^${n} = ${ans}（整數，捨去小數）。`};},
   ()=>{const a=rnd(2,6),b=rnd(2,6);const ans=a^b;const s=new Set([String(ans)]);const ws=[];for(const v of[String(a&b),String(a|b),String(ans+1),String(ans-1)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:3,q:'下列 C 程式輸出為何？（位元 XOR）',code:`int a=${a}, b=${b};\nprintf("%d", a ^ b);`,opts,a:opts.indexOf(String(ans)),exp:`XOR：相同為 0，不同為 1。${a}(${a.toString(2)}) ^ ${b}(${b.toString(2)}) = ${ans.toString(2)} = ${ans}。`};},
+
   /* ── Ch3 ⭐ 基礎（補 4 題）── */
   ()=>({ch:3,q:'關於 C 語言中的 <code>if-else</code>，下列敘述何者正確？',code:null,opts:['if 區塊一定要有對應的 else','else 不是必要的，if 可以獨立使用','if 條件必須是整數','else 區塊一定先執行'],a:1,exp:'if 可以單獨存在，不必配 else。只有在需要「條件不成立時做另一件事」才加 else。'}),
   ()=>({ch:3,q:'下列哪一種迴圈「保證至少執行一次主體」？',code:null,opts:['for','while','do-while','if-else'],a:2,exp:'do-while 的特性：先執行主體，之後才判斷條件。不管條件是否成立，主體至少執行一次。for 和 while 都是先判斷再執行。'}),
@@ -2214,8 +2223,12 @@ const GEN = [
   ()=>{const a=rnd(5,15),b=rnd(5,15);const ans=`${a*2} ${b*2}`;const s=new Set([ans]);const ws=[];for(const v of[`${a} ${b}`,`${a+b} ${a+b}`,`${a*2} ${b}`,`${a} ${b*2}`]){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}const opts=shuf([ans,...ws]);return{ch:6,diff:3,cppOnly:true,q:'下列 C 程式輸出為何？',code:`void dbl(int *x){ *x *= 2; }\nint a=${a},b=${b};\ndbl(&a); dbl(&b);\nprintf("%d %d",a,b);`,opts,a:opts.indexOf(ans),exp:`傳址呼叫：dbl(&a) 讓 *x=&a，*x*=2 即 a*=2=${a*2}。dbl(&b) 同理 b=${b*2}。`};},
   ()=>{const n=rnd(3,6),val=rnd(2,5);const arr=Array.from({length:n},(_,i)=>val*(i+1));const ans=arr.reduce((a,b)=>a+b,0);const s=new Set([String(ans)]);const ws=[];for(const v of[ans-val,ans+val,arr[0]*n,val*n*n].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:6,diff:3,cppOnly:true,q:'下列 C 程式輸出為何？（指標走訪陣列）',code:`int a[]={${arr.join(',')}},s=0;\nfor(int *p=a;p<a+${n};p++) s+=*p;\nprintf("%d",s);`,opts,a:opts.indexOf(String(ans)),exp:`指標 p 從 a[0] 走到 a[${n-1}]，逐一累加。總和=${arr.join('+')}=${ans}。`};},
   ()=>{const a=rnd(3,15),b=rnd(3,15);const ans=`${b} ${a}`;const s=new Set([ans]);const ws=[];for(const v of[`${a} ${b}`,`${a+b} ${b-a}`,`${b} ${b}`].filter(v=>!s.has(v)&&s.add(v))){ws.push(v);}while(ws.length<3){const e=String(ws.length)+' '+String(a);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([ans,...ws.slice(0,3)]);return{ch:6,diff:3,cppOnly:true,q:'下列 C 程式輸出為何？',code:`int a=${a},b=${b};\nint **pp;\nint *p=&a;\npp=&p;\n*(*pp)=b;\np=&b;\n*(*pp)=a;\nprintf("%d %d",a,b);`,opts,a:opts.indexOf(ans),exp:`pp→p→a。*(*pp)=b 即 a=b=${b}。然後 p=&b；*(*pp)=a 即 b=a=${a}（但 a 已是 ${b}！）。最終 a=${b}，b=${a}。輸出：${b} ${a}。`};},
+
+,
   ()=>({ch:5,diff:1,q:'C 語言函式中，<code>return</code> 的主要作用是？',code:null,opts:['宣告一個新變數','結束函式並回傳值給呼叫者','重複執行函式','跳過函式中的某段程式碼'],a:1,exp:'return 將函式的執行結果（值）回傳給呼叫者，並立即結束函式。若函式宣告為 void，可以直接寫 return; 不帶值。'}),
-  ()=>({ch:5,diff:1,q:'關於「函式多載 (function overloading)」，下列敘述何者正確？',code:null,opts:['C 語言支援，C++ 不支援','兩個函式名稱相同但參數不同，C++ 允許','一個函式可以有無限個回傳型別','函式多載讓函式執行更快'],a:1,exp:'函式多載：C++ 允許定義同名函式，只要「參數的個數或型別不同」即可。C 語言不支援。呼叫時，編譯器根據傳入的參數自動選擇正確的版本。'}),
+  ()=>({ch:5,diff:1,q:'關於「函式多載 (function overloading)」，下列敘述何者正確？',code:null,opts:['C 語言支援，C++ 不支援','兩個函式名稱相同但參數不同，C++ 允許','一個函式可以有無限個回傳型別','函式多載讓函式執行更快'],a:1,exp:'函式多載：C++ 允許定義同名函式，只要「參數的個數或型別不同」即可。C 語言不支援。呼叫時，編譯器根據傳入的參數自動選擇正確的版本。'})
+,
+,
 // Ch3 ⭐ 基礎
 ()=>({ch:3,diff:1,q:'for 迴圈 for(i=1; i<=5; i++) 共執行幾次？',code:null,opts:['4','5','6','無限次'],a:1,exp:'i 從 1 到 5，每次加 1，共執行 i=1,2,3,4,5 → 5 次。'}),
 ()=>({ch:3,diff:1,q:'while 迴圈在什麼條件下「一次都不執行」？',code:null,opts:['條件一開始就為 false（0）','條件為 true','迴圈內有 continue','迴圈沒有 break'],a:0,exp:'while 先判斷條件再執行。若條件一開始就是 false（0），主體一次都不會執行。do-while 才保證至少執行一次。'}),
@@ -2386,13 +2399,13 @@ const GEN = [
 ()=>{const a=rnd(1,255);const comp=~a&0xFF;const s=new Set([String(comp)]);const ws=[];for(const v of[a,255-a+1,comp+1,comp-1<0?comp+2:comp-1].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(comp+ws.length+3);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(comp),...ws]);return{ch:2,diff:3,q:`8 位元表示中，~${a}（位元 NOT）的無號結果為何？`,code:null,opts,a:opts.indexOf(String(comp)),exp:`~${a}：將 ${a}(${a.toString(2).padStart(8,'0')}₂) 每位反轉 = ${comp.toString(2).padStart(8,'0')}₂ = ${comp}（無號 8 位元）。`};},
 ()=>{const a=rnd(0,7);const ans=(a&1)===1?'奇數':'偶數';const opts=['奇數','偶數','0','1'];const optsFmt=shuf(opts);return{ch:2,diff:3,q:`已知 n=${a}，運算式 n & 1 可以判斷什麼？`,code:null,opts:optsFmt,a:optsFmt.indexOf(ans),exp:`n & 1 取最低位元：若最低位為 1 是奇數，為 0 是偶數。${a} & 1 = ${a&1}（${ans}）。`};},
 ()=>{const n=rnd(1,8);const ans=!(n&(n-1))&&n>0?'是 2 的次方':'不是 2 的次方';const isPow2=!(n&(n-1))&&n>0;const opts=['是 2 的次方','不是 2 的次方','n 為偶數','n 為奇數'];const optsFmt=shuf(opts);return{ch:2,diff:3,q:`運算式 (n & (n-1)) == 0 對 n=${n} 的結果，表示什麼？`,code:null,opts:optsFmt,a:optsFmt.indexOf(ans),exp:`n & (n-1)：若 n 是 2 的次方，二進位只有一個 1，n-1 的那個 1 就變成 0，AND 後為 0。n=${n}(${n.toString(2)})：${isPow2?'是 2 的次方（'+ans+'）':'不是 2 的次方（'+ans+'）'}。`};},
-()=>{const a=rnd(10,20),b=rnd(10,20);let tempA=a,tempB=b;tempA^=tempB;tempB^=tempA;tempA^=tempB;const correct=`a=${tempA},b=${tempB}`;const s=new Set([correct]);const ws=[];for(const v of[`a=${a},b=${b}`,`a=${b},b=${a}`,`a=${a^b},b=${b}`].filter(v=>!s.has(v)&&s.add(v))){ws.push(v);if(ws.length===3)break;}while(ws.length<3)ws.push('a=0,b='+String(ws.length));const optsFmt=shuf([correct,...ws.slice(0,3)]);return{ch:2,diff:3,q:'下列 C 程式執行後 a, b 的值為何？（XOR 交換法）',code:`int a=${a},b=${b};\na=a^b; b=b^a; a=a^b;\nprintf("a=%d,b=%d",a,b);`,opts:optsFmt,a:optsFmt.indexOf(correct),exp:'XOR 交換後 a 和 b 互換。a='+String(tempA)+', b='+String(tempB)+'。'};},
+()=>{const a=rnd(10,20),b=rnd(10,20);let tempA=a,tempB=b;tempA^=tempB;tempB^=tempA;tempA^=tempB;const correct=`a=${tempA},b=${tempB}`;const s=new Set([correct]);const ws=[];for(const v of[`a=${a},b=${b}`,`a=${b},b=${a}`,`a=${a^b},b=${b}`].filter(v=>!s.has(v)&&s.add(v))){ws.push(v);if(ws.length===3)break;}while(ws.length<3)ws.push('a=0,b='+String(ws.length));const optsFmt=shuf([correct,...ws.slice(0,3)]);return{ch:2,diff:3,q:'下列 C 程式執行後 a, b 的值為何？（XOR 交換法）',code:`int a=${a},b=${b};\na=a^b; b=b^a; a=a^b;\nprintf("a=%d,b=%d",a,b);`,opts:optsFmt,a:optsFmt.indexOf(correct),exp:'XOR 交換後 a 和 b 互換。a='+String(tempA)+', b='+String(tempB)+'。'};},,
 ()=>{const x=rnd(100,200);const mask=0x0F;const ans=x&mask;const s=new Set([String(ans)]);const ws=[];for(const v of[x>>4,ans+1,ans-1<0?ans+2:ans-1,mask].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+3);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:3,q:`x = ${x}，x & 0x0F 的結果為何？（取低 4 位）`,code:null,opts,a:opts.indexOf(String(ans)),exp:`0x0F = 00001111₂。AND 遮罩取低 4 位：${x}(${x.toString(2)}) & 0x0F = ${ans}。`};},
 ()=>{const a=rnd(5,20),b=rnd(5,20);const res=a>b&&b>0?'A':a<b||b>10?'B':'C';const optsFmt=shuf(['A','B','C','D']);return{ch:2,diff:3,q:`已知 a=${a}, b=${b}，下列 C 程式輸出為何？`,code:`int a=${a}, b=${b};\nif(a>b && b>0) printf("A");\nelse if(a<b || b>10) printf("B");\nelse printf("C");`,opts:optsFmt,a:optsFmt.indexOf(res),exp:'依序判斷條件：a>b&&b>0→'+String(a>b&&b>0)+', a<b||b>10→'+String(a<b||b>10)+'。輸出：'+res+'。'};},
 ()=>{const x=rnd(1,10),y=rnd(1,10);const a=Number(!x),b=Number(!y),ans=Number(a||b);const s=new Set([String(ans)]);const ws=['0','1','2','非零'].filter(v=>v!==String(ans));const opts=shuf([String(ans),...ws.slice(0,3)]);return{ch:2,diff:3,q:`已知 x=${x}, y=${y}，表達式 !x || !y 的值為何？`,code:null,opts,a:opts.indexOf(String(ans)),exp:`!x = !${x} = ${Number(!x)}，!y = !${y} = ${Number(!y)}。${Number(!x)} || ${Number(!y)} = ${ans}。`};},
 ()=>{const a=rnd(2,9),b=rnd(2,9),c=rnd(2,9),d=rnd(2,9);const ans=((a+b)*(c-d));const s=new Set([String(ans)]);const ws=[];for(const v of[ans+1,ans-1,a*c+b*d,(a+b)+(c-d)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:3,q:`計算 (${a}+${b})*(${c}-${d}) 的結果為何？`,code:null,opts,a:opts.indexOf(String(ans)),exp:`先算括號：(${a}+${b})=${a+b}，(${c}-${d})=${c-d}。再乘：${a+b}×${c-d}=${ans}。`};},
 ()=>{const n=rnd(4,8);const flag=rnd(0,n-1);const bit=1<<flag;const x=rnd(0,255)&~bit;const ans=x|bit;const s=new Set([String(ans)]);const ws=[];for(const v of[ans+1,ans-1,x,bit].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(ans+ws.length+3);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:3,q:`x = ${x}，要設定第 ${flag} 個 bit（從 0 計）為 1，結果為何？`,code:null,opts,a:opts.indexOf(String(ans)),exp:`設定第 ${flag} 位：x | (1 << ${flag}) = ${x} | ${bit} = ${x.toString(2).padStart(8,'0')} | ${bit.toString(2).padStart(8,'0')} = ${ans.toString(2).padStart(8,'0')} = ${ans}。`};},
-()=>{const a=rnd(10,50),b=rnd(10,50);const ans=a>b?1:(a<b?-1:0);const comp=a>b?'a>b':a<b?'a<b':'a==b';const s=new Set([String(ans)]);const ws=[-1,0,1].filter(v=>v!==ans).map(String);while(ws.length<3)ws.push(String(2+ws.length));const opts=shuf([String(ans),...ws.slice(0,3)]);return{ch:2,diff:3,q:`三元運算式：(${a}>=${b}) ? 1 : (${a}<${b}) ? -1 : 0 的結果為何？`,code:null,opts,a:opts.indexOf(String(ans)),exp:`${a} >= ${b} 是 ${a>=b}${a>=b?'（真）→結果 1':'（假）→再判斷 '+a+'<'+b+' 是 '+a<b+(a<b?'（真）→-1':'（假）→0')}'。結果：${ans}。`};},
+()=>{const a=rnd(10,50),b=rnd(10,50);const ans=a>b?1:(a<b?-1:0);const comp=a>b?'a>b':a<b?'a<b':'a==b';const s=new Set([String(ans)]);const ws=[-1,0,1].filter(v=>v!==ans).map(String);const opts=shuf([String(ans),...ws]);return{ch:2,diff:3,q:`三元運算式：(${a}>=${b}) ? 1 : (${a}<${b}) ? -1 : 0 的結果為何？`,code:null,opts,a:opts.indexOf(String(ans)),exp:`${a} >= ${b} 是 ${a>=b}${a>=b?'（真）→結果 1':'（假）→再判斷 '+a+'<'+b+' 是 '+a<b+(a<b?'（真）→-1':'（假）→0')}'。結果：${ans}。`};},
 // Ch3 ⭐⭐⭐ 挑戰 +3
 ()=>{const n=rnd(5,15),d=rnd(2,4);let cnt=0,i=1;while(i<=n){cnt++;i+=d;}const s=new Set([String(cnt)]);const ws=[];for(const v of[cnt-1||1,cnt+1,n,Math.floor(n/d)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(cnt+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(cnt),...ws]);return{ch:3,diff:3,q:`while(i<=${n}) 且每次 i+=${d}，從 i=1 開始，共執行幾次？`,code:null,opts,a:opts.indexOf(String(cnt)),exp:`i = 1,${1+d},${1+d*2},... ≤ ${n}，共 ${cnt} 次（ceiling((${n}-1+${d})/${d}) = ${cnt}）。`};},
 ()=>{const n=rnd(3,5);let sum=0;for(let i=1;i<=n;i++)for(let j=i;j<=n;j++)sum++;const s=new Set([String(sum)]);const ws=[];for(const v of[sum+1,sum-1,n*n,n*(n+1)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}while(ws.length<3){const e=String(sum+ws.length+1);if(!s.has(e)){s.add(e);ws.push(e);}}const opts=shuf([String(sum),...ws]);return{ch:3,diff:3,q:'下列 C 程式片段中 printf 共執行幾次？',code:`for(int i=1;i<=${n};i++)\n  for(int j=i;j<=${n};j++)\n    printf("*");`,opts,a:opts.indexOf(String(sum)),exp:`j 從 i 到 ${n}：當 i=1 執行 ${n} 次, i=2 執行 ${n-1} 次,...,i=${n} 執行 1 次。合計 ${n}+${n-1}+...+1 = ${sum}。`};},
