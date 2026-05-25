@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+  <meta name="version" content="v20260525-1027" data-version="v20260525-1027">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>高中生程式能力測試（非官方）</title>
@@ -298,20 +299,20 @@ pre.code-block .cm{color:#8b949e;font-style:italic}
               <button type="button" class="diff-pill" data-d="1" id="diff-1" onclick="pickDiff(1)">
                 <span style="font-size:22px">⭐</span>
                 <span style="font-weight:700;font-size:14px">基礎</span>
-                <span style="font-size:11px;opacity:.75;line-height:1.4"><br></span>
+                <span style="font-size:11px;opacity:.75;line-height:1.4">概念問答<br>無程式碼</span>
               </button>
               <button type="button" class="diff-pill on" data-d="2" id="diff-2" onclick="pickDiff(2)">
                 <span style="font-size:22px">⭐⭐</span>
                 <span style="font-weight:700;font-size:14px">進階</span>
-                <span style="font-size:11px;opacity:.75;line-height:1.4"><br></span>
+                <span style="font-size:11px;opacity:.75;line-height:1.4">程式碼追蹤<br>4–8 行程式</span>
               </button>
               <button type="button" class="diff-pill" data-d="3" id="diff-3" onclick="pickDiff(3)">
                 <span style="font-size:22px">⭐⭐⭐</span>
                 <span style="font-weight:700;font-size:14px">挑戰</span>
-                <span style="font-size:11px;opacity:.75;line-height:1.4"><br></span>
+                <span style="font-size:11px;opacity:.75;line-height:1.4">互遞迴<br>複雜演算法</span>
               </button>
             </div>
-            <div style="margin-top:8px;font-size:11px;color:var(--dim);text-align:center">建議：初學者從 ⭐ 基礎開始，熟悉後再挑戰 ⭐⭐ 進階，熟練後再寫 ⭐⭐⭐挑戰題</div>
+            <div style="margin-top:8px;font-size:11px;color:var(--dim);text-align:center">建議：初學者從 ⭐ 基礎開始，熟悉後再挑戰 ⭐⭐ 進階</div>
           </div>
           <button class="btn btn-green full" style="font-size:15px;padding:14px" onclick="startExam()">🚀 開始模擬考試</button>
         </div>
@@ -2381,7 +2382,7 @@ const GEN = [
 ()=>{const a=rnd(1,15),b=rnd(1,15);const ans=a^b;const s=new Set([String(ans)]);const ws=[];for(const v of[a&b,a|b,ans+1,ans-1<0?ans+2:ans-1].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(ans+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:2,q:`${a} ^ ${b} 的結果（位元 XOR）為何？`,code:null,opts,a:opts.indexOf(String(ans)),exp:`${a}=${a.toString(2).padStart(4,'0')}₂，${b}=${b.toString(2).padStart(4,'0')}₂。逐位 XOR（不同取 1）：${ans.toString(2).padStart(4,'0')}₂ = ${ans}。`};},
 ()=>{const a=rnd(1,10),sh=rnd(1,3);const ans=a<<sh;const s=new Set([String(ans)]);const ws=[];for(const v of[a>>sh,ans+1,ans-1,a*sh].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(ans+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:2,q:`${a} << ${sh} 的結果（左移 ${sh} 位）為何？`,code:null,opts,a:opts.indexOf(String(ans)),exp:`左移 ${sh} 位 = 乘以 2^${sh}=${1<<sh}。${a} × ${1<<sh} = ${ans}。`};},
 ()=>{const a=rnd(8,64),sh=rnd(1,3);const ans=a>>sh;const s=new Set([String(ans)]);const ws=[];for(const v of[a<<sh,ans+1,ans-1<0?ans+2:ans-1,a*sh].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(ans+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:2,q:`${a} >> ${sh} 的結果（右移 ${sh} 位）為何？`,code:null,opts,a:opts.indexOf(String(ans)),exp:`右移 ${sh} 位 = 除以 2^${sh}=${1<<sh} 取整數。${a} ÷ ${1<<sh} = ${ans}（截斷）。`};},
-()=>{const x=rnd(5,15);const s=new Set([String(x+1)]);const ws=[];for(const v of[x,x+2,x-1].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(x+_x+3);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(x+1),...ws]);return{ch:2,diff:2,q:'下列 C 程式執行後 x 的值為何？',code:`int x=${x};\nx=x++;\nprintf("%d",x);`,opts,a:opts.indexOf(String(x+1)),exp:`x++ 是後置遞增：先用 x=${x} 完成賦值（x=x=${x}），之後 x 增加 1 成為 ${x+1}。最終輸出 ${x+1}。`};},
+()=>{const x=rnd(5,15);const s=new Set([String(x+1)]);const ws=[];for(const v of[x,x+2,x-1].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(x+_x+3);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(x+1),...ws]);return{ch:2,diff:2,q:'下列 C 程式執行後 x 的值為何？',code:`int x=${x};\nx++;\nprintf("%d",x);`,opts,a:opts.indexOf(String(x+1)),exp:`x++ 是後置遞增：執行後 x 從 ${x} 變為 ${x+1}。最終輸出 ${x+1}。`};},
 // Ch2 ⭐⭐⭐ 挑戰 +10
 ()=>{const a=rnd(1,255);const comp=~a&0xFF;const s=new Set([String(comp)]);const ws=[];for(const v of[a,255-a+1,comp+1,comp-1<0?comp+2:comp-1].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(comp+_x+3);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(comp),...ws]);return{ch:2,diff:3,q:`8 位元表示中，~${a}（位元 NOT）的無號結果為何？`,code:null,opts,a:opts.indexOf(String(comp)),exp:`~${a}：將 ${a}(${a.toString(2).padStart(8,'0')}₂) 每位反轉 = ${comp.toString(2).padStart(8,'0')}₂ = ${comp}（無號 8 位元）。`};},
 ()=>{const a=rnd(0,7);const ans=(a&1)===1?'奇數':'偶數';const opts=['奇數','偶數','0','1'];const optsFmt=shuf(opts);return{ch:2,diff:3,q:`已知 n=${a}，運算式 n & 1 可以判斷什麼？`,code:null,opts:optsFmt,a:optsFmt.indexOf(ans),exp:`n & 1 取最低位元：若最低位為 1 是奇數，為 0 是偶數。${a} & 1 = ${a&1}（${ans}）。`};},
@@ -2392,7 +2393,7 @@ const GEN = [
 ()=>{const x=rnd(1,10),y=rnd(1,10);const a=Number(!x),b=Number(!y),ans=Number(a||b);const s=new Set([String(ans)]);const ws=['0','1','2','非零'].filter(v=>v!==String(ans));const opts=shuf([String(ans),...ws.slice(0,3)]);return{ch:2,diff:3,q:`已知 x=${x}, y=${y}，表達式 !x || !y 的值為何？`,code:null,opts,a:opts.indexOf(String(ans)),exp:`!x = !${x} = ${Number(!x)}，!y = !${y} = ${Number(!y)}。${Number(!x)} || ${Number(!y)} = ${ans}。`};},
 ()=>{const a=rnd(2,9),b=rnd(2,9),c=rnd(2,9),d=rnd(2,9);const ans=((a+b)*(c-d));const s=new Set([String(ans)]);const ws=[];for(const v of[ans+1,ans-1,a*c+b*d,(a+b)+(c-d)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(ans+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:3,q:`計算 (${a}+${b})*(${c}-${d}) 的結果為何？`,code:null,opts,a:opts.indexOf(String(ans)),exp:`先算括號：(${a}+${b})=${a+b}，(${c}-${d})=${c-d}。再乘：${a+b}×${c-d}=${ans}。`};},
 ()=>{const n=rnd(4,8);const flag=rnd(0,n-1);const bit=1<<flag;const x=rnd(0,255)&~bit;const ans=x|bit;const s=new Set([String(ans)]);const ws=[];for(const v of[ans+1,ans-1,x,bit].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(ans+_x+3);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(ans),...ws]);return{ch:2,diff:3,q:`x = ${x}，要設定第 ${flag} 個 bit（從 0 計）為 1，結果為何？`,code:null,opts,a:opts.indexOf(String(ans)),exp:`設定第 ${flag} 位：x | (1 << ${flag}) = ${x} | ${bit} = ${x.toString(2).padStart(8,'0')} | ${bit.toString(2).padStart(8,'0')} = ${ans.toString(2).padStart(8,'0')} = ${ans}。`};},
-()=>{const a=rnd(10,50),b=rnd(10,50);const ans=a>b?1:(a<b?-1:0);const comp=a>b?'a>b':a<b?'a<b':'a==b';const s=new Set([String(ans)]);const ws=[-1,0,1].filter(v=>v!==ans).map(String);while(ws.length<3)ws.push(String(2+ws.length));const opts=shuf([String(ans),...ws.slice(0,3)]);return{ch:2,diff:3,q:`三元運算式：(${a}>=${b}) ? 1 : (${a}<${b}) ? -1 : 0 的結果為何？`,code:null,opts,a:opts.indexOf(String(ans)),exp:`${a} >= ${b} 是 ${a>=b}${a>=b?'（真）→結果 1':'（假）→再判斷 '+a+'<'+b+' 是 '+a<b+(a<b?'（真）→-1':'（假）→0')}'。結果：${ans}。`};},
+()=>{const a=rnd(10,50),b=rnd(10,50);const ans=a>b?1:(a<b?-1:0);const comp=a>b?'a>b':a<b?'a<b':'a==b';const s=new Set([String(ans)]);const ws=[-1,0,1].filter(v=>v!==ans).map(String);while(ws.length<3)ws.push(String(2+ws.length));const opts=shuf([String(ans),...ws.slice(0,3)]);return{ch:2,diff:3,q:`三元運算式：(${a}>=${b}) ? 1 : (${a}<${b}) ? -1 : 0 的結果為何？`,code:null,opts,a:opts.indexOf(String(ans)),exp:`${a} >= ${b} 是 ${a>=b}。結果為 ${ans}。`};},
 // Ch3 ⭐⭐⭐ 挑戰 +3
 ()=>{const n=rnd(5,15),d=rnd(2,4);let cnt=0,i=1;while(i<=n){cnt++;i+=d;}const s=new Set([String(cnt)]);const ws=[];for(const v of[cnt-1||1,cnt+1,n,Math.floor(n/d)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(cnt+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(cnt),...ws]);return{ch:3,diff:3,q:`while(i<=${n}) 且每次 i+=${d}，從 i=1 開始，共執行幾次？`,code:null,opts,a:opts.indexOf(String(cnt)),exp:`i = 1,${1+d},${1+d*2},... ≤ ${n}，共 ${cnt} 次（ceiling((${n}-1+${d})/${d}) = ${cnt}）。`};},
 ()=>{const n=rnd(3,5);let sum=0;for(let i=1;i<=n;i++)for(let j=i;j<=n;j++)sum++;const s=new Set([String(sum)]);const ws=[];for(const v of[sum+1,sum-1,n*n,n*(n+1)].map(String)){if(!s.has(v)){s.add(v);ws.push(v);}if(ws.length===3)break;}{let _x=1;while(ws.length<3){const e=String(sum+_x+1);if(!s.has(e)){s.add(e);ws.push(e);}_x++;}}const opts=shuf([String(sum),...ws]);return{ch:3,diff:3,q:'下列 C 程式片段中 printf 共執行幾次？',code:`for(int i=1;i<=${n};i++)\n  for(int j=i;j<=${n};j++)\n    printf("*");`,opts,a:opts.indexOf(String(sum)),exp:`j 從 i 到 ${n}：當 i=1 執行 ${n} 次, i=2 執行 ${n-1} 次,...,i=${n} 執行 1 次。合計 ${n}+${n-1}+...+1 = ${sum}。`};},
